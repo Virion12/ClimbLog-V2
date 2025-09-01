@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ClimbLogApi.Services
@@ -12,8 +13,8 @@ namespace ClimbLogApi.Services
         {
             _configuration = configuration;
         }
-        
-        public string GenerateToken(string username,int userId)
+
+        public string GenerateToken(string username, int userId)
         {
             var claims = new[] {
             new Claim(ClaimTypes.Name, username),
@@ -28,10 +29,15 @@ namespace ClimbLogApi.Services
                 issuer: "ImageApi",
                 audience: "ImageApiUsers",
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(8),
+                expires: DateTime.UtcNow.AddMinutes(10),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public string GenerateRefreshToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        }
+
     }
 }
