@@ -4,6 +4,7 @@ using ClimbLogApi.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ClimbLogApi.Controllers
 {
@@ -36,6 +37,65 @@ namespace ClimbLogApi.Controllers
         }
 
 
+        //ADD
+
+        [HttpPost("add-many")]
+        public async Task<IActionResult> AddManyRoutes([FromBody] AddRoutesDTO routes)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+
+            var userID = int.Parse(User.FindFirst("UserId")!.Value);
+
+            foreach (var pasedRoute in routes.Routes)
+            {
+                var route = new ClimbLogApi.Models.Route
+                {
+                    UserID = userID,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow,
+                    IsPublic = pasedRoute.IsPublic,
+                    Name = pasedRoute.Name,
+                    Color = pasedRoute.Color,
+                    Heigth = pasedRoute.Heigth,
+                    IsPowery = pasedRoute.IsPowery,
+                    IsSloppy = pasedRoute.IsSloppy,
+                    IsDynamic = pasedRoute.IsDynamic,
+                    IsCrimpy = pasedRoute.IsCrimpy,
+                    IsReachy = pasedRoute.IsReachy,
+                    IsOnsighted = pasedRoute.IsOnsighted,
+                    IsRedPointed = pasedRoute.IsRedPointed,
+                    IsFlashed = pasedRoute.IsFlashed,
+                    IsFavorite = pasedRoute.IsFavorite,
+                    NumberOfTried = pasedRoute.NumberOfTried,
+                    IsDone = pasedRoute.IsDone,
+                    Grade = pasedRoute.Grade,
+                    ImagePath = pasedRoute.ImagePath,
+                    thumbnailPath = pasedRoute.thumbnailPath
+
+                };
+
+                try
+                {
+                    _context.Routes.Add(route);
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest($"Unable to add route due to {ex.Message}");
+                }
+
+            }
+            try {
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex) { return BadRequest(ex.Message); }
+
+
+
+        }
+
         //Ok
         [HttpPost("add-one")]
         public async Task<IActionResult> AddMyRoute([FromBody] RouteDto dto)
@@ -61,7 +121,9 @@ namespace ClimbLogApi.Controllers
                 IsFavorite = dto.IsFavorite,
                 NumberOfTried = dto.NumberOfTried,
                 IsDone = dto.IsDone,
-                Grade = dto.Grade
+                Grade = dto.Grade,
+                ImagePath = dto.ImagePath,
+                thumbnailPath = dto.thumbnailPath,
             };
 
             try
@@ -75,6 +137,9 @@ namespace ClimbLogApi.Controllers
                 return BadRequest(new { message = $"Adding route failed: {ex.Message}" });
             }
         }
+
+
+        //Update
 
         //OK
         [HttpPatch("update-route-by-id")]
@@ -117,6 +182,31 @@ namespace ClimbLogApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(routeEx);
+        }
+
+        //Remove route : To Test
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteById(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("No correct id");
+            }
+
+            try
+            {
+                var route = await _context.Routes.FindAsync(id);
+                if (route == null)
+                {
+                    return BadRequest("route with provided id does not exists");
+                }
+                _context.Routes.Remove(route);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex) {
+                return BadRequest(new { message = $"Removal of route failed: {ex.Message}" });
+            }
         }
 
 
