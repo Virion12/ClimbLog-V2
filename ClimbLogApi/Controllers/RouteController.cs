@@ -87,10 +87,12 @@ namespace ClimbLogApi.Controllers
                 }
 
             }
-            try {
+            try
+            {
                 await _context.SaveChangesAsync();
                 return Ok();
-            } catch (Exception ex) { return BadRequest(ex.Message); }
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
 
 
 
@@ -140,6 +142,8 @@ namespace ClimbLogApi.Controllers
 
 
         //Update
+
+        //SyncAll : Determine if needed
 
         //OK
         [HttpPatch("update-route-by-id")]
@@ -204,8 +208,46 @@ namespace ClimbLogApi.Controllers
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new { message = $"Removal of route failed: {ex.Message}" });
+            }
+        }
+
+
+        //Remove-Bulk : To Test
+        [HttpDelete("delete-bulk")]
+        public async Task<IActionResult> DdeleteBulkByID([FromBody]List<int> ids)
+        {
+            if (ids.Count == 0)
+                return BadRequest("List of routes ");
+
+            foreach (int id in ids) {
+                try
+                {
+                    var route = await _context.Routes.FindAsync(id);
+                    if (route == null)
+                        return BadRequest("route with provided id does not exists");
+
+                    try
+                    {
+                        _context.Routes.Remove(route);
+                    }
+                    catch (Exception ex) { 
+                        return BadRequest(new { message = ex.Message });
+                    }
+                }
+                catch (Exception ex) { 
+                return BadRequest(new { message = ex.Message });
+                }
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex) {
+            return BadRequest(ex.Message);
             }
         }
 

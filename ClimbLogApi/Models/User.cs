@@ -10,6 +10,7 @@
         public string PhotoUrl { get; set; } = string.Empty;
         public double Weigth { get; set; }
         public double Heigth { get; set; }
+        public DateTime LastSync { get; set; }
         
     }
 }
