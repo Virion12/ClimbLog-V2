@@ -1,14 +1,17 @@
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
+import 'package:climblog_mobile/Widgets/LoginScreen/register_message.dart';
+import 'package:climblog_mobile/Widgets/Shared/Login&Register/logo_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:climblog_mobile/Services/AuthService.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
@@ -23,58 +26,79 @@ class _LoginScreenState extends State<LoginScreen> {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
-    final success = await AuthService().login(username, password);
-
+    final success = await ref.read(authStateProvider.notifier).login(username, password);
+    debugPrint(success.toString());
     setState(() => _loading = false);
 
-    if (success) {
-      if (context.mounted) {
-        Navigator.pushReplacementNamed(context, "/home");
-      }
-    } else {
+    if(success){
+      if (mounted) {
+       Navigator.of(context).pushNamed('/home');
+     }
+    }
+
+    if (!success) {
       setState(() {
         _errorMessage = "Invalid username or password";
       });
     }
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: "Username"),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: "Password"),
-              obscureText: true,
-            ),
-            const SizedBox(height: 24),
-            if (_loading)
-              const CircularProgressIndicator()
-            else
-              ElevatedButton(
-                onPressed: _login,
-                child: const Text("Login"),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              const LogoWidget(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(labelText: "Username"),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(labelText: "Password"),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 24),
+                  if (_loading)
+                    const CircularProgressIndicator()
+                  else
+                    ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00a896),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                        minimumSize: const Size(340, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      child: const Text("Login"),
+                    ),
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ],
               ),
-            if (_errorMessage != null) ...[
-              const SizedBox(height: 16),
-              Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.red),
-              ),
-            ]
-          ],
+            ],
+          ),
         ),
       ),
+      bottomSheet: const RegisterMessage(),
     );
   }
 }

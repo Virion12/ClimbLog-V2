@@ -72,7 +72,7 @@ namespace ClimbLogApi.Controllers
 
             await _db.SaveChangesAsync();
 
-            return Ok(new { accessToken = token, refreshToken = rawRefreshToken });
+            return Ok(new { accessToken = token, refreshToken = rawRefreshToken,});
         }
 
         [HttpPost("refresh")]
