@@ -1,3 +1,4 @@
+import 'package:climblog_mobile/Widgets/Routes/route_add_button.dart';
 import 'package:flutter/material.dart';
 
 class RoutesPage extends StatefulWidget {
@@ -10,6 +11,6 @@ class RoutesPage extends StatefulWidget {
 class _RoutesPageState extends State<RoutesPage> {
   @override
   Widget build(BuildContext context) {
-    return Text("routes");
+    return RouteAddButton();
   }
 }

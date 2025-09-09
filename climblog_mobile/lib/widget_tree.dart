@@ -13,8 +13,13 @@ class Widgettree extends ConsumerWidget {
      ref.listen(connectivityProvider, (previous, current) {
       current.whenData((isConnected) {
         if (isConnected) {
-          //Create sync data service and class
+          debugPrint("there is netowrk");
+          //Create sync function for routes
         }
+        else
+          {
+            debugPrint("there is no network");
+          }
       });
     });
     final isLogged = ref.watch(authStateProvider); 

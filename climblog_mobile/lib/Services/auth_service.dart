@@ -40,12 +40,16 @@ class AuthService {
       final data = jsonDecode(response.body);
       final refreshToken = data["refreshToken"];
       final token = data["accessToken"];
+      final userId = data["userid"];
       if (token != null && refreshToken != null) {
         await _storage.write(key: "accessToken", value: token);
         await _storage.write(key: "accessTokenExpiration", value: DateTime.now().toUtc().add(const Duration(minutes: 9)).toString());
         await _storage.write(key: "refreshToken", value: refreshToken);
         await _storage.write(key: "refreshTokenExpiration", value: DateTime.now().toUtc().add(const Duration(days: 30)).toString());
+        await _storage.write(key: "userid", value: userId.toString());
+        
         debugPrint(await _storage.read(key: "refreshTokenExpiration"));
+        debugPrint(await _storage.read(key: "userid"));
         return true;
       }
     }

@@ -18,6 +18,17 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _backendIdMeta = const VerificationMeta(
+    'backendId',
+  );
+  @override
+  late final GeneratedColumn<int> backendId = GeneratedColumn<int>(
+    'backend_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedColumn<int> userId = GeneratedColumn<int>(
@@ -319,9 +330,25 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     ),
     defaultValue: Constant(false),
   );
+  static const VerificationMeta _isAddedToBackendMeta = const VerificationMeta(
+    'isAddedToBackend',
+  );
+  @override
+  late final GeneratedColumn<bool> isAddedToBackend = GeneratedColumn<bool>(
+    'is_added_to_backend',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_added_to_backend" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    backendId,
     userId,
     isPublic,
     name,
@@ -345,6 +372,7 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     lastUpdatedAt,
     isToUpdate,
     isToDelete,
+    isAddedToBackend,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -360,6 +388,14 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('backend_id')) {
+      context.handle(
+        _backendIdMeta,
+        backendId.isAcceptableOrUnknown(data['backend_id']!, _backendIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_backendIdMeta);
     }
     if (data.containsKey('user_id')) {
       context.handle(
@@ -526,6 +562,15 @@ class $ClimbingRoutesTable extends ClimbingRoutes
         ),
       );
     }
+    if (data.containsKey('is_added_to_backend')) {
+      context.handle(
+        _isAddedToBackendMeta,
+        isAddedToBackend.isAcceptableOrUnknown(
+          data['is_added_to_backend']!,
+          _isAddedToBackendMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -538,6 +583,10 @@ class $ClimbingRoutesTable extends ClimbingRoutes
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
+      )!,
+      backendId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}backend_id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -631,6 +680,10 @@ class $ClimbingRoutesTable extends ClimbingRoutes
         DriftSqlType.bool,
         data['${effectivePrefix}is_to_delete'],
       )!,
+      isAddedToBackend: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_added_to_backend'],
+      )!,
     );
   }
 
@@ -642,6 +695,7 @@ class $ClimbingRoutesTable extends ClimbingRoutes
 
 class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
   final int id;
+  final int backendId;
   final int userId;
   final bool isPublic;
   final String name;
@@ -665,8 +719,10 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
   final DateTime lastUpdatedAt;
   final bool isToUpdate;
   final bool isToDelete;
+  final bool isAddedToBackend;
   const ClimbingRoute({
     required this.id,
+    required this.backendId,
     required this.userId,
     required this.isPublic,
     required this.name,
@@ -690,11 +746,13 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     required this.lastUpdatedAt,
     required this.isToUpdate,
     required this.isToDelete,
+    required this.isAddedToBackend,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['backend_id'] = Variable<int>(backendId);
     map['user_id'] = Variable<int>(userId);
     map['is_public'] = Variable<bool>(isPublic);
     map['name'] = Variable<String>(name);
@@ -718,12 +776,14 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     map['last_updated_at'] = Variable<DateTime>(lastUpdatedAt);
     map['is_to_update'] = Variable<bool>(isToUpdate);
     map['is_to_delete'] = Variable<bool>(isToDelete);
+    map['is_added_to_backend'] = Variable<bool>(isAddedToBackend);
     return map;
   }
 
   ClimbingRoutesCompanion toCompanion(bool nullToAbsent) {
     return ClimbingRoutesCompanion(
       id: Value(id),
+      backendId: Value(backendId),
       userId: Value(userId),
       isPublic: Value(isPublic),
       name: Value(name),
@@ -747,6 +807,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       lastUpdatedAt: Value(lastUpdatedAt),
       isToUpdate: Value(isToUpdate),
       isToDelete: Value(isToDelete),
+      isAddedToBackend: Value(isAddedToBackend),
     );
   }
 
@@ -757,6 +818,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ClimbingRoute(
       id: serializer.fromJson<int>(json['id']),
+      backendId: serializer.fromJson<int>(json['backendId']),
       userId: serializer.fromJson<int>(json['userId']),
       isPublic: serializer.fromJson<bool>(json['isPublic']),
       name: serializer.fromJson<String>(json['name']),
@@ -780,6 +842,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       lastUpdatedAt: serializer.fromJson<DateTime>(json['lastUpdatedAt']),
       isToUpdate: serializer.fromJson<bool>(json['isToUpdate']),
       isToDelete: serializer.fromJson<bool>(json['isToDelete']),
+      isAddedToBackend: serializer.fromJson<bool>(json['isAddedToBackend']),
     );
   }
   @override
@@ -787,6 +850,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'backendId': serializer.toJson<int>(backendId),
       'userId': serializer.toJson<int>(userId),
       'isPublic': serializer.toJson<bool>(isPublic),
       'name': serializer.toJson<String>(name),
@@ -810,11 +874,13 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       'lastUpdatedAt': serializer.toJson<DateTime>(lastUpdatedAt),
       'isToUpdate': serializer.toJson<bool>(isToUpdate),
       'isToDelete': serializer.toJson<bool>(isToDelete),
+      'isAddedToBackend': serializer.toJson<bool>(isAddedToBackend),
     };
   }
 
   ClimbingRoute copyWith({
     int? id,
+    int? backendId,
     int? userId,
     bool? isPublic,
     String? name,
@@ -838,8 +904,10 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     DateTime? lastUpdatedAt,
     bool? isToUpdate,
     bool? isToDelete,
+    bool? isAddedToBackend,
   }) => ClimbingRoute(
     id: id ?? this.id,
+    backendId: backendId ?? this.backendId,
     userId: userId ?? this.userId,
     isPublic: isPublic ?? this.isPublic,
     name: name ?? this.name,
@@ -863,10 +931,12 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     isToUpdate: isToUpdate ?? this.isToUpdate,
     isToDelete: isToDelete ?? this.isToDelete,
+    isAddedToBackend: isAddedToBackend ?? this.isAddedToBackend,
   );
   ClimbingRoute copyWithCompanion(ClimbingRoutesCompanion data) {
     return ClimbingRoute(
       id: data.id.present ? data.id.value : this.id,
+      backendId: data.backendId.present ? data.backendId.value : this.backendId,
       userId: data.userId.present ? data.userId.value : this.userId,
       isPublic: data.isPublic.present ? data.isPublic.value : this.isPublic,
       name: data.name.present ? data.name.value : this.name,
@@ -906,6 +976,9 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       isToDelete: data.isToDelete.present
           ? data.isToDelete.value
           : this.isToDelete,
+      isAddedToBackend: data.isAddedToBackend.present
+          ? data.isAddedToBackend.value
+          : this.isAddedToBackend,
     );
   }
 
@@ -913,6 +986,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
   String toString() {
     return (StringBuffer('ClimbingRoute(')
           ..write('id: $id, ')
+          ..write('backendId: $backendId, ')
           ..write('userId: $userId, ')
           ..write('isPublic: $isPublic, ')
           ..write('name: $name, ')
@@ -935,7 +1009,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           ..write('createdAt: $createdAt, ')
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
           ..write('isToUpdate: $isToUpdate, ')
-          ..write('isToDelete: $isToDelete')
+          ..write('isToDelete: $isToDelete, ')
+          ..write('isAddedToBackend: $isAddedToBackend')
           ..write(')'))
         .toString();
   }
@@ -943,6 +1018,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
   @override
   int get hashCode => Object.hashAll([
     id,
+    backendId,
     userId,
     isPublic,
     name,
@@ -966,12 +1042,14 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     lastUpdatedAt,
     isToUpdate,
     isToDelete,
+    isAddedToBackend,
   ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ClimbingRoute &&
           other.id == this.id &&
+          other.backendId == this.backendId &&
           other.userId == this.userId &&
           other.isPublic == this.isPublic &&
           other.name == this.name &&
@@ -994,11 +1072,13 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           other.createdAt == this.createdAt &&
           other.lastUpdatedAt == this.lastUpdatedAt &&
           other.isToUpdate == this.isToUpdate &&
-          other.isToDelete == this.isToDelete);
+          other.isToDelete == this.isToDelete &&
+          other.isAddedToBackend == this.isAddedToBackend);
 }
 
 class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
   final Value<int> id;
+  final Value<int> backendId;
   final Value<int> userId;
   final Value<bool> isPublic;
   final Value<String> name;
@@ -1022,8 +1102,10 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
   final Value<DateTime> lastUpdatedAt;
   final Value<bool> isToUpdate;
   final Value<bool> isToDelete;
+  final Value<bool> isAddedToBackend;
   const ClimbingRoutesCompanion({
     this.id = const Value.absent(),
+    this.backendId = const Value.absent(),
     this.userId = const Value.absent(),
     this.isPublic = const Value.absent(),
     this.name = const Value.absent(),
@@ -1047,9 +1129,11 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     this.lastUpdatedAt = const Value.absent(),
     this.isToUpdate = const Value.absent(),
     this.isToDelete = const Value.absent(),
+    this.isAddedToBackend = const Value.absent(),
   });
   ClimbingRoutesCompanion.insert({
     this.id = const Value.absent(),
+    required int backendId,
     required int userId,
     this.isPublic = const Value.absent(),
     required String name,
@@ -1073,11 +1157,14 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     this.lastUpdatedAt = const Value.absent(),
     this.isToUpdate = const Value.absent(),
     this.isToDelete = const Value.absent(),
-  }) : userId = Value(userId),
+    this.isAddedToBackend = const Value.absent(),
+  }) : backendId = Value(backendId),
+       userId = Value(userId),
        name = Value(name),
        color = Value(color);
   static Insertable<ClimbingRoute> custom({
     Expression<int>? id,
+    Expression<int>? backendId,
     Expression<int>? userId,
     Expression<bool>? isPublic,
     Expression<String>? name,
@@ -1101,9 +1188,11 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     Expression<DateTime>? lastUpdatedAt,
     Expression<bool>? isToUpdate,
     Expression<bool>? isToDelete,
+    Expression<bool>? isAddedToBackend,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (backendId != null) 'backend_id': backendId,
       if (userId != null) 'user_id': userId,
       if (isPublic != null) 'is_public': isPublic,
       if (name != null) 'name': name,
@@ -1127,11 +1216,13 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
       if (lastUpdatedAt != null) 'last_updated_at': lastUpdatedAt,
       if (isToUpdate != null) 'is_to_update': isToUpdate,
       if (isToDelete != null) 'is_to_delete': isToDelete,
+      if (isAddedToBackend != null) 'is_added_to_backend': isAddedToBackend,
     });
   }
 
   ClimbingRoutesCompanion copyWith({
     Value<int>? id,
+    Value<int>? backendId,
     Value<int>? userId,
     Value<bool>? isPublic,
     Value<String>? name,
@@ -1155,9 +1246,11 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     Value<DateTime>? lastUpdatedAt,
     Value<bool>? isToUpdate,
     Value<bool>? isToDelete,
+    Value<bool>? isAddedToBackend,
   }) {
     return ClimbingRoutesCompanion(
       id: id ?? this.id,
+      backendId: backendId ?? this.backendId,
       userId: userId ?? this.userId,
       isPublic: isPublic ?? this.isPublic,
       name: name ?? this.name,
@@ -1181,6 +1274,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
       isToUpdate: isToUpdate ?? this.isToUpdate,
       isToDelete: isToDelete ?? this.isToDelete,
+      isAddedToBackend: isAddedToBackend ?? this.isAddedToBackend,
     );
   }
 
@@ -1189,6 +1283,9 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (backendId.present) {
+      map['backend_id'] = Variable<int>(backendId.value);
     }
     if (userId.present) {
       map['user_id'] = Variable<int>(userId.value);
@@ -1259,6 +1356,9 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     if (isToDelete.present) {
       map['is_to_delete'] = Variable<bool>(isToDelete.value);
     }
+    if (isAddedToBackend.present) {
+      map['is_added_to_backend'] = Variable<bool>(isAddedToBackend.value);
+    }
     return map;
   }
 
@@ -1266,6 +1366,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
   String toString() {
     return (StringBuffer('ClimbingRoutesCompanion(')
           ..write('id: $id, ')
+          ..write('backendId: $backendId, ')
           ..write('userId: $userId, ')
           ..write('isPublic: $isPublic, ')
           ..write('name: $name, ')
@@ -1288,7 +1389,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
           ..write('createdAt: $createdAt, ')
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
           ..write('isToUpdate: $isToUpdate, ')
-          ..write('isToDelete: $isToDelete')
+          ..write('isToDelete: $isToDelete, ')
+          ..write('isAddedToBackend: $isAddedToBackend')
           ..write(')'))
         .toString();
   }
@@ -1308,6 +1410,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$ClimbingRoutesTableCreateCompanionBuilder =
     ClimbingRoutesCompanion Function({
       Value<int> id,
+      required int backendId,
       required int userId,
       Value<bool> isPublic,
       required String name,
@@ -1331,10 +1434,12 @@ typedef $$ClimbingRoutesTableCreateCompanionBuilder =
       Value<DateTime> lastUpdatedAt,
       Value<bool> isToUpdate,
       Value<bool> isToDelete,
+      Value<bool> isAddedToBackend,
     });
 typedef $$ClimbingRoutesTableUpdateCompanionBuilder =
     ClimbingRoutesCompanion Function({
       Value<int> id,
+      Value<int> backendId,
       Value<int> userId,
       Value<bool> isPublic,
       Value<String> name,
@@ -1358,6 +1463,7 @@ typedef $$ClimbingRoutesTableUpdateCompanionBuilder =
       Value<DateTime> lastUpdatedAt,
       Value<bool> isToUpdate,
       Value<bool> isToDelete,
+      Value<bool> isAddedToBackend,
     });
 
 class $$ClimbingRoutesTableFilterComposer
@@ -1371,6 +1477,11 @@ class $$ClimbingRoutesTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get backendId => $composableBuilder(
+    column: $table.backendId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1488,6 +1599,11 @@ class $$ClimbingRoutesTableFilterComposer
     column: $table.isToDelete,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<bool> get isAddedToBackend => $composableBuilder(
+    column: $table.isAddedToBackend,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ClimbingRoutesTableOrderingComposer
@@ -1501,6 +1617,11 @@ class $$ClimbingRoutesTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get backendId => $composableBuilder(
+    column: $table.backendId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1618,6 +1739,11 @@ class $$ClimbingRoutesTableOrderingComposer
     column: $table.isToDelete,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isAddedToBackend => $composableBuilder(
+    column: $table.isAddedToBackend,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ClimbingRoutesTableAnnotationComposer
@@ -1631,6 +1757,9 @@ class $$ClimbingRoutesTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get backendId =>
+      $composableBuilder(column: $table.backendId, builder: (column) => column);
 
   GeneratedColumn<int> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
@@ -1716,6 +1845,11 @@ class $$ClimbingRoutesTableAnnotationComposer
     column: $table.isToDelete,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isAddedToBackend => $composableBuilder(
+    column: $table.isAddedToBackend,
+    builder: (column) => column,
+  );
 }
 
 class $$ClimbingRoutesTableTableManager
@@ -1752,6 +1886,7 @@ class $$ClimbingRoutesTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<int> backendId = const Value.absent(),
                 Value<int> userId = const Value.absent(),
                 Value<bool> isPublic = const Value.absent(),
                 Value<String> name = const Value.absent(),
@@ -1775,8 +1910,10 @@ class $$ClimbingRoutesTableTableManager
                 Value<DateTime> lastUpdatedAt = const Value.absent(),
                 Value<bool> isToUpdate = const Value.absent(),
                 Value<bool> isToDelete = const Value.absent(),
+                Value<bool> isAddedToBackend = const Value.absent(),
               }) => ClimbingRoutesCompanion(
                 id: id,
+                backendId: backendId,
                 userId: userId,
                 isPublic: isPublic,
                 name: name,
@@ -1800,10 +1937,12 @@ class $$ClimbingRoutesTableTableManager
                 lastUpdatedAt: lastUpdatedAt,
                 isToUpdate: isToUpdate,
                 isToDelete: isToDelete,
+                isAddedToBackend: isAddedToBackend,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                required int backendId,
                 required int userId,
                 Value<bool> isPublic = const Value.absent(),
                 required String name,
@@ -1827,8 +1966,10 @@ class $$ClimbingRoutesTableTableManager
                 Value<DateTime> lastUpdatedAt = const Value.absent(),
                 Value<bool> isToUpdate = const Value.absent(),
                 Value<bool> isToDelete = const Value.absent(),
+                Value<bool> isAddedToBackend = const Value.absent(),
               }) => ClimbingRoutesCompanion.insert(
                 id: id,
+                backendId: backendId,
                 userId: userId,
                 isPublic: isPublic,
                 name: name,
@@ -1852,6 +1993,7 @@ class $$ClimbingRoutesTableTableManager
                 lastUpdatedAt: lastUpdatedAt,
                 isToUpdate: isToUpdate,
                 isToDelete: isToDelete,
+                isAddedToBackend: isAddedToBackend,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -3,7 +3,8 @@ import 'package:drift/drift.dart';
 
 
 class ClimbingRoutes extends Table {
-  IntColumn get id => integer()();  
+  IntColumn get id => integer()(); 
+  IntColumn get backendId => integer()(); 
   IntColumn get userId => integer()();
   BoolColumn get isPublic => boolean().withDefault(Constant(false))();
   TextColumn get name => text()();
@@ -27,6 +28,7 @@ class ClimbingRoutes extends Table {
   DateTimeColumn get lastUpdatedAt => dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isToUpdate => boolean().withDefault(Constant(false))();
   BoolColumn get isToDelete => boolean().withDefault(Constant(false))();
+  BoolColumn get isAddedToBackend => boolean().withDefault(Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};
