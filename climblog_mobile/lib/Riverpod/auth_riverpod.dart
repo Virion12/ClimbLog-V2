@@ -24,6 +24,11 @@ class AuthStateNotifier extends StateNotifier<bool> {
     state = result;
     return result;
   }
+  Future<bool> register(String username, String password)  async{
+    final result = await _authService.register(username, password);
+    debugPrint(result.toString());
+    return result;
+  }
 
   Future<void> logout() async {
     await _authService.logout();

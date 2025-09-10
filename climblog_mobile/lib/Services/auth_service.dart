@@ -15,6 +15,31 @@ class AuthService {
     return IOClient(client);
   }
 
+  Future<bool> register(String username, String password) async {
+    final url = Uri.parse("$baseUrl/api/auth/register");
+    final body = jsonEncode({
+      "username": username.trim(),
+      "password": password.trim()
+    });
+
+    debugPrint("Request body: $body");
+
+    final ioClient = _createIoClient();
+    final response = await ioClient.post(
+      url,
+      headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      body: body,
+    );
+
+    debugPrint("Response status: ${response.statusCode}");
+    debugPrint("Response body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
+
   
 
   Future<bool> login(String username, String password) async {

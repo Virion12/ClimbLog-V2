@@ -45,7 +45,7 @@ namespace ClimbLogApi.Controllers
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return Unauthorized("Invalid credentials");
-
+            var userID = user.Id;
             var token = _tokenService.GenerateToken(user.Username, user.Id);
 
             string rawRefreshToken = _tokenService.GenerateRefreshToken();
@@ -72,7 +72,7 @@ namespace ClimbLogApi.Controllers
 
             await _db.SaveChangesAsync();
 
-            return Ok(new { accessToken = token, refreshToken = rawRefreshToken,});
+            return Ok(new { accessToken = token, refreshToken = rawRefreshToken, userid = userID});
         }
 
         [HttpPost("refresh")]
