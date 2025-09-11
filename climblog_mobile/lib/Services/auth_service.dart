@@ -67,6 +67,7 @@ class AuthService {
       final token = data["accessToken"];
       final userId = data["userid"];
       if (token != null && refreshToken != null) {
+        await _storage.write(key: "username", value: username.trim());
         await _storage.write(key: "accessToken", value: token);
         await _storage.write(key: "accessTokenExpiration", value: DateTime.now().toUtc().add(const Duration(minutes: 9)).toString());
         await _storage.write(key: "refreshToken", value: refreshToken);
@@ -84,15 +85,70 @@ class AuthService {
   Future<String?> getToken() async {
     return await _storage.read(key: "accessToken");
   }
+
+  
   Future<bool> isAccessTokenValid() async {
    var accessTokenExpiration =  await _storage.read(key: "accessTokenExpiration");
    if(accessTokenExpiration != null){
-    final TokenExpiration = DateTime.parse(accessTokenExpiration);
-    if(DateTime.now().toUtc().isBefore(TokenExpiration)){
+    final tokenExpiration = DateTime.parse(accessTokenExpiration);
+    if(DateTime.now().toUtc().isBefore(tokenExpiration)){
       return true;
     }
    }
    return false;
+  }
+
+  Future<void> refreshToken() async{
+    final username = await _storage.read(key: "username");
+
+
+    if(username == null ){
+      throw Exception("No username for user please re-login");
+    }
+
+    final refreshToken = await _storage.read(key: "accessToken");
+    final refreshTokenExpiration = await _storage.read(key: "accessTokenExpiration");
+
+    if(refreshToken == null){
+      throw Exception("No refresh token assigned to user please re-login");
+    }
+
+    if(refreshTokenExpiration == null){
+      throw Exception("User does not have refreshtoken please re-login");
+    }
+
+    final refreshTokenExpirationValidated = DateTime.parse(refreshTokenExpiration);
+    if(refreshTokenExpirationValidated.isBefore(DateTime.now().toUtc())){
+      throw Exception("User does not have correct refreshtoken please re-login");
+    }
+
+    final url = Uri.parse("$baseUrl/api/auth/refresh");
+    final body = jsonEncode({
+      "username": username.trim(),
+      "RefreshToken": refreshToken
+    });
+
+    debugPrint("Request body: $body");
+
+    final ioClient = _createIoClient();
+    final response = await ioClient.post(
+      url,
+      headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      body: body,
+    );
+
+    debugPrint("Response status: ${response.statusCode}");
+    debugPrint("Response body: ${response.body}");
+
+    if(response.statusCode == 200){
+       final data = jsonDecode(response.body);
+      final refreshToken = data["refreshToken"];
+      final token = data["accessToken"];
+      await _storage.write(key: "accessToken", value: token);
+      await _storage.write(key: "accessTokenExpiration", value: DateTime.now().toUtc().add(const Duration(minutes: 9)).toString());
+      await _storage.write(key: "refreshToken", value: refreshToken);
+      await _storage.write(key: "refreshTokenExpiration", value: DateTime.now().toUtc().add(const Duration(days: 30)).toString());
+    }
   }
 
   Future<void> logout() async {
