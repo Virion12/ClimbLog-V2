@@ -132,7 +132,7 @@ namespace ClimbLogApi.Controllers
             {
                 _context.Add(route);
                 await _context.SaveChangesAsync();
-                return Ok(route);
+                return Ok(new { routeid = route.Id});
             }
             catch (Exception ex)
             {
