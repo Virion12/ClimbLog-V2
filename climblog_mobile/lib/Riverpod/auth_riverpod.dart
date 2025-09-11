@@ -1,4 +1,4 @@
-import 'package:climblog_mobile/Services/auth_service.dart';
+import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

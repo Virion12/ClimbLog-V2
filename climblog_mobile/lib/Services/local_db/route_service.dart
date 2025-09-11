@@ -83,4 +83,12 @@ class RouteService {
     }
   }
 }
+Future<void> markRouteAsUploaded(int localId, int backendId) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(ClimbingRoutesCompanion(
+        backendId: Value(backendId),
+        isAddedToBackend: Value(true),
+      ));
+}
 }

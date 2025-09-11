@@ -1,4 +1,4 @@
-import 'package:climblog_mobile/Services/auth_service.dart';
+import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/pages/home_page.dart';
 import 'package:climblog_mobile/pages/routes_page.dart';
 import 'package:climblog_mobile/pages/trening_page.dart';
