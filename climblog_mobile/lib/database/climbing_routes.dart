@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 
 
 class ClimbingRoutes extends Table {
-  IntColumn get id => integer()(); 
+  IntColumn get id => integer().autoIncrement()(); 
   IntColumn get backendId => integer()(); 
   IntColumn get userId => integer()();
   BoolColumn get isPublic => boolean().withDefault(Constant(false))();
@@ -30,6 +30,5 @@ class ClimbingRoutes extends Table {
   BoolColumn get isToDelete => boolean().withDefault(Constant(false))();
   BoolColumn get isAddedToBackend => boolean().withDefault(Constant(false))();
 
-  @override
-  Set<Column> get primaryKey => {id};
+  
 }

@@ -15,8 +15,12 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     'id',
     aliasedName,
     false,
+    hasAutoIncrement: true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
   );
   static const VerificationMeta _backendIdMeta = const VerificationMeta(
     'backendId',

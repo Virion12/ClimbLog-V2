@@ -1,15 +1,19 @@
+import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
+import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class RouteAddForm extends StatefulWidget {
+class RouteAddForm extends ConsumerStatefulWidget {
   const RouteAddForm({super.key});
 
   @override
-  State<RouteAddForm> createState() => _RouteAddFormState();
+  ConsumerState<RouteAddForm> createState() => _RouteAddFormState();
 }
 
-class _RouteAddFormState extends State<RouteAddForm> {
+class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   final _formKey = GlobalKey<FormState>();
 
   final _idController = TextEditingController();
@@ -61,12 +65,6 @@ class _RouteAddFormState extends State<RouteAddForm> {
             const SizedBox(height: 16),
 
             // ---- Pola tekstowe ----
-            TextFormField(
-              controller: _idController,
-              decoration: const InputDecoration(labelText: "ID"),
-              keyboardType: TextInputType.number,
-              validator: (v) => v == null || v.isEmpty ? "Enter ID" : null,
-            ),
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: "Name"),
@@ -174,9 +172,9 @@ class _RouteAddFormState extends State<RouteAddForm> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   final service = RouteService(AppDatabase());
-
-                  await service.addRoute(
-                    id: int.parse(_idController.text),
+                  var newRouteId = 0;
+                  try{
+                    newRouteId =  await service.addRoute(
                     name: _nameController.text,
                     color: _colorController.text,
                     height: double.tryParse(_heightController.text) ?? 0.0,
@@ -198,6 +196,25 @@ class _RouteAddFormState extends State<RouteAddForm> {
                     isToDelete: _isToDelete,
                     isAddedToBackend: _isAddedToBackend,
                   );
+                  if(newRouteId == 0){
+                    throw Exception("addind to local db went wrong");
+                  }
+                  }
+                  catch (e){
+                    throw Exception(e);
+                  }
+
+                 
+                  final auth = AuthService();
+                  final isConnected = await ref.read(connectivityProvider.future);
+                  if(isConnected){
+                    final remoteService = RouteServiceApi(AppDatabase(), auth, service);
+                    try {
+                        await remoteService.AddRoute(newRouteId);
+                      } catch (e) {
+                        debugPrint(" Failed to sync with backend: $e");
+                      }
+                  }
                   await service.printAllRoutes();
 
                   if (context.mounted) {

@@ -68,7 +68,7 @@ class RouteServiceApi {
 
     final userAccessToken = await tokenValidation();
 
-    final url = Uri.parse("$baseUrl/api/auth/login");
+    final url = Uri.parse("$baseUrl/api/Route/add-one");
     final body = jsonEncode({
   "isPublic": route.isPublic,
   "name": route.name,
@@ -107,7 +107,7 @@ class RouteServiceApi {
     }
     
     final data = jsonDecode(response.body);
-    final routeid = data["routeId"];
+    final routeid = data["routeid"];
     _localRouteService.markRouteAsUploaded(id,routeid);
 
 

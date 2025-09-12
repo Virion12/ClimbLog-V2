@@ -76,6 +76,7 @@ class AuthService {
         
         debugPrint(await _storage.read(key: "refreshTokenExpiration"));
         debugPrint(await _storage.read(key: "userid"));
+        debugPrint(await _storage.read(key: "username"));
         return true;
       }
     }
@@ -106,8 +107,8 @@ class AuthService {
       throw Exception("No username for user please re-login");
     }
 
-    final refreshToken = await _storage.read(key: "accessToken");
-    final refreshTokenExpiration = await _storage.read(key: "accessTokenExpiration");
+    final refreshToken = await _storage.read(key: "refreshToken");
+    final refreshTokenExpiration = await _storage.read(key: "refreshTokenExpiration");
 
     if(refreshToken == null){
       throw Exception("No refresh token assigned to user please re-login");

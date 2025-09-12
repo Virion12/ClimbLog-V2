@@ -14,7 +14,6 @@ class Widgettree extends ConsumerWidget {
       current.whenData((isConnected) {
         if (isConnected) {
           debugPrint("there is netowrk");
-          //Create sync function for routes
         }
         else
           {
