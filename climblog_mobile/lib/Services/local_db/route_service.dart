@@ -91,4 +91,11 @@ Future<void> markRouteAsUploaded(int localId, int backendId) async {
         isAddedToBackend: Value(true),
       ));
 }
+
+Future<void> removeRoute(int localId) async{
+  await (_db.delete(_db.climbingRoutes)..where((r) => r.id.equals(localId))).go();
+}
+Stream<List<ClimbingRoute>> watchAllRoutes() {
+  return _db.select(_db.climbingRoutes).watch();
+}
 }

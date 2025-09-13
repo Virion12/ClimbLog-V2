@@ -112,5 +112,26 @@ class RouteServiceApi {
 
 
   }
+
+  //Remove 
+  Future<void> RemoveRoute(int id) async{
+    final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(id))).getSingle();
+    final routeId = route.backendId;
+    
+    final userAccessToken = await tokenValidation();
+
+    final url = Uri.parse("$baseUrl/api/Route/delete/$routeId");
+    final ioClient = _createIoClient();
+    final response = await ioClient.delete(
+      url,
+      headers: {"Content-Type": "application/json", "Accept": "application/json","Authorization" : "Bearer $userAccessToken"},
+    );
+    debugPrint("Response status: ${response.statusCode}");
+    debugPrint("Response body: ${response.body}");
+
+    if(response.statusCode != 200){
+      throw Exception("removing of the route failed");
+    }
+  }
   
 }
