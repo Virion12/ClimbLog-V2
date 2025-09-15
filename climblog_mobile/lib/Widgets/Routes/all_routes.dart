@@ -46,9 +46,11 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                             final isConnected = await ref.read(connectivityProvider.future);
                             if(isConnected){
                               if(route.isAddedToBackend == true && route.backendId != 0){
-                                  final routeServiceApi = RouteServiceApi(AppDatabase(), AuthService(), routeServiceLocal);
+                                  final auth = AuthService();
+                                  final routeServiceApi = RouteServiceApi(AppDatabase(), auth, routeServiceLocal);
                                  await routeServiceApi.RemoveRoute(route.id);
                                  await routeServiceLocal.removeRoute(route.id);
+                                 
                               }
                               await routeServiceLocal.removeRoute(route.id);
                             }

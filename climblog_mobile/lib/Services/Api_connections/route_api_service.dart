@@ -130,9 +130,10 @@ class RouteServiceApi {
     debugPrint("Response status: ${response.statusCode}");
     debugPrint("Response body: ${response.body}");
 
-    if(response.statusCode != 200){
+    if(response.statusCode != 204){
       throw Exception("removing of the route failed");
     }
+    
   }
   
 }
