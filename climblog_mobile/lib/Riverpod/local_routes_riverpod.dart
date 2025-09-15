@@ -10,12 +10,12 @@ final routeServiceProvider = Provider<RouteService>((ref) {
   return RouteService(db);
 });
 
-// StreamProvider z debug print
+
 final routesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((ref) {
   final routeService = ref.watch(routeServiceProvider);
 
-  // Możemy "podsłuchać" strumień i wypisywać dane
-  return routeService.watchAllRoutes().map((routes) {
+  
+  return routeService.watchAllRoutesWithoutToDelete().map((routes) {
     debugPrint("=== Aktualne lokalne drogi ===");
     if (routes.isEmpty) {
       debugPrint("Brak dróg w bazie.");

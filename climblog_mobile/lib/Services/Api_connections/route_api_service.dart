@@ -117,10 +117,11 @@ class RouteServiceApi {
   Future<void> RemoveRoute(int id) async{
     final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(id))).getSingle();
     final routeId = route.backendId;
+    debugPrint(routeId.toString());
     
     final userAccessToken = await tokenValidation();
 
-    final url = Uri.parse("$baseUrl/api/Route/delete/$routeId");
+    final url = Uri.parse("$baseUrl/api/Route/$routeId");
     final ioClient = _createIoClient();
     final response = await ioClient.delete(
       url,

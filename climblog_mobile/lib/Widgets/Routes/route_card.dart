@@ -27,7 +27,7 @@ class RouteCard extends StatelessWidget {
           width: 55,
           margin: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(grade,style: TextStyle(fontWeight: FontWeight.bold),),
               Container(

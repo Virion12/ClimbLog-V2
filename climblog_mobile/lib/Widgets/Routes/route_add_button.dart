@@ -7,23 +7,34 @@ class RouteAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return Dialog(
-              backgroundColor: Colors.white,
-              insetPadding: const EdgeInsets.all(10),
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: RouteAddForm(),
-              ),
-            );
-          },
-        );
-      },
-      icon: const Icon(Icons.add),
-    );
+    return GestureDetector(
+                    onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              backgroundColor: Colors.white,
+                              insetPadding: const EdgeInsets.all(10),
+                              child: const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: RouteAddForm(),
+                              ),
+                            );
+                          },
+                        );
+                      },
+
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: const Color(0xFF00a896),
+                      ),
+                      padding: EdgeInsets.only(top: 8,bottom: 5),
+                      height: 55,
+                      width: 55,
+                      margin: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                      child: Icon(Icons.add, size: 30, color: Colors.white,),
+                    ),
+                  );
   }
 }

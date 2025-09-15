@@ -17,7 +17,6 @@ class _RoutesPageState extends State<RoutesPage> {
       backgroundColor: Colors.white,
       body: Column(
         children: const [
-          RouteAddButton(),
           Expanded(
             child: AllRoutes(),
           ),
