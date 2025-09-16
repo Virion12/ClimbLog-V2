@@ -4,7 +4,6 @@ import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart'
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_add_button.dart';
-import 'package:climblog_mobile/Widgets/Routes/route_add_form.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_card.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +17,11 @@ class AllRoutes extends ConsumerStatefulWidget {
 }
 
 class _AllRoutesState extends ConsumerState<AllRoutes> {
+  bool isInSelectionMode = false;
+  Set<int> selectedRoutes = {};
   @override
   Widget build(BuildContext context) {
+    
     final routesAsync = ref.watch(routesProvider);
     return routesAsync.when(
         data: (routes) {
@@ -37,32 +39,60 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                     final route = routes[index];
                     return GestureDetector(
                        onTap: () { 
-                        //add in future route redirection
+                        if(isInSelectionMode){
+                          setState(() {
+                            if(selectedRoutes.contains(route.id)){
+                              selectedRoutes.remove(route.id);
+                          }else{
+                              selectedRoutes.add(route.id);
+                          }
+                          });
+                        }
                        },
                        onLongPress: () async {
-                         final routeServiceLocal = RouteService(AppDatabase());
-                         try{
+                        //  final routeServiceLocal = RouteService(AppDatabase());
+                        //  try{
                             
-                            final isConnected = await ref.read(connectivityProvider.future);
-                            if(isConnected){
-                              if(route.isAddedToBackend == true && route.backendId != 0){
-                                  final auth = AuthService();
-                                  final routeServiceApi = RouteServiceApi(AppDatabase(), auth, routeServiceLocal);
-                                 await routeServiceApi.RemoveRoute(route.id);
-                                 await routeServiceLocal.removeRoute(route.id);
+                        //     final isConnected = await ref.read(connectivityProvider.future);
+                        //     if(isConnected){
+                        //       if(route.isAddedToBackend == true && route.backendId != 0){
+                        //           final auth = AuthService();
+                        //           final routeServiceApi = RouteServiceApi(AppDatabase(), auth, routeServiceLocal);
+                        //          await routeServiceApi.RemoveRoute(route.id);
+                        //          await routeServiceLocal.removeRoute(route.id);
                                  
-                              }
-                              await routeServiceLocal.removeRoute(route.id);
-                            }
-                            else{
+                        //       }
+                        //       await routeServiceLocal.removeRoute(route.id);
+                        //     }
+                        //     else{
                              
-                             await routeServiceLocal.markRouteAsToDeletion(route.id);
-                            }
-                         }catch(e){
-                          throw Exception(e);
-                         }
+                        //      await routeServiceLocal.markRouteAsToDeletion(route.id);
+                        //     }
+                        //  }catch(e){
+                        //   throw Exception(e);
+                        //  }
+                        setState(() {
+                          if(!isInSelectionMode){
+                          isInSelectionMode = true;
+                          }else{
+                            isInSelectionMode = false;
+                            selectedRoutes = {};
+                          }
+                        });
                        },
-                      child:RouteCard(color: route.color, grade: route.grade,timestamp: route.createdAt)
+                      child:Stack(
+                        children: [
+                          RouteCard(color: route.color, grade: route.grade,timestamp: route.createdAt),
+
+                          if(isInSelectionMode)
+                            Positioned(top: 0.0, right: 0.0,
+                              child: Container( width: 12, height: 12, decoration: BoxDecoration(
+                            color: selectedRoutes.contains(route.id) ? const Color(0xFF00a896) : Colors.transparent,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 1.2),
+                          ),))
+                        ],
+                      )
                     );
                   })
                   ]

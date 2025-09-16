@@ -219,7 +219,7 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                   await service.printAllRoutes();
 
                   if (context.mounted) {
-                    Navigator.pop(context);
+                    Navigator.of(context).pop();
                   }
                 }
               },
