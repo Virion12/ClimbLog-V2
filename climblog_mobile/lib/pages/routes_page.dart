@@ -14,7 +14,7 @@ class _RoutesPageState extends State<RoutesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 237, 237, 237),
+      backgroundColor: const Color.fromARGB(255, 246, 245, 245),
       body: Column(
         children: const [
           Expanded(

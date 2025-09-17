@@ -112,5 +112,13 @@ Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDelete() {
         ..where((t) => t.isToDelete.equals(false) | t.isToDelete.isNull()))
       .watch();
 }
+Future<bool> isRouteAddedTobackendValidator(int localId) async{
+ final route =  await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
+ if(route.isAddedToBackend && route.backendId != 0){
+  return true;
+ }
+ return false;
+}
+
 
 }
