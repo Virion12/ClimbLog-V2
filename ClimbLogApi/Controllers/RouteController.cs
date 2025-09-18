@@ -188,7 +188,7 @@ namespace ClimbLogApi.Controllers
             return Ok(routeEx);
         }
 
-        //Remove route : To Test
+        //Remove route : OK
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteById(int id)
         {
