@@ -67,10 +67,32 @@ namespace ClimbLogApi.Controllers
             var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(path, out var contentType))
             {
-                contentType = "application/octet-stream"; 
+                contentType = "application/octet-stream";
             }
 
             return PhysicalFile(path, contentType, Path.GetFileName(path));
+        }
+
+        [HttpDelete("{filename}")]
+        public async Task<IActionResult> DeleteFile(string filename)
+        {
+            var userID = int.Parse(User.FindFirst("UserId")!.Value);
+            if (string.IsNullOrEmpty(filename))
+                return BadRequest("Empty file name");
+
+            var path = Path.Combine(_environment.ContentRootPath, "uploads", "routes", $"{userID}", filename);
+            if (!System.IO.File.Exists(path))
+                return NotFound("File not found");
+
+            try
+            {
+                System.IO.File.Delete(path);
+            }
+            catch (Exception e) {
+            return BadRequest(e.Message);
+            }
+
+            return Ok();
         }
 
 
