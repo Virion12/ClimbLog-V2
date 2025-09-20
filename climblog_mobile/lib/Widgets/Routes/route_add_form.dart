@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
@@ -6,6 +8,7 @@ import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RouteAddForm extends ConsumerStatefulWidget {
   const RouteAddForm({super.key});
@@ -16,6 +19,8 @@ class RouteAddForm extends ConsumerStatefulWidget {
 
 class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   final _formKey = GlobalKey<FormState>();
+  var _image;
+  bool _isImagePicked = false;
 
   final _idController = TextEditingController();
   final _nameController = TextEditingController();
@@ -64,6 +69,26 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
           children: [
             Text("Add Route", style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
+            IconButton(onPressed: () async {
+              final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+              setState(() {
+                _isImagePicked = true;
+                _image = pickedFile;
+              });
+            },
+            icon: Icon(Icons.camera_alt),
+            ),
+            if(_isImagePicked)
+              Container(
+                height: 300,
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: FileImage(File(_image.path)), 
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
 
             // ---- Pola tekstowe ----
             TextFormField(
