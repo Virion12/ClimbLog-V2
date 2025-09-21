@@ -4,6 +4,7 @@ using ClimbLogApi.Models.DB;
 using ClimbLogApi.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -45,7 +46,7 @@ namespace ClimbLogApi.Controllers
                 {
                     await file.CopyToAsync(stream);
                 }
-                return Ok($"{fileName}");
+                return Ok(new { filename = fileName});
 
             }
             catch (Exception e)

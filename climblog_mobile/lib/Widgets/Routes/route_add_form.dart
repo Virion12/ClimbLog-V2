@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
@@ -90,7 +91,6 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                 ),
               ),
 
-            // ---- Pola tekstowe ----
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: "Name"),
@@ -233,9 +233,27 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                  
                   final auth = AuthService();
                   final isConnected = await ref.read(connectivityProvider.future);
+                  String remoteImageLocation;
                   if(isConnected){
                     final remoteService = RouteServiceApi(AppDatabase(), auth, service);
+                    final fileUploadService = FileService();
+
+                    try{
+                        remoteImageLocation = await fileUploadService.uploadFileApi(File(_image.path));
+                        debugPrint(remoteImageLocation);
+
+                        service.addImagePath(newRouteId, remoteImageLocation);
+
+                    }catch(e){
+                        debugPrint(" Failed to sync with backend: $e");
+                    }
+                    
+
                     try {
+                        
+
+
+                        
                         await remoteService.AddRoute(newRouteId);
                       } catch (e) {
                         debugPrint(" Failed to sync with backend: $e");

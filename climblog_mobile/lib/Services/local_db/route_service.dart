@@ -78,7 +78,7 @@ class RouteService {
   } else {
     for (var route in routes) {
       debugPrint(
-        "ID: ${route.id}, Name: ${route.name}, Color: ${route.color}, Height: ${route.height}, UserID: ${route.userId}, Backend id: ${route.backendId}"
+        "ID: ${route.id}, Name: ${route.name}, Color: ${route.color}, Height: ${route.height}, UserID: ${route.userId}, Backend id: ${route.backendId}, imagePath : ${route.imagePath}"
       );
     }
   }
@@ -96,6 +96,13 @@ Future<void> markRouteAsToDeletion(int localId) async {
         ..where((t) => t.id.equals(localId)))
       .write(ClimbingRoutesCompanion(
         isToDelete: Value(true),
+      ));
+}
+Future<void> addImagePath(int localId,String imagePath) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(ClimbingRoutesCompanion(
+        imagePath: Value(imagePath),
       ));
 }
 

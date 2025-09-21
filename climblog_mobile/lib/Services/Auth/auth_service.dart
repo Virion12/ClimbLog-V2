@@ -168,4 +168,28 @@ class AuthService {
    }
    return false;
   }
+
+  Future<String> tokenValidation() async {
+  var userAccessToken = await getToken();
+
+  if (userAccessToken == null) {
+    throw Exception("User is not logged in");
+  }
+
+  final isValid = await isAccessTokenValid();
+
+  if (!isValid) {
+    try {
+      await refreshToken();
+      userAccessToken = await getToken();
+      if (userAccessToken == null) {
+        throw Exception("No access token after refresh");
+      }
+    } catch (e) {
+      throw Exception("Failed to refresh token: $e");
+    }
+  }
+
+  return userAccessToken;
+}
 }
