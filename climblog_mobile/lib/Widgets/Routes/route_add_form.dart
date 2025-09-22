@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
@@ -10,6 +9,7 @@ import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RouteAddForm extends ConsumerStatefulWidget {
   const RouteAddForm({super.key});
@@ -20,7 +20,7 @@ class RouteAddForm extends ConsumerStatefulWidget {
 
 class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   final _formKey = GlobalKey<FormState>();
-  var _image;
+  XFile? _image;
   bool _isImagePicked = false;
 
   final _idController = TextEditingController();
@@ -85,7 +85,7 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: FileImage(File(_image.path)), 
+                    image: FileImage(File(_image!.path)), 
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -230,35 +230,29 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                     throw Exception(e);
                   }
 
-                 
                   final auth = AuthService();
                   final isConnected = await ref.read(connectivityProvider.future);
                   String remoteImageLocation;
                   if(isConnected){
                     final remoteService = RouteServiceApi(AppDatabase(), auth, service);
                     final fileUploadService = FileService();
-
                     try{
-                        remoteImageLocation = await fileUploadService.uploadFileApi(File(_image.path));
+                        remoteImageLocation = await fileUploadService.uploadFileApi(File(_image!.path));
                         debugPrint(remoteImageLocation);
-
+                        await saveImage(_image!, remoteImageLocation);
                         service.addImagePath(newRouteId, remoteImageLocation);
-
+                        
                     }catch(e){
-                        debugPrint(" Failed to sync with backend: $e");
+                        debugPrint(" Failed to uplaod photo: $e");
                     }
-                    
-
                     try {
-                        
 
-
-                        
                         await remoteService.AddRoute(newRouteId);
                       } catch (e) {
                         debugPrint(" Failed to sync with backend: $e");
                       }
                   }
+                  await saveImage(_image!);
                   await service.printAllRoutes();
 
                   if (context.mounted) {
@@ -271,5 +265,16 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
         ),
       ),
     );
+  }
+  Future<void> saveImage(XFile file, [String? filename])async {
+    String path = (await getApplicationDocumentsDirectory()).path;
+
+    filename ??= '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    try{
+    await File(file.path).copy('$path/$filename');
+    }
+    catch(e){
+      throw Exception(e);
+    }
   }
 }
