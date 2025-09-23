@@ -5,6 +5,7 @@ import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_add_button.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_card.dart';
+import 'package:climblog_mobile/Widgets/Routes/route_single.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -95,30 +96,15 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                                   selectedRoutes.add(route.id);
                               }
                               });
+                            }else{
+                              ref.read(selectedRouteProvider.notifier).state = route;
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => const RouteSingle(),
+                                );
                             }
                            },
                            onLongPress: () async {
-                            //  final routeServiceLocal = RouteService(AppDatabase());
-                            //  try{
-                                
-                            //     final isConnected = await ref.read(connectivityProvider.future);
-                            //     if(isConnected){
-                            //       if(route.isAddedToBackend == true && route.backendId != 0){
-                            //           final auth = AuthService();
-                            //           final routeServiceApi = RouteServiceApi(AppDatabase(), auth, routeServiceLocal);
-                            //          await routeServiceApi.RemoveRoute(route.id);
-                            //          await routeServiceLocal.removeRoute(route.id);
-                                     
-                            //       }
-                            //       await routeServiceLocal.removeRoute(route.id);
-                            //     }
-                            //     else{
-                                 
-                            //      await routeServiceLocal.markRouteAsToDeletion(route.id);
-                            //     }
-                            //  }catch(e){
-                            //   throw Exception(e);
-                            //  }
                             setState(() {
                               if(!isInSelectionMode){
                               isInSelectionMode = true;

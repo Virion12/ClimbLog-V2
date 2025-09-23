@@ -23,7 +23,6 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   XFile? _image;
   bool _isImagePicked = false;
 
-  final _idController = TextEditingController();
   final _nameController = TextEditingController();
   final _colorController = TextEditingController();
   final _heightController = TextEditingController();
@@ -41,15 +40,12 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   bool _isFlashed = false;
   bool _isFavorite = false;
   bool _isDone = false;
-  bool _isToUpdate = false;
-  bool _isToDelete = false;
-  bool _isAddedToBackend = false;
+ 
 
   final _numberOfTriedController = TextEditingController(text: "0");
 
   @override
   void dispose() {
-    _idController.dispose();
     _nameController.dispose();
     _colorController.dispose();
     _heightController.dispose();
@@ -125,7 +121,6 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
 
             const Divider(),
 
-            // ---- CheckBoxy dla flag ----
             CheckboxListTile(
               title: const Text("Powery"),
               value: _isPowery,
@@ -176,21 +171,7 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
               value: _isDone,
               onChanged: (val) => setState(() => _isDone = val ?? false),
             ),
-            CheckboxListTile(
-              title: const Text("To Update"),
-              value: _isToUpdate,
-              onChanged: (val) => setState(() => _isToUpdate = val ?? false),
-            ),
-            CheckboxListTile(
-              title: const Text("To Delete"),
-              value: _isToDelete,
-              onChanged: (val) => setState(() => _isToDelete = val ?? false),
-            ),
-            CheckboxListTile(
-              title: const Text("Added To Backend"),
-              value: _isAddedToBackend,
-              onChanged: (val) => setState(() => _isAddedToBackend = val ?? false),
-            ),
+            
 
             const SizedBox(height: 16),
             ElevatedButton(
@@ -218,9 +199,9 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                     isFlashed: _isFlashed,
                     isFavorite: _isFavorite,
                     isDone: _isDone,
-                    isToUpdate: _isToUpdate,
-                    isToDelete: _isToDelete,
-                    isAddedToBackend: _isAddedToBackend,
+                    isToUpdate: false,
+                    isToDelete: false,
+                    isAddedToBackend: false,
                   );
                   if(newRouteId == 0){
                     throw Exception("addind to local db went wrong");

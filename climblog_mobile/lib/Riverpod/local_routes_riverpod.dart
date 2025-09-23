@@ -30,3 +30,7 @@ final routesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((ref) {
     return routes;
   });
 });
+
+final selectedRouteProvider = StateProvider<ClimbingRoute?>((ref) => null);
+
+
