@@ -221,7 +221,7 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                         remoteImageLocation = await fileUploadService.uploadFileApi(File(_image!.path));
                         debugPrint(remoteImageLocation);
                         await saveImage(_image!, remoteImageLocation);
-                        service.addImagePath(newRouteId, remoteImageLocation);
+                        await service.addImagePath(newRouteId, remoteImageLocation);
                         
                     }catch(e){
                         debugPrint(" Failed to uplaod photo: $e");
@@ -232,8 +232,13 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                       } catch (e) {
                         debugPrint(" Failed to sync with backend: $e");
                       }
-                  }
-                  await saveImage(_image!);
+                  }else{
+                    String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+                    String filename = '$timestamp.jpg';
+                    await saveImage(_image!, filename);
+                    await service.addImagePath(newRouteId, filename);
+                    }
+                    
                   await service.printAllRoutes();
 
                   if (context.mounted) {
