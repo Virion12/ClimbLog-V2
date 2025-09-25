@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
+import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
+import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +25,20 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   final _formKey = GlobalKey<FormState>();
   XFile? _image;
   bool _isImagePicked = false;
+  final List<String> climbingGrades = [
+  // 4
+  "4a", "4a+", "4b", "4b+", "4c", "4c+",
+  // 5
+  "5a", "5a+", "5b", "5b+", "5c", "5c+",
+  // 6
+  "6a", "6a+", "6b", "6b+", "6c", "6c+",
+  // 7
+  "7a", "7a+", "7b", "7b+", "7c", "7c+",
+  // 8
+  "8a", "8a+", "8b", "8b+", "8c", "8c+",
+  // 9
+  "9a", "9a+", "9b", "9b+", "9c"
+];
 
   final _nameController = TextEditingController();
   final _colorController = TextEditingController();
@@ -64,18 +81,46 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Add Route", style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
-            IconButton(onPressed: () async {
-              final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
-              setState(() {
-                _isImagePicked = true;
-                _image = pickedFile;
-              });
-            },
-            icon: Icon(Icons.camera_alt),
+            Row(
+            mainAxisAlignment: MainAxisAlignment.center ,
+              children: [
+                Text("Add Route", style: Theme.of(context).textTheme.titleLarge),
+                IconButton(onPressed: () {
+                  setState(() {
+                    if(_isFavorite){_isFavorite = false;}
+                    else{
+                      _isFavorite = true;
+                    }
+                  });
+                }, icon: Icon(Icons.star,color: _isFavorite ? Colors.amber : Colors.grey, size: MediaQuery.of(context).size.width * 0.09,))
+              ],
             ),
-            if(_isImagePicked)
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(onPressed: () async {
+                  final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+                  setState(() {
+                    _isImagePicked = true;
+                    _image = pickedFile;
+                  });
+                },
+                  icon: Icon(Icons.camera_alt),
+                ),
+                IconButton(onPressed: () async {
+                  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                  setState(() {
+                    _isImagePicked = true;
+                    _image = pickedFile;
+                  });
+                },
+                  icon: Icon(Icons.photo_library),
+                ),
+              ],
+            ),
+            
+            if(_isImagePicked && _image!= null)
               Container(
                 height: 300,
                 margin: const EdgeInsets.all(10),
@@ -87,35 +132,21 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                 ),
               ),
 
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: "Name"),
-              validator: (v) => v == null || v.isEmpty ? "Enter name" : null,
-            ),
+            
             TextFormField(
               controller: _colorController,
               decoration: const InputDecoration(labelText: "Color"),
             ),
-            TextFormField(
+            HeightPickerField(
               controller: _heightController,
-              decoration: const InputDecoration(labelText: "Height (m)"),
-              keyboardType: TextInputType.number,
             ),
-            TextFormField(
+            GradePickerField(
               controller: _gradeController,
-              decoration: const InputDecoration(labelText: "Grade"),
-            ),
-            TextFormField(
-              controller: _imagePathController,
-              decoration: const InputDecoration(labelText: "Image path"),
-            ),
-            TextFormField(
-              controller: _thumbnailPathController,
-              decoration: const InputDecoration(labelText: "Thumbnail path"),
+              grades: climbingGrades,
             ),
             TextFormField(
               controller: _numberOfTriedController,
-              decoration: const InputDecoration(labelText: "Number of tried"),
+              decoration: const InputDecoration(labelText: "Number of tries"),
               keyboardType: TextInputType.number,
             ),
 
@@ -177,16 +208,48 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
             ElevatedButton(
               child: const Text("Save"),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+
+                final isConnected = await ref.read(connectivityProvider.future);
+
+                if(_formKey.currentState!.validate()){
                   final service = RouteService(AppDatabase());
                   var newRouteId = 0;
+                  String filename ="";
+
+                  if(isConnected){
+                    if(_isImagePicked)
+                    {
+
+                      final fileUploadService = FileService();
+                      
+                      try{
+                        filename = await fileUploadService.uploadFileApi(File(_image!.path));
+                        debugPrint("filename returned from backend : $filename");
+                        await saveImage(_image!, filename);
+
+                      }catch(e){
+                        debugPrint("File upload failed due to : $e}");
+                        debugPrint("Trying to uplad image localy}");
+                        filename = DateTime.now().millisecondsSinceEpoch.toString();
+                        await saveImage(_image!, filename);
+                      }                   
+                    }
+
+                  }else{
+                      if(_isImagePicked){
+                        filename = DateTime.now().millisecondsSinceEpoch.toString();
+                        await saveImage(_image!, filename);
+                      }
+                  }
+
+                  //Adding route localy 
                   try{
                     newRouteId =  await service.addRoute(
                     name: _nameController.text,
                     color: _colorController.text,
                     height: double.tryParse(_heightController.text) ?? 0.0,
                     grade: _gradeController.text,
-                    imagePath: _imagePathController.text,
+                    imagePath: filename,
                     thumbnailPath: _thumbnailPathController.text,
                     numberOfTried: int.tryParse(_numberOfTriedController.text) ?? 0,
                     isPowery: _isPowery,
@@ -204,46 +267,29 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
                     isAddedToBackend: false,
                   );
                   if(newRouteId == 0){
-                    throw Exception("addind to local db went wrong");
+                    throw Exception("addind to local db went wrong dute to backend id being 0");
+                  }
+
+                  if(isConnected){
+                    final auth = AuthService();
+                    final remoteService = RouteServiceApi(AppDatabase(), auth, service);
+                    try{
+                      await remoteService.AddRoute(newRouteId);
+                    }catch (e){
+                      throw Exception("addind to remote serwis route : $newRouteId went wrong due to $e");
+                    }
+                    
                   }
                   }
                   catch (e){
-                    throw Exception(e);
+                    throw Exception("addind to local db went wrong due to : $e");
                   }
 
-                  final auth = AuthService();
-                  final isConnected = await ref.read(connectivityProvider.future);
-                  String remoteImageLocation;
-                  if(isConnected){
-                    final remoteService = RouteServiceApi(AppDatabase(), auth, service);
-                    final fileUploadService = FileService();
-                    try{
-                        remoteImageLocation = await fileUploadService.uploadFileApi(File(_image!.path));
-                        debugPrint(remoteImageLocation);
-                        await saveImage(_image!, remoteImageLocation);
-                        await service.addImagePath(newRouteId, remoteImageLocation);
-                        
-                    }catch(e){
-                        debugPrint(" Failed to uplaod photo: $e");
-                    }
-                    try {
-
-                        await remoteService.AddRoute(newRouteId);
-                      } catch (e) {
-                        debugPrint(" Failed to sync with backend: $e");
-                      }
-                  }else{
-                    String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-                    String filename = '$timestamp.jpg';
-                    await saveImage(_image!, filename);
-                    await service.addImagePath(newRouteId, filename);
-                    }
-                    
-                  await service.printAllRoutes();
 
                   if (context.mounted) {
                     Navigator.of(context).pop();
                   }
+
                 }
               },
             ),
