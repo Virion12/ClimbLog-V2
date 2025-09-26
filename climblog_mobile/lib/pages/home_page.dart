@@ -1,3 +1,5 @@
+import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
+import 'package:climblog_mobile/Widgets/home/home_contaner.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,6 +12,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return const Text("home");
+    return Column(
+      children: [
+        HomeContaner(),
+        
+      ],
+    );
   }
 }

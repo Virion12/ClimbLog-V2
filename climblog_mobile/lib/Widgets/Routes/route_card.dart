@@ -18,7 +18,7 @@ class RouteCard extends StatelessWidget {
 
     return  Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 241, 240, 240),
             borderRadius: BorderRadius.circular(8.0),
           ),
           

@@ -58,6 +58,7 @@ class RouteSingle extends ConsumerWidget {
                 Text("Color : ${selectedRoute.color}"),
                 Text("Grade : ${selectedRoute.grade}"),
                 Text("Created at : ${selectedRoute.createdAt}"),
+                Text("Tries : ${selectedRoute.numberOfTried}"),
               ],
             ),
           ),

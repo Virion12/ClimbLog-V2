@@ -1,5 +1,7 @@
 import 'package:climblog_mobile/Widgets/Routes/all_routes.dart';
+import 'package:climblog_mobile/Widgets/Routes/data_filter_buttons.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_add_button.dart';
+import 'package:climblog_mobile/Widgets/Routes/route_count.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:flutter/material.dart';
 
@@ -13,15 +15,15 @@ class RoutesPage extends StatefulWidget {
 class _RoutesPageState extends State<RoutesPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 246, 245, 245),
-      body: Column(
+    return  Column(
         children: const [
+          DateFilterButtons(),
+          RouteCount(),
           Expanded(
             child: AllRoutes(),
           ),
         ],
-      ),
-    );
+      );
+    
   }
 }

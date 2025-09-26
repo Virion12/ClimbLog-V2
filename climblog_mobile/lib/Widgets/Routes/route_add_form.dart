@@ -210,7 +210,6 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
               onPressed: () async {
 
                 final isConnected = await ref.read(connectivityProvider.future);
-
                 if(_formKey.currentState!.validate()){
                   final service = RouteService(AppDatabase());
                   var newRouteId = 0;

@@ -98,6 +98,25 @@ Future<void> markRouteAsToDeletion(int localId) async {
         isToDelete: Value(true),
       ));
 }
+// Future<void> markRouteAsFavorite(int localId) async {
+//   await (_db.update(_db.climbingRoutes)
+//         ..where((t) => t.id.equals(localId)))
+//       .write(ClimbingRoutesCompanion(
+//         isFavorite: Value(true),
+//         isToUpdate: Value(true)
+//       ));
+// }
+
+Future<void> toggleFavorite(int localId) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(
+        ClimbingRoutesCompanion.custom(
+          isFavorite: _db.climbingRoutes.isFavorite.not(),
+          isToUpdate: const Constant(true),
+        ),
+      );
+}
 Future<void> addImagePath(int localId,String imagePath) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
@@ -119,6 +138,18 @@ Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDelete() {
         ..where((t) => t.isToDelete.equals(false) | t.isToDelete.isNull()))
       .watch();
 }
+
+
+
+
+Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDeleteLastCustom(DateTime fromWhen) {
+  return (_db.select(_db.climbingRoutes)
+        ..where((t) => (t.isToDelete.equals(false) | t.isToDelete.isNull()) & t.createdAt.isBiggerOrEqualValue(fromWhen)))
+      .watch();
+}
+
+
+
 Future<bool> isRouteAddedTobackendValidator(int localId) async{
  final route =  await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
  if(route.isAddedToBackend && route.backendId != 0){
@@ -126,6 +157,7 @@ Future<bool> isRouteAddedTobackendValidator(int localId) async{
  }
  return false;
 }
+
 
 
 }

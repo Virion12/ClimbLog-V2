@@ -34,3 +34,57 @@ final routesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((ref) {
 final selectedRouteProvider = StateProvider<ClimbingRoute?>((ref) => null);
 
 
+//Filtering Date
+
+enum DateFilterOption {
+  all,
+  lastDay,
+  lastWeek,
+  lastMonth,
+  last3Months,
+  last6Months,
+  lastYear,
+}
+
+
+final dataProvider = StateProvider<DateFilterOption>((ref) => DateFilterOption.all);
+
+final filteredRoutesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((ref) {
+  final routeService = ref.watch(routeServiceProvider);
+  final filter = ref.watch(dataProvider);
+
+  return routeService.watchAllRoutesWithoutToDelete().map((routes) {
+    final now = DateTime.now();
+    DateTime? fromDate;
+
+    switch (filter) {
+      case DateFilterOption.all:
+        fromDate = null;
+        break;
+      case DateFilterOption.lastDay:
+        fromDate = now.subtract(const Duration(days: 1));
+        break;
+      case DateFilterOption.lastWeek:
+        fromDate = now.subtract(const Duration(days: 7));
+        break;
+      case DateFilterOption.lastMonth:
+        fromDate = DateTime(now.year, now.month - 1, now.day);
+        break;
+      case DateFilterOption.last3Months:
+        fromDate = DateTime(now.year, now.month - 3, now.day);
+        break;
+      case DateFilterOption.last6Months:
+        fromDate = DateTime(now.year, now.month - 6, now.day);
+        break;
+      case DateFilterOption.lastYear:
+        fromDate = DateTime(now.year - 1, now.month, now.day);
+        break;
+    }
+
+    if (fromDate != null) {
+      routes = routes.where((r) => r.createdAt.isAfter(fromDate!)).toList();
+    }
+
+    return routes;
+  });
+});
