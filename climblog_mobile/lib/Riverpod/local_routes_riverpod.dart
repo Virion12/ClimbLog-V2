@@ -88,3 +88,4 @@ final filteredRoutesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((
     return routes;
   });
 });
+
