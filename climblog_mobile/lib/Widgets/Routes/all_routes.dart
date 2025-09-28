@@ -1,13 +1,11 @@
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
-import 'package:climblog_mobile/Services/Auth/auth_service.dart';
-import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_add_button.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_card.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_single.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
-import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,12 +23,13 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
   @override
   Widget build(BuildContext context) {
     final routesAsync = ref.watch(filteredRoutesProvider);
-    final routeServiceLocal = RouteService(AppDatabase());
+    final serviceLocal = ref.read(routeServiceProvider);
+    
     
     return routesAsync.when(
         data: (routes) {
           if (routes.isEmpty) {
-            return Wrap(children: [RouteAddButton()]);
+            return BasicContainer(child: Wrap(children: [RouteAddButton()]));
           }
           return Column(
             children: [
@@ -45,17 +44,9 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                               try{
                                   
                                   final isConnected = await ref.read(connectivityProvider.future);
-                                  if(isConnected){
-                                    if(await routeServiceLocal.isRouteAddedTobackendValidator(routeId)){
-                                        final auth = AuthService();
-                                        final routeServiceApi = RouteServiceApi(AppDatabase(), auth, routeServiceLocal);
-                                       await routeServiceApi.RemoveRoute(routeId);
-                                    }
-                                    await routeServiceLocal.removeRoute(routeId);
-                                  }
-                                  else{
-                                   await routeServiceLocal.markRouteAsToDeletion(routeId);
-                                  }
+                                  final auth = ref.read(authServiceProvider);
+                                  final routeServiceApi = RouteServiceApi(ref.read(dbProvider), auth, serviceLocal);
+                                  await routeServiceApi.RemoveRoute(routeId, isConnected);
                                   
                                }catch(e){
                                 throw Exception(e);
@@ -67,6 +58,7 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                                   });
                  
                   }, icon: Icon(Icons.delete)),
+
                   IconButton(onPressed: () {
                      setState(() {
                                 if(!isInSelectionMode){
@@ -79,7 +71,7 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                   }, icon: Icon(Icons.check)),
                   IconButton(onPressed: (){
                     for(int routeId in selectedRoutes){
-                      routeServiceLocal.toggleFavorite(routeId);
+                      serviceLocal.toggleFavorite(routeId);
                     }
                   }, icon: Icon(Icons.star))
                  ],),
@@ -99,7 +91,7 @@ class _AllRoutesState extends ConsumerState<AllRoutes> {
                           final route = routes[index];
                           return GestureDetector(
                             onDoubleTap: (){
-                              routeServiceLocal.toggleFavorite(route.id);
+                              serviceLocal.toggleFavorite(route.id);
                             },
                              onTap: () { 
                               if(isInSelectionMode){

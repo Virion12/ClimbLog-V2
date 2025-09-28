@@ -29,6 +29,8 @@ class ClimbingRoutes extends Table {
   BoolColumn get isToUpdate => boolean().withDefault(Constant(false))();
   BoolColumn get isToDelete => boolean().withDefault(Constant(false))();
   BoolColumn get isAddedToBackend => boolean().withDefault(Constant(false))();
+  BoolColumn get isImagePendingUpdate => boolean().withDefault(Constant(false))();
+
 
   
 }

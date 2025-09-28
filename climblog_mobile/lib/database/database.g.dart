@@ -349,6 +349,20 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     ),
     defaultValue: Constant(false),
   );
+  static const VerificationMeta _isImagePendingUpdateMeta =
+      const VerificationMeta('isImagePendingUpdate');
+  @override
+  late final GeneratedColumn<bool> isImagePendingUpdate = GeneratedColumn<bool>(
+    'is_image_pending_update',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_image_pending_update" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -377,6 +391,7 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     isToUpdate,
     isToDelete,
     isAddedToBackend,
+    isImagePendingUpdate,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -575,6 +590,15 @@ class $ClimbingRoutesTable extends ClimbingRoutes
         ),
       );
     }
+    if (data.containsKey('is_image_pending_update')) {
+      context.handle(
+        _isImagePendingUpdateMeta,
+        isImagePendingUpdate.isAcceptableOrUnknown(
+          data['is_image_pending_update']!,
+          _isImagePendingUpdateMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -688,6 +712,10 @@ class $ClimbingRoutesTable extends ClimbingRoutes
         DriftSqlType.bool,
         data['${effectivePrefix}is_added_to_backend'],
       )!,
+      isImagePendingUpdate: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_image_pending_update'],
+      )!,
     );
   }
 
@@ -724,6 +752,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
   final bool isToUpdate;
   final bool isToDelete;
   final bool isAddedToBackend;
+  final bool isImagePendingUpdate;
   const ClimbingRoute({
     required this.id,
     required this.backendId,
@@ -751,6 +780,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     required this.isToUpdate,
     required this.isToDelete,
     required this.isAddedToBackend,
+    required this.isImagePendingUpdate,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -781,6 +811,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     map['is_to_update'] = Variable<bool>(isToUpdate);
     map['is_to_delete'] = Variable<bool>(isToDelete);
     map['is_added_to_backend'] = Variable<bool>(isAddedToBackend);
+    map['is_image_pending_update'] = Variable<bool>(isImagePendingUpdate);
     return map;
   }
 
@@ -812,6 +843,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       isToUpdate: Value(isToUpdate),
       isToDelete: Value(isToDelete),
       isAddedToBackend: Value(isAddedToBackend),
+      isImagePendingUpdate: Value(isImagePendingUpdate),
     );
   }
 
@@ -847,6 +879,9 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       isToUpdate: serializer.fromJson<bool>(json['isToUpdate']),
       isToDelete: serializer.fromJson<bool>(json['isToDelete']),
       isAddedToBackend: serializer.fromJson<bool>(json['isAddedToBackend']),
+      isImagePendingUpdate: serializer.fromJson<bool>(
+        json['isImagePendingUpdate'],
+      ),
     );
   }
   @override
@@ -879,6 +914,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       'isToUpdate': serializer.toJson<bool>(isToUpdate),
       'isToDelete': serializer.toJson<bool>(isToDelete),
       'isAddedToBackend': serializer.toJson<bool>(isAddedToBackend),
+      'isImagePendingUpdate': serializer.toJson<bool>(isImagePendingUpdate),
     };
   }
 
@@ -909,6 +945,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     bool? isToUpdate,
     bool? isToDelete,
     bool? isAddedToBackend,
+    bool? isImagePendingUpdate,
   }) => ClimbingRoute(
     id: id ?? this.id,
     backendId: backendId ?? this.backendId,
@@ -936,6 +973,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     isToUpdate: isToUpdate ?? this.isToUpdate,
     isToDelete: isToDelete ?? this.isToDelete,
     isAddedToBackend: isAddedToBackend ?? this.isAddedToBackend,
+    isImagePendingUpdate: isImagePendingUpdate ?? this.isImagePendingUpdate,
   );
   ClimbingRoute copyWithCompanion(ClimbingRoutesCompanion data) {
     return ClimbingRoute(
@@ -983,6 +1021,9 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       isAddedToBackend: data.isAddedToBackend.present
           ? data.isAddedToBackend.value
           : this.isAddedToBackend,
+      isImagePendingUpdate: data.isImagePendingUpdate.present
+          ? data.isImagePendingUpdate.value
+          : this.isImagePendingUpdate,
     );
   }
 
@@ -1014,7 +1055,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
           ..write('isToUpdate: $isToUpdate, ')
           ..write('isToDelete: $isToDelete, ')
-          ..write('isAddedToBackend: $isAddedToBackend')
+          ..write('isAddedToBackend: $isAddedToBackend, ')
+          ..write('isImagePendingUpdate: $isImagePendingUpdate')
           ..write(')'))
         .toString();
   }
@@ -1047,6 +1089,7 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     isToUpdate,
     isToDelete,
     isAddedToBackend,
+    isImagePendingUpdate,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -1077,7 +1120,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           other.lastUpdatedAt == this.lastUpdatedAt &&
           other.isToUpdate == this.isToUpdate &&
           other.isToDelete == this.isToDelete &&
-          other.isAddedToBackend == this.isAddedToBackend);
+          other.isAddedToBackend == this.isAddedToBackend &&
+          other.isImagePendingUpdate == this.isImagePendingUpdate);
 }
 
 class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
@@ -1107,6 +1151,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
   final Value<bool> isToUpdate;
   final Value<bool> isToDelete;
   final Value<bool> isAddedToBackend;
+  final Value<bool> isImagePendingUpdate;
   const ClimbingRoutesCompanion({
     this.id = const Value.absent(),
     this.backendId = const Value.absent(),
@@ -1134,6 +1179,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     this.isToUpdate = const Value.absent(),
     this.isToDelete = const Value.absent(),
     this.isAddedToBackend = const Value.absent(),
+    this.isImagePendingUpdate = const Value.absent(),
   });
   ClimbingRoutesCompanion.insert({
     this.id = const Value.absent(),
@@ -1162,6 +1208,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     this.isToUpdate = const Value.absent(),
     this.isToDelete = const Value.absent(),
     this.isAddedToBackend = const Value.absent(),
+    this.isImagePendingUpdate = const Value.absent(),
   }) : backendId = Value(backendId),
        userId = Value(userId),
        name = Value(name),
@@ -1193,6 +1240,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     Expression<bool>? isToUpdate,
     Expression<bool>? isToDelete,
     Expression<bool>? isAddedToBackend,
+    Expression<bool>? isImagePendingUpdate,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1221,6 +1269,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
       if (isToUpdate != null) 'is_to_update': isToUpdate,
       if (isToDelete != null) 'is_to_delete': isToDelete,
       if (isAddedToBackend != null) 'is_added_to_backend': isAddedToBackend,
+      if (isImagePendingUpdate != null)
+        'is_image_pending_update': isImagePendingUpdate,
     });
   }
 
@@ -1251,6 +1301,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     Value<bool>? isToUpdate,
     Value<bool>? isToDelete,
     Value<bool>? isAddedToBackend,
+    Value<bool>? isImagePendingUpdate,
   }) {
     return ClimbingRoutesCompanion(
       id: id ?? this.id,
@@ -1279,6 +1330,7 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
       isToUpdate: isToUpdate ?? this.isToUpdate,
       isToDelete: isToDelete ?? this.isToDelete,
       isAddedToBackend: isAddedToBackend ?? this.isAddedToBackend,
+      isImagePendingUpdate: isImagePendingUpdate ?? this.isImagePendingUpdate,
     );
   }
 
@@ -1363,6 +1415,11 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     if (isAddedToBackend.present) {
       map['is_added_to_backend'] = Variable<bool>(isAddedToBackend.value);
     }
+    if (isImagePendingUpdate.present) {
+      map['is_image_pending_update'] = Variable<bool>(
+        isImagePendingUpdate.value,
+      );
+    }
     return map;
   }
 
@@ -1394,7 +1451,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
           ..write('isToUpdate: $isToUpdate, ')
           ..write('isToDelete: $isToDelete, ')
-          ..write('isAddedToBackend: $isAddedToBackend')
+          ..write('isAddedToBackend: $isAddedToBackend, ')
+          ..write('isImagePendingUpdate: $isImagePendingUpdate')
           ..write(')'))
         .toString();
   }
@@ -1439,6 +1497,7 @@ typedef $$ClimbingRoutesTableCreateCompanionBuilder =
       Value<bool> isToUpdate,
       Value<bool> isToDelete,
       Value<bool> isAddedToBackend,
+      Value<bool> isImagePendingUpdate,
     });
 typedef $$ClimbingRoutesTableUpdateCompanionBuilder =
     ClimbingRoutesCompanion Function({
@@ -1468,6 +1527,7 @@ typedef $$ClimbingRoutesTableUpdateCompanionBuilder =
       Value<bool> isToUpdate,
       Value<bool> isToDelete,
       Value<bool> isAddedToBackend,
+      Value<bool> isImagePendingUpdate,
     });
 
 class $$ClimbingRoutesTableFilterComposer
@@ -1606,6 +1666,11 @@ class $$ClimbingRoutesTableFilterComposer
 
   ColumnFilters<bool> get isAddedToBackend => $composableBuilder(
     column: $table.isAddedToBackend,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isImagePendingUpdate => $composableBuilder(
+    column: $table.isImagePendingUpdate,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1748,6 +1813,11 @@ class $$ClimbingRoutesTableOrderingComposer
     column: $table.isAddedToBackend,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isImagePendingUpdate => $composableBuilder(
+    column: $table.isImagePendingUpdate,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ClimbingRoutesTableAnnotationComposer
@@ -1854,6 +1924,11 @@ class $$ClimbingRoutesTableAnnotationComposer
     column: $table.isAddedToBackend,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isImagePendingUpdate => $composableBuilder(
+    column: $table.isImagePendingUpdate,
+    builder: (column) => column,
+  );
 }
 
 class $$ClimbingRoutesTableTableManager
@@ -1915,6 +1990,7 @@ class $$ClimbingRoutesTableTableManager
                 Value<bool> isToUpdate = const Value.absent(),
                 Value<bool> isToDelete = const Value.absent(),
                 Value<bool> isAddedToBackend = const Value.absent(),
+                Value<bool> isImagePendingUpdate = const Value.absent(),
               }) => ClimbingRoutesCompanion(
                 id: id,
                 backendId: backendId,
@@ -1942,6 +2018,7 @@ class $$ClimbingRoutesTableTableManager
                 isToUpdate: isToUpdate,
                 isToDelete: isToDelete,
                 isAddedToBackend: isAddedToBackend,
+                isImagePendingUpdate: isImagePendingUpdate,
               ),
           createCompanionCallback:
               ({
@@ -1971,6 +2048,7 @@ class $$ClimbingRoutesTableTableManager
                 Value<bool> isToUpdate = const Value.absent(),
                 Value<bool> isToDelete = const Value.absent(),
                 Value<bool> isAddedToBackend = const Value.absent(),
+                Value<bool> isImagePendingUpdate = const Value.absent(),
               }) => ClimbingRoutesCompanion.insert(
                 id: id,
                 backendId: backendId,
@@ -1998,6 +2076,7 @@ class $$ClimbingRoutesTableTableManager
                 isToUpdate: isToUpdate,
                 isToDelete: isToDelete,
                 isAddedToBackend: isAddedToBackend,
+                isImagePendingUpdate: isImagePendingUpdate,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FileService {
   final AuthService _authService;
@@ -20,10 +21,19 @@ class FileService {
     return IOClient(client);
   }
 
-//Todo implement 
-  Future<void> uploadFileLocaly(File file) async {
-
+ 
+  Future<String> uploadFileLocally(File file, [String? filename]) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    filename ??= '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final localPath = '${appDir.path}/$filename';
+    try {
+      await file.copy(localPath);
+    } catch (e) {
+      throw Exception("Failed to save file locally: $e");
+    }
+    return filename; 
   }
+
 
   Future<String> uploadFileApi(File file) async {
     var token = await _authService.tokenValidation();
@@ -60,5 +70,37 @@ class FileService {
       throw Exception("No file name was returned");
     }
     return fileName;
+  }
+
+  Future<bool>  RemoveFileAPi(String fileName)  async {
+    var token = await _authService.tokenValidation();
+    final url = Uri.parse("$baseUrl/api/FileUpload/$fileName");
+    final ioClient = _createIoClient();
+     final response = await ioClient.delete(
+      url,
+      headers: {"Content-Type": "application/json", "Accept": "application/json","Authorization" : "Bearer $token"},
+    );
+    debugPrint("Response status: ${response.statusCode}");
+    debugPrint("Response body: ${response.body}");
+
+    if(response.statusCode != 204){
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<bool> RemoveFileLocal(String filename) async {
+    String path = (await getApplicationDocumentsDirectory()).path;
+              final file = File('$path/${filename}');
+              if(await file.exists()){
+                try{
+                  await file.delete();
+                }catch(e){
+                  debugPrint(e.toString());
+                  return false;
+                }
+            }
+            return true;
   }
 }

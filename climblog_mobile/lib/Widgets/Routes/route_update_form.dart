@@ -1,6 +1,6 @@
 import 'dart:io';
-
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
@@ -13,14 +13,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-class RouteAddForm extends ConsumerStatefulWidget {
-  const RouteAddForm({super.key});
+class RouteUpdateForm extends ConsumerStatefulWidget {
+  const RouteUpdateForm({super.key});
 
   @override
-  ConsumerState<RouteAddForm> createState() => _RouteAddFormState();
+  ConsumerState<RouteUpdateForm> createState() => _RouteUpdateFormState();
 }
 
-class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
+class _RouteUpdateFormState extends   ConsumerState<RouteUpdateForm>{
+  
   final _formKey = GlobalKey<FormState>();
   XFile? _image;
   bool _isImagePicked = false;
@@ -73,6 +74,32 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    final route = ref.read(selectedRouteProvider);
+
+    _nameController.text = route?.name ?? '';
+    _colorController.text = route?.color ?? '';
+    _heightController.text = route?.height?.toString() ?? '';
+    _gradeController.text = route?.grade ?? '';
+    _numberOfTriedController.text = (route?.numberOfTried ?? 0).toString();
+    _imagePathController.text = route?.imagePath ?? ''; 
+    _isPowery = route?.isPowery ?? false;
+    _isSloppy = route?.isSloppy ?? false;
+    _isDynamic = route?.isDynamic ?? false;
+    _isCrimpy = route?.isCrimpy ?? false;
+    _isReachy = route?.isReachy ?? false;
+    _isOnsighted = route?.isOnsighted ?? false;
+    _isRedPointed = route?.isRedPointed ?? false;
+    _isFlashed = route?.isFlashed ?? false;
+    _isFavorite = route?.isFavorite ?? false;
+    _isDone = route?.isDone ?? false;
+  }
+
+   
+
+  @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
@@ -83,7 +110,7 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
             Row(
             mainAxisAlignment: MainAxisAlignment.center ,
               children: [
-                Text("Add Route", style: Theme.of(context).textTheme.titleLarge),
+                Text("Edit Route", style: Theme.of(context).textTheme.titleLarge),
                 IconButton(onPressed: () {
                   setState(() {
                     if(_isFavorite){_isFavorite = false;}
@@ -210,90 +237,11 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
             ElevatedButton(
               child: const Text("Save"),
               onPressed: () async {
-                bool isimageToUpdate = false;
-
-                final isConnected = await ref.read(connectivityProvider.future);
-                if(_formKey.currentState!.validate()){
-                  final service = RouteService(AppDatabase());
-                  var newRouteId = 0;
-                  String filename ="";
-
-                  if(isConnected){
-                    if(_isImagePicked)
-                    {
-
-                      final fileUploadService = FileService();
-                      
-                      try{
-                        filename = await fileUploadService.uploadFileApi(File(_image!.path));
-                        debugPrint("filename returned from backend : $filename");
-                        await saveImage(_image!, filename);
-                    
-                      }catch(e){
-                        debugPrint("File upload failed due to : $e}");
-                        debugPrint("Trying to uplad image localy}");
-                        filename = DateTime.now().millisecondsSinceEpoch.toString();
-                        await saveImage(_image!, filename);
-                        isimageToUpdate = true;
-                        
-                      }                   
-                    }
-
-                  }else{
-                      if(_isImagePicked){
-                        filename = DateTime.now().millisecondsSinceEpoch.toString();
-                        await saveImage(_image!, filename);
-                        isimageToUpdate = true;
-                      }
-                  }
-
-                  try{
-                    newRouteId =  await service.addRoute(
-                    name: _nameController.text,
-                    color: _colorController.text,
-                    height: double.tryParse(_heightController.text) ?? 0.0,
-                    grade: _gradeController.text,
-                    imagePath: filename,
-                    thumbnailPath: _thumbnailPathController.text,
-                    numberOfTried: int.tryParse(_numberOfTriedController.text) ?? 0,
-                    isPowery: _isPowery,
-                    isSloppy: _isSloppy,
-                    isDynamic: _isDynamic,
-                    isCrimpy: _isCrimpy,
-                    isReachy: _isReachy,
-                    isOnsighted: _isOnsighted,
-                    isRedPointed: _isRedPointed,
-                    isFlashed: _isFlashed,
-                    isFavorite: _isFavorite,
-                    isDone: _isDone,
-                    isToUpdate: false,
-                    isToDelete: false,
-                    isAddedToBackend: false,
-                    isImagePendingUpdate: isimageToUpdate,
-                  );
-                  if(newRouteId == 0){
-                    throw Exception("addind to local db went wrong dute to backend id being 0");
-                  }
-
-                  if(isConnected){
-                    final auth = AuthService();
-                    final remoteService = RouteServiceApi(AppDatabase(), auth, service);
-                    try{
-                      await remoteService.AddRoute(newRouteId);
-                    }catch (e){
-                      throw Exception("addind to remote serwis route : $newRouteId went wrong due to $e");
-                    }
-                    
-                  }
-                  }
-                  catch (e){
-                    throw Exception("addind to local db went wrong due to : $e");
-                  }
-
-
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
+                final route = ref.read(selectedRouteProvider);
+                final routeId = route?.id;
+                if(routeId != null){
+                  final serviceLocal = ref.read(routeServiceProvider);
+                  final isConnected = await ref.read(connectivityProvider.future);
 
                 }
               },

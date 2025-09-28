@@ -1,4 +1,3 @@
-import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:climblog_mobile/Widgets/home/home_contaner.dart';
 import 'package:flutter/material.dart';
 

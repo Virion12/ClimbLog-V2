@@ -32,6 +32,7 @@ class RouteService {
   bool isToUpdate = false,
   bool isToDelete = false,
   bool isAddedToBackend = false,
+  bool isImagePendingUpdate = false,
 }) async {
   final userID = await _storage.read(key: "userid");
   if (userID == null) {
@@ -65,11 +66,73 @@ class RouteService {
       isToUpdate: Value(isToUpdate),
       isToDelete: Value(isToDelete),
       isAddedToBackend: Value(isAddedToBackend),
+      isImagePendingUpdate: Value(isImagePendingUpdate),
     ),
   );
 
   return newId;
 }
+
+Future<bool> updateRoute({
+  required int id,
+  String? name,
+  String? color,
+  double? height,
+  bool? isPowery,
+  bool? isSloppy,
+  bool? isDynamic,
+  bool? isCrimpy,
+  bool? isReachy,
+  bool? isOnsighted,
+  bool? isRedPointed,
+  bool? isFlashed,
+  bool? isFavorite,
+  int? numberOfTried,
+  bool? isDone,
+  String? grade,
+  String? imagePath,
+  String? thumbnailPath,
+  DateTime? createdAt,
+  bool? isToDelete,
+  bool? isAddedToBackend,
+  bool? isimageToUpdate,
+}) async {
+  final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(id))).getSingleOrNull();
+  if (route == null) {
+    throw Exception("Route with id $id not found");
+  }
+
+  await (_db.update(_db.climbingRoutes)..where((r) => r.id.equals(id))).write(
+    ClimbingRoutesCompanion(
+      name: name != null ? Value(name) : Value.absent(),
+      color: color != null ? Value(color) : Value.absent(),
+      height: height != null ? Value(height) : Value.absent(),
+      isPowery: isPowery != null ? Value(isPowery) : Value.absent(),
+      isSloppy: isSloppy != null ? Value(isSloppy) : Value.absent(),
+      isDynamic: isDynamic != null ? Value(isDynamic) : Value.absent(),
+      isCrimpy: isCrimpy != null ? Value(isCrimpy) : Value.absent(),
+      isReachy: isReachy != null ? Value(isReachy) : Value.absent(),
+      isOnsighted: isOnsighted != null ? Value(isOnsighted) : Value.absent(),
+      isRedPointed: isRedPointed != null ? Value(isRedPointed) : Value.absent(),
+      isFlashed: isFlashed != null ? Value(isFlashed) : Value.absent(),
+      isFavorite: isFavorite != null ? Value(isFavorite) : Value.absent(),
+      numberOfTried: numberOfTried != null ? Value(numberOfTried) : Value.absent(),
+      isDone: isDone != null ? Value(isDone) : Value.absent(),
+      grade: grade != null ? Value(grade) : Value.absent(),
+      imagePath: imagePath != null ? Value(imagePath) : Value.absent(),
+      thumbnailPath: thumbnailPath != null ? Value(thumbnailPath) : Value.absent(),
+      createdAt: createdAt != null ? Value(createdAt) : Value.absent(),
+      lastUpdatedAt: Value(DateTime.now()),
+      isToUpdate: Value(true),
+      isToDelete: isToDelete != null ? Value(isToDelete) : Value.absent(),
+      isAddedToBackend: isAddedToBackend != null ? Value(isAddedToBackend) : Value.absent(),
+      isImagePendingUpdate: isimageToUpdate != null ? Value(isimageToUpdate) : Value.absent(),
+    ),
+  );
+
+  return true;
+}
+
   Future<void> printAllRoutes() async {
   final routes = await _db.select(_db.climbingRoutes).get();
 
@@ -117,11 +180,28 @@ Future<void> toggleFavorite(int localId) async {
         ),
       );
 }
+Future<void> toggleUpdate(int localId) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(
+        ClimbingRoutesCompanion.custom(
+          isToUpdate: _db.climbingRoutes.isToUpdate.not(),
+        ),
+      );
+}
 Future<void> addImagePath(int localId,String imagePath) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
       .write(ClimbingRoutesCompanion(
         imagePath: Value(imagePath),
+      ));
+}
+
+Future<void> toogleImagePendingUpdate(int localId,bool toggle) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(ClimbingRoutesCompanion(
+        isImagePendingUpdate:  Value(toggle),
       ));
 }
 
@@ -158,6 +238,13 @@ Future<bool> isRouteAddedTobackendValidator(int localId) async{
  return false;
 }
 
+Future<bool> isImagepathSame(int localId, String filename) async{
+ final route =  await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
+ if(route.imagePath == filename){
+  return true;
+ }
+ return false;
+}
 
 
 }
