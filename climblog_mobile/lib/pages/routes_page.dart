@@ -1,6 +1,7 @@
 import 'package:climblog_mobile/Widgets/Routes/all_routes.dart';
 import 'package:climblog_mobile/Widgets/Routes/data_filter_buttons.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_count.dart';
+import 'package:climblog_mobile/Widgets/Shared/basic_half_container.dart';
 import 'package:flutter/material.dart';
 
 class RoutesPage extends StatefulWidget {
@@ -14,9 +15,31 @@ class _RoutesPageState extends State<RoutesPage> {
   @override
   Widget build(BuildContext context) {
     return  Column(
-        children: const [
+        children:  [
           DateFilterButtons(),
           RouteCount(),
+          Row(
+            
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  
+                },
+                child: BasicHalfContainer(child: Text("Statistics",textAlign: TextAlign.center,style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold
+                ),),)),
+                GestureDetector(
+                onTap: () {
+                  
+                },
+                child: BasicHalfContainer(child: Text("Compare",textAlign: TextAlign.center,style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold
+                ),),)),
+            ],
+          ),
           SingleChildScrollView(
             child: AllRoutes(),
           ),

@@ -306,7 +306,7 @@ class _RouteAddFormState extends   ConsumerState<RouteAddForm>{
   Future<void> saveImage(XFile file, [String? filename])async {
     String path = (await getApplicationDocumentsDirectory()).path;
 
-    filename ??= '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    filename ??= '${DateTime.now().millisecondsSinceEpoch}';
     try{
     await File(file.path).copy('$path/$filename');
     }

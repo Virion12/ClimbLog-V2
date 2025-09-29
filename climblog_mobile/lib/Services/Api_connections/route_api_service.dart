@@ -6,7 +6,6 @@ import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 
@@ -180,6 +179,7 @@ class RouteServiceApi {
   }
 
   //Update Route 
+  //To do : Fix issue with the file uplkaod locally 
 
   Future<bool> updateRoute(ClimbingRoute route, bool isConnected, File? newFile) async {
   try {

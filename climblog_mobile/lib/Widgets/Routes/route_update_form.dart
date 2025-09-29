@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
@@ -5,6 +6,7 @@ import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
+import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -266,8 +268,19 @@ class _RouteUpdateFormState extends   ConsumerState<RouteUpdateForm>{
                     return;
                   } 
                   File? file = _image != null ? File(_image!.path) : null;
-                  remoteRouteService.updateRoute(route, isConnected, file);
 
+                  ClimbingRoute routeToUpdate = new ClimbingRoute(id: route.id, backendId: route.backendId, userId: route.userId, isPublic: route.isPublic, name: _nameController.text, color: _colorController.text,
+                   height: double.parse(_heightController.text), isPowery: _isPowery, isSloppy: _isSloppy, isDynamic: _isDynamic, isCrimpy: _isCrimpy,
+                    isReachy: _isReachy, isOnsighted: _isOnsighted, isRedPointed: _isRedPointed,
+                     isFlashed: _isFlashed, isFavorite: _isFavorite, numberOfTried: int.parse(_numberOfTriedController.text), isDone: _isDone, 
+                     grade: _gradeController.text, imagePath: route.imagePath, thumbnailPath: route.thumbnailPath,
+                      createdAt: route.createdAt, lastUpdatedAt: route.lastUpdatedAt, isToUpdate: route.isToUpdate,
+                       isToDelete: route.isToDelete, isAddedToBackend: route.isAddedToBackend,
+                        isImagePendingUpdate: route.isImagePendingUpdate);
+                  remoteRouteService.updateRoute(routeToUpdate, isConnected, file);
+                  if(context.mounted){
+                  Navigator.of(context).pop();
+                  }
                 }
               },
             ),
@@ -279,7 +292,7 @@ class _RouteUpdateFormState extends   ConsumerState<RouteUpdateForm>{
   Future<void> saveImage(XFile file, [String? filename])async {
     String path = (await getApplicationDocumentsDirectory()).path;
 
-    filename ??= '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    filename ??= '${DateTime.now().millisecondsSinceEpoch}';
     try{
     await File(file.path).copy('$path/$filename');
     }

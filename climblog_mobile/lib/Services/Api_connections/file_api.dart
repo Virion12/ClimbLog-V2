@@ -24,7 +24,7 @@ class FileService {
  
   Future<String> uploadFileLocally(File file, [String? filename]) async {
     final appDir = await getApplicationDocumentsDirectory();
-    filename ??= '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    filename ??= '${DateTime.now().millisecondsSinceEpoch}';
     final localPath = '${appDir.path}/$filename';
     try {
       await file.copy(localPath);
@@ -92,7 +92,7 @@ class FileService {
 
   Future<bool> RemoveFileLocal(String filename) async {
     String path = (await getApplicationDocumentsDirectory()).path;
-              final file = File('$path/${filename}');
+              final file = File('$path/$filename');
               if(await file.exists()){
                 try{
                   await file.delete();
