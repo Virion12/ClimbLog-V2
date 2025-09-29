@@ -93,7 +93,7 @@ namespace ClimbLogApi.Controllers
             return BadRequest(e.Message);
             }
 
-            return Ok();
+            return NoContent();
         }
 
 

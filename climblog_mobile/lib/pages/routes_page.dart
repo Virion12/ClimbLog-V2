@@ -17,7 +17,7 @@ class _RoutesPageState extends State<RoutesPage> {
         children: const [
           DateFilterButtons(),
           RouteCount(),
-          Expanded(
+          SingleChildScrollView(
             child: AllRoutes(),
           ),
         ],

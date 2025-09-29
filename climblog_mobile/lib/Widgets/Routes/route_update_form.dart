@@ -1,13 +1,10 @@
 import 'dart:io';
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
-import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
-import 'package:climblog_mobile/Services/Auth/auth_service.dart';
-import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
-import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -73,29 +70,48 @@ class _RouteUpdateFormState extends   ConsumerState<RouteUpdateForm>{
     super.dispose();
   }
 
-  @override
+ @override
   void initState() {
     super.initState();
-
-    final route = ref.read(selectedRouteProvider);
-
-    _nameController.text = route?.name ?? '';
-    _colorController.text = route?.color ?? '';
-    _heightController.text = route?.height?.toString() ?? '';
-    _gradeController.text = route?.grade ?? '';
-    _numberOfTriedController.text = (route?.numberOfTried ?? 0).toString();
-    _imagePathController.text = route?.imagePath ?? ''; 
-    _isPowery = route?.isPowery ?? false;
-    _isSloppy = route?.isSloppy ?? false;
-    _isDynamic = route?.isDynamic ?? false;
-    _isCrimpy = route?.isCrimpy ?? false;
-    _isReachy = route?.isReachy ?? false;
-    _isOnsighted = route?.isOnsighted ?? false;
-    _isRedPointed = route?.isRedPointed ?? false;
-    _isFlashed = route?.isFlashed ?? false;
-    _isFavorite = route?.isFavorite ?? false;
-    _isDone = route?.isDone ?? false;
+    _loadRouteData();
   }
+
+      Future<void> _loadRouteData() async {
+        final route = ref.read(selectedRouteProvider);
+
+        if (route != null) {
+          if (route.imagePath.isNotEmpty) {
+            final dir = await getApplicationDocumentsDirectory();
+            final filePath = '${dir.path}/${route.imagePath}';
+
+            if (await File(filePath).exists()) {
+              setState(() {
+                _image = XFile(filePath);
+                _isImagePicked = true;
+              });
+            }
+          }
+
+          setState(() {
+            _nameController.text = route.name;
+            _colorController.text = route.color;
+            _heightController.text = route.height.toString();
+            _gradeController.text = route.grade;
+            _numberOfTriedController.text = (route.numberOfTried).toString();
+            _imagePathController.text = route.imagePath;
+            _isPowery = route.isPowery;
+            _isSloppy = route.isSloppy;
+            _isDynamic = route.isDynamic;
+            _isCrimpy = route.isCrimpy;
+            _isReachy = route.isReachy;
+            _isOnsighted = route.isOnsighted;
+            _isRedPointed = route.isRedPointed;
+            _isFlashed = route.isFlashed;
+            _isFavorite = route.isFavorite;
+            _isDone = route.isDone;
+          });
+        }
+      }
 
    
 
@@ -235,13 +251,22 @@ class _RouteUpdateFormState extends   ConsumerState<RouteUpdateForm>{
 
             const SizedBox(height: 16),
             ElevatedButton(
-              child: const Text("Save"),
+              child: const Text("Confirm"),
               onPressed: () async {
                 final route = ref.read(selectedRouteProvider);
                 final routeId = route?.id;
                 if(routeId != null){
                   final serviceLocal = ref.read(routeServiceProvider);
                   final isConnected = await ref.read(connectivityProvider.future);
+                  final auth = ref.read(authServiceProvider);
+                  final remoteRouteService = RouteServiceApi(ref.read(dbProvider), auth, serviceLocal);
+                  
+                  if(route == null){
+                    debugPrint("no route provided");
+                    return;
+                  } 
+                  File? file = _image != null ? File(_image!.path) : null;
+                  remoteRouteService.updateRoute(route, isConnected, file);
 
                 }
               },
