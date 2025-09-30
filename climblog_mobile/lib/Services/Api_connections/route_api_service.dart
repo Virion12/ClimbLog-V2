@@ -179,7 +179,6 @@ class RouteServiceApi {
   }
 
   //Update Route 
-  //To do : Fix issue with the file uplkaod locally 
 
   Future<bool> updateRoute(ClimbingRoute route, bool isConnected, File? newFile) async {
   try {
@@ -219,14 +218,17 @@ class RouteServiceApi {
         }
       }
 
-      String savedFileName = await fileService.uploadFileLocally(newFile);
-      newImagePath = savedFileName;
+      
 
       if (isConnected) {
         String uploadedFileName = await fileService.uploadFileApi(newFile);
         newImagePath = uploadedFileName;
+        String savedFileName = await fileService.uploadFileLocally(newFile, newImagePath);
+        newImagePath = savedFileName;
         await _localRouteService.toogleImagePendingUpdate(route.id, false);
       } else {
+        String savedFileName = await fileService.uploadFileLocally(newFile);
+        newImagePath = savedFileName;
         await _localRouteService.toogleImagePendingUpdate(route.id, true);
       }
     }
