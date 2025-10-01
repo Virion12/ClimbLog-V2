@@ -266,7 +266,7 @@ class RouteServiceApi {
         "isPowery": route.isPowery,
         "isSloppy": route.isSloppy,
         "isDynamic": route.isDynamic,
-        "isCrimpy": route.isSloppy,
+        "isCrimpy": route.isCrimpy,
         "isReachy": route.isReachy,
         "isOnsighted": route.isOnsighted,
         "isRedPointed": route.isRedPointed,

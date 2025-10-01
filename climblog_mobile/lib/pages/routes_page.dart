@@ -24,6 +24,7 @@ class _RoutesPageState extends State<RoutesPage> {
             children: [
               GestureDetector(
                 onTap: () {
+                  Navigator.of(context).pushNamed("/routeStatistic");
                   
                 },
                 child: BasicHalfContainer(child: Text("Statistics",textAlign: TextAlign.center,style: TextStyle(
