@@ -89,3 +89,22 @@ final filteredRoutesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((
   });
 });
 
+final sortedRoutesProviderTop60 = Provider.autoDispose<List<ClimbingRoute>>((ref) {
+  final asyncRoutes = ref.watch(filteredRoutesProvider);
+
+  return asyncRoutes.maybeWhen(
+    data: (routes) {
+      final sorted = [...routes];
+
+      sorted.sort((a, b) {
+        if (a.isFavorite && !b.isFavorite) return -1;
+        if (!a.isFavorite && b.isFavorite) return 1;
+        return b.createdAt.compareTo(a.createdAt);
+      });
+
+      return sorted.take(60).toList();
+    },
+    orElse: () => [],
+  );
+});
+

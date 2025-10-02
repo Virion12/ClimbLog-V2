@@ -1,6 +1,7 @@
 import 'package:climblog_mobile/Widgets/Routes/all_routes.dart';
 import 'package:climblog_mobile/Widgets/Routes/data_filter_buttons.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_count.dart';
+import 'package:climblog_mobile/Widgets/Routes/top60_routes.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_half_container.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +43,7 @@ class _RoutesPageState extends State<RoutesPage> {
             ],
           ),
           SingleChildScrollView(
-            child: AllRoutes(),
+            child: Top60Routes(),
           ),
         ],
       );

@@ -1,6 +1,7 @@
 import 'package:climblog_mobile/Screens/home_screen.dart';
 import 'package:climblog_mobile/Screens/login_screen.dart';
 import 'package:climblog_mobile/Screens/register_screen.dart';
+import 'package:climblog_mobile/pages/all_routes_page.dart';
 import 'package:climblog_mobile/pages/statistics_routes_page.dart';
 import 'package:climblog_mobile/widget_tree.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         "/register": (context) => const RegisterScreen(),
         "/home": (context) => const HomeScreen(),
         "/routeStatistic": (context) => const StatisticsRoutesPage(),
+        "/routesAll": (context) => const AllRoutesPage(),
       },
     );
   }
