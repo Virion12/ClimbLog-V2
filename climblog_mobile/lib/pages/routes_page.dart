@@ -34,7 +34,7 @@ class _RoutesPageState extends State<RoutesPage> {
                 ),),)),
                 GestureDetector(
                 onTap: () {
-                  
+                  Navigator.of(context).pushNamed("/routesCompare");
                 },
                 child: BasicHalfContainer(child: Text("Compare",textAlign: TextAlign.center,style: TextStyle(
                   fontSize: 16,

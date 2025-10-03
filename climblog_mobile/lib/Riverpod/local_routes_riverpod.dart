@@ -10,6 +10,11 @@ final routeServiceProvider = Provider<RouteService>((ref) {
   return RouteService(db);
 });
 
+final selectedDate1Provider = StateProvider<DateTime>((ref) => DateTime.now());
+final selectedDate2Provider = StateProvider<DateTime>((ref) => DateTime.now());
+final selectedDate3Provider = StateProvider<DateTime>((ref) => DateTime.now());
+final selectedDate4Provider = StateProvider<DateTime>((ref) => DateTime.now());
+
 
 final routesProvider = StreamProvider.autoDispose<List<ClimbingRoute>>((ref) {
   final routeService = ref.watch(routeServiceProvider);
@@ -108,3 +113,18 @@ final sortedRoutesProviderTop60 = Provider.autoDispose<List<ClimbingRoute>>((ref
   );
 });
 
+final climbingRoutesStreamProviderForChartdata1 = StreamProvider<List<ClimbingRoute>>((ref) {
+  final routeService = ref.watch(routeServiceProvider);
+  final startDate = ref.watch(selectedDate1Provider);
+  final endDate = ref.watch(selectedDate2Provider);
+
+  return routeService.getRoutesByDateRange(startDate, endDate);
+});
+
+final climbingRoutesStreamProviderForChartdata2 = StreamProvider<List<ClimbingRoute>>((ref) {
+  final routeService = ref.watch(routeServiceProvider);
+  final startDate = ref.watch(selectedDate3Provider);
+  final endDate = ref.watch(selectedDate4Provider);
+
+  return routeService.getRoutesByDateRange(startDate, endDate);
+});

@@ -246,5 +246,16 @@ Future<bool> isImagepathSame(int localId, String filename) async{
  return false;
 }
 
+Stream<List<ClimbingRoute>> getRoutesByDateRange(DateTime startDate, DateTime endDate) {
+  return (_db.select(_db.climbingRoutes)
+        ..where(
+          (t) =>
+              t.createdAt.isBiggerOrEqualValue(startDate) &
+              t.createdAt.isSmallerOrEqualValue(endDate) &
+              (t.isToDelete.equals(false) | t.isToDelete.isNull()),
+        ))
+      .watch();
+}
+
 
 }
