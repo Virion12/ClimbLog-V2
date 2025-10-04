@@ -25,6 +25,7 @@ class _StatisticsRoutesPageState extends State<StatisticsRoutesPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            BasicContainer(child: Text("Details",textAlign: TextAlign.center, style: TextStyle(fontSize: 16),)),
             BasicContainer(child: Text("By grade :", textAlign: TextAlign.center,)),
             BasicContainer(child: 
             RoutesChart(height: 200,)),
