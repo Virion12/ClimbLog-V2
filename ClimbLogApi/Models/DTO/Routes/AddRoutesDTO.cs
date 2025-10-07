@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ClimbLogApi.Models.DTO
+namespace ClimbLogApi.Models.DTO.Routes
 {
     public class AddRoutesDTO
     {

@@ -1,6 +1,6 @@
 ﻿using ClimbLogApi.Models;
 using ClimbLogApi.Models.DB;
-using ClimbLogApi.Models.DTO;
+using ClimbLogApi.Models.DTO.Routes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

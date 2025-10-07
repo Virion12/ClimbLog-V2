@@ -3,6 +3,7 @@
     public class WorkoutSession
     {
         public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int WorkoutDayId { get; set; }
         public WorkoutDay WorkoutDay { get; set; } = null!;
         public TimeSpan Start { get; set; }
