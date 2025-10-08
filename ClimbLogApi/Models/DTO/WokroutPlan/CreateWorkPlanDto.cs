@@ -7,9 +7,6 @@ namespace ClimbLogApi.Models.DTO.WokroutPlan
         public bool IsPublic { get; set; } = false;
         public string Name { get; set; } = string.Empty;
         public string ImagePath { get; set; } = string.Empty;
-        
-        
-        //change
         public List<WorkoutDayCreateDto> WorkoutDays { get; set; } = new();
     }
 }

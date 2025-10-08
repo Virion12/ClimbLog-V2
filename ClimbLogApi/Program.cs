@@ -1,5 +1,6 @@
 using ClimbLogApi.Models.DB;
 using ClimbLogApi.Services;
+using ClimbLogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -38,6 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
 
 
 var app = builder.Build();

@@ -3,6 +3,5 @@
     public class WorkoutPlanDto : CreateWorkPlanDto
     {
         public int Id { get; set; }
-
     }
 }
