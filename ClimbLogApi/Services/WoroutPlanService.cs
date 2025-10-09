@@ -1,7 +1,11 @@
 ﻿using ClimbLogApi.Models;
 using ClimbLogApi.Models.DB;
+using ClimbLogApi.Models.DTO.Exercise;
 using ClimbLogApi.Models.DTO.WokroutPlan;
+using ClimbLogApi.Models.DTO.WorkoutDay;
+using ClimbLogApi.Models.DTO.workoutSession;
 using ClimbLogApi.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClimbLogApi.Services
 {
@@ -79,9 +83,47 @@ namespace ClimbLogApi.Services
             throw new NotImplementedException();
         }
 
-        public Task<WorkoutPlanDto> GetUserPlanByIdAsync(int id, int userId)
+        public async Task<WorkoutPlanDto> GetUserPlanByIdAsync(int id, int userId)
         {
-            throw new NotImplementedException();
+            var plan = await _context.WorkoutPlans
+                .Include(p => p.WorkoutDays)
+                    .ThenInclude(d => d.Sessions)
+                        .ThenInclude(s => s.Exercises)
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+
+            if (plan == null)
+                return null;    
+
+            return new WorkoutPlanDto
+            {
+                Id = plan.Id,
+                Name = plan.Name,
+                ImagePath = plan.ImagePath,
+                IsPublic = plan.IsPublic,
+                CreatedAt = plan.CreatedAt,
+                LastUpdatedAt = plan.LastUpdatedAt,
+                WorkoutDays = plan.WorkoutDays.Select(d => new WorkoutDayDto
+                {
+                    Id = d.Id,
+                    WorkoutDayOfWeek = d.WorkoutDayOfWeek,
+                    Sessions = d.Sessions.Select(s => new WorkoutSesssionDto
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        Location = s.Location,
+                        Start = s.Start,
+                        Exercises = s.Exercises.Select(e => new ExerciseDto
+                        {
+                            Id = e.Id,
+                            Name = e.Name,
+                            SetNumber = e.SetNumber,
+                            RepNumber = e.RepNumber,
+                            Time = e.Time,
+                            BreakTime = e.BreakTime
+                        }).ToList()
+                    }).ToList()
+                }).ToList()
+            };
         }
 
         public Task<IEnumerable<WorkoutPlanDto>> GetUsersPlansAsync(int userId)

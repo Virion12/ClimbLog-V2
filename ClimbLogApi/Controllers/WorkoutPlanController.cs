@@ -1,4 +1,5 @@
 ﻿using ClimbLogApi.Models.DTO.WokroutPlan;
+using ClimbLogApi.Services;
 using ClimbLogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,41 @@ namespace ClimbLogApi.Controllers
         private int GetUserId() => int.Parse(User.FindFirst("UserId")!.Value);
 
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPlanById(int id)
+        {
+            int UserId = GetUserId();
+            try
+            {
+                var plan = await _workoutPlanService.GetUserPlanByIdAsync(id,UserId);
+                if (plan == null)
+                {
+                    return NotFound();
+                }
+                return Ok(plan);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
+        }
+
+
         //To implemente in future
         [HttpGet("my-all")]
         public async Task<IActionResult> GetAllRoutesForUser()
         {
-            return Ok();
+            int UserId = GetUserId();
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex) { 
+            return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
