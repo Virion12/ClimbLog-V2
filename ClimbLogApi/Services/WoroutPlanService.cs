@@ -131,9 +131,78 @@ namespace ClimbLogApi.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateWorkoutPlanAsync(WorkoutPlanDto dto, int userId)
+        public async Task<bool> UpdateWorkoutPlanAsync(WorkoutPlanDto dto, int userId)
         {
-            throw new NotImplementedException();
+
+            var plan = await _context.WorkoutPlans
+                            .Include(p => p.WorkoutDays)
+                                .ThenInclude(d => d.Sessions)
+                                    .ThenInclude(s => s.Exercises)
+                            .FirstOrDefaultAsync(p => p.Id == dto.Id && p.UserId == userId);
+
+            if (plan == null)
+            {
+                return false;
+            }
+
+
+            plan.ImagePath = dto.ImagePath;
+            plan.Name = dto.Name;
+            plan.IsPublic = dto.IsPublic;
+            plan.LastUpdatedAt = DateTime.UtcNow;
+
+            _context.WorkoutDays.RemoveRange(plan.WorkoutDays);
+
+            if (dto.WorkoutDays != null && dto.WorkoutDays.Any())
+            {
+                foreach(var day in dto.WorkoutDays)
+                {
+                    var workoutday = new WorkoutDay 
+                    { 
+                        WorkoutDayOfWeek = day.WorkoutDayOfWeek,
+
+
+                    };
+
+                    if (day.Sessions != null && day.Sessions.Any()) 
+                    { 
+                       foreach (var sessionDto in day.Sessions)
+                        {
+                            var session = new WorkoutSession
+                            {
+                                Name = sessionDto.Name,
+                                Location = sessionDto.Location,
+                                Start = sessionDto.Start,
+                            };
+                            if(sessionDto.Exercises != null && sessionDto.Exercises.Any())
+                            {
+                                foreach(var exerciseDto  in sessionDto.Exercises)
+                                {
+                                    var exercise = new Exercise {
+                                        Name = exerciseDto.Name,
+                                        Time = exerciseDto.Time,
+                                        BreakTime = exerciseDto.BreakTime,
+                                        SetNumber = exerciseDto.SetNumber,
+                                        RepNumber = exerciseDto.RepNumber,
+
+                                    };
+
+                                    session.Exercises.Add(exercise);
+                                }
+                            }
+                            workoutday.Sessions.Add(session);
+                        }
+                    }
+
+
+
+                    plan.WorkoutDays.Add(workoutday);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

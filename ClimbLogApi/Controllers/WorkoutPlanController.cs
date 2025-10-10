@@ -12,7 +12,7 @@ namespace ClimbLogApi.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class WorkoutPlanController : Controller
+    public class WorkoutPlanController : ControllerBase
     {
         private readonly IWorkoutPlanService _workoutPlanService;
 
@@ -30,7 +30,7 @@ namespace ClimbLogApi.Controllers
             int UserId = GetUserId();
             try
             {
-                var plan = await _workoutPlanService.GetUserPlanByIdAsync(id,UserId);
+                var plan = await _workoutPlanService.GetUserPlanByIdAsync(id, UserId);
                 if (plan == null)
                 {
                     return NotFound();
@@ -56,8 +56,9 @@ namespace ClimbLogApi.Controllers
             {
                 return Ok();
             }
-            catch (Exception ex) { 
-            return BadRequest(ex.Message);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -65,7 +66,7 @@ namespace ClimbLogApi.Controllers
         public async Task<IActionResult> CreatePlan([FromBody] CreateWorkPlanDto dto)
         {
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             int UserId = GetUserId();
@@ -74,10 +75,41 @@ namespace ClimbLogApi.Controllers
                 int BackendPlanId = await _workoutPlanService.CreatePlanAsync(dto, UserId);
                 return Ok(new { id = BackendPlanId });
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdatePlan(int id, [FromBody] WorkoutPlanDto dto)
+        {
+            if(id != dto.Id)
+            {
+                return BadRequest("Id mismatch");
+            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            int UserId = GetUserId();
+            try
+            {
+                bool isUpdated = await _workoutPlanService.UpdateWorkoutPlanAsync(dto, UserId);
+                if (isUpdated)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound($"No plan with this uid {dto.Id}");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
