@@ -126,9 +126,15 @@ namespace ClimbLogApi.Services
             };
         }
 
-        public Task<IEnumerable<WorkoutPlanDto>> GetUsersPlansAsync(int userId)
+        public async Task<IEnumerable<WorkoutPlan>> GetUsersPlansAsync(int userId)
         {
-            throw new NotImplementedException();
+            var plans = await _context.WorkoutPlans
+                    .Include(p => p.WorkoutDays)
+                        .ThenInclude(d => d.Sessions)
+                            .ThenInclude(s => s.Exercises)
+                    .Where(p => p.UserId == userId).ToListAsync();
+
+            return plans;
         }
 
         public async Task<bool> UpdateWorkoutPlanAsync(WorkoutPlanDto dto, int userId)

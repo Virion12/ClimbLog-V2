@@ -51,10 +51,13 @@ namespace ClimbLogApi.Controllers
         [HttpGet("my-all")]
         public async Task<IActionResult> GetAllRoutesForUser()
         {
-            int UserId = GetUserId();
+            int userId = GetUserId();
             try
             {
-                return Ok();
+               var plans = await _workoutPlanService.GetUsersPlansAsync(userId);
+                if(plans == null || !plans.Any())
+                    return NotFound("No workout plans found for this user.");
+                return Ok(plans);
             }
             catch (Exception ex)
             {
