@@ -1,6 +1,6 @@
 import 'dart:io';
-
 import 'package:climblog_mobile/database/climbing_routes.dart';
+import 'package:climblog_mobile/database/workout.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
@@ -8,7 +8,15 @@ import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [ClimbingRoutes])
+@DriftDatabase(
+  tables: [
+    ClimbingRoutes,
+    WorkoutPlans,
+    WorkoutDays,
+    WorkoutSessions,
+    Exercises,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
@@ -18,6 +26,7 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
 }
 
 LazyDatabase _openConnection() {

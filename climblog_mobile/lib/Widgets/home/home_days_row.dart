@@ -1,16 +1,27 @@
+import 'package:climblog_mobile/Riverpod/trening.riverpod.dart';
 import 'package:climblog_mobile/Widgets/home/home_day_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeDaysRow extends StatefulWidget {
+class HomeDaysRow extends ConsumerStatefulWidget {
   const HomeDaysRow({super.key});
 
   @override
-  State<HomeDaysRow> createState() => _HomeDaysRowState();
+  ConsumerState<HomeDaysRow> createState() => _HomeDaysRowState();
 }
 
-class _HomeDaysRowState extends State<HomeDaysRow> {
+class _HomeDaysRowState extends ConsumerState<HomeDaysRow> {
   
   int selectedIndex = 2; 
+  final  List daysOfWeek = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +32,7 @@ class _HomeDaysRowState extends State<HomeDaysRow> {
       DateTime.now().add(const Duration(days: 1)),
       DateTime.now().add(const Duration(days: 2)),
     ];
+    
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -32,6 +44,8 @@ class _HomeDaysRowState extends State<HomeDaysRow> {
           onTap: () {
             setState(() {
               selectedIndex = index;
+              ref.read(selectedDay.notifier).state = daysOfWeek[days[index].weekday -1];
+
             });
           },
           child: HomeDayBox(

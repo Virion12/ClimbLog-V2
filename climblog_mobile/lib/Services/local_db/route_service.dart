@@ -146,6 +146,7 @@ Future<bool> updateRoute({
     }
   }
 }
+
 Future<void> markRouteAsUploaded(int localId, int backendId) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
