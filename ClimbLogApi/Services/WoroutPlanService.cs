@@ -78,9 +78,20 @@ namespace ClimbLogApi.Services
             return plan.Id;
         }
 
-        public Task<bool> DeletePlanAsync(int id, int userId)
+        public async Task<bool> DeletePlanAsync(int id, int userId)
         {
-            throw new NotImplementedException();
+            var plan = await _context.WorkoutPlans
+                .Include(p => p.WorkoutDays)
+                    .ThenInclude(d => d.Sessions)
+                        .ThenInclude(s => s.Exercises)
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+
+            if(plan == null)
+                return false;
+
+            _context.WorkoutPlans.Remove(plan);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<WorkoutPlanDto> GetUserPlanByIdAsync(int id, int userId)

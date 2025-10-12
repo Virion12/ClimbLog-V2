@@ -15,5 +15,6 @@ namespace ClimbLogApi.Models.DB
         public DbSet<WorkoutSession> WorkoutSessions { get; set; }
         public DbSet<WorkoutDay> WorkoutDays { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
+        public DbSet<Benchmark> Benchmarks { get; set; }
     }
 }

@@ -65,6 +65,25 @@ namespace ClimbLogApi.Controllers
             }
         }
 
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePlan(int id) { 
+            int userId = GetUserId();
+            try
+            {
+             bool isDeleted =  await _workoutPlanService.DeletePlanAsync(id, userId);
+                if (isDeleted)
+                {
+                    return NoContent();
+                }
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreatePlan([FromBody] CreateWorkPlanDto dto)
         {

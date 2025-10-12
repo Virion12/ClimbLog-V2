@@ -8,6 +8,6 @@
         public WorkoutDay WorkoutDay { get; set; } = null!;
         public TimeSpan Start { get; set; }
         public List<Exercise> Exercises { get; set; } = new();
-        public String Location { get; set; } = "Default";
+        public string Location { get; set; } = "Default";
     }
 }
