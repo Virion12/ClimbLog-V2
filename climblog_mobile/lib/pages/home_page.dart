@@ -14,19 +14,21 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      
-      children: [
-        HomeContaner(),
-        BasicContainer(child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-              HomeDaysRow(),
-              HomeTreningCard(),
-          ],
-        ))
+    return SingleChildScrollView(
+      child: Column(
         
-      ],
+        children: [
+          HomeContaner(),
+          BasicContainer(child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+                HomeDaysRow(),
+                HomeTreningCard(),
+            ],
+          ))
+          
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
@@ -269,7 +268,7 @@ class _RouteUpdateFormState extends   ConsumerState<RouteUpdateForm>{
                   } 
                   File? file = _image != null ? File(_image!.path) : null;
 
-                  ClimbingRoute routeToUpdate = new ClimbingRoute(id: route.id, backendId: route.backendId, userId: route.userId, isPublic: route.isPublic, name: _nameController.text, color: _colorController.text,
+                  ClimbingRoute routeToUpdate = ClimbingRoute(id: route.id, backendId: route.backendId, userId: route.userId, isPublic: route.isPublic, name: _nameController.text, color: _colorController.text,
                    height: double.parse(_heightController.text), isPowery: _isPowery, isSloppy: _isSloppy, isDynamic: _isDynamic, isCrimpy: _isCrimpy,
                     isReachy: _isReachy, isOnsighted: _isOnsighted, isRedPointed: _isRedPointed,
                      isFlashed: _isFlashed, isFavorite: _isFavorite, numberOfTried: int.parse(_numberOfTriedController.text), isDone: _isDone, 

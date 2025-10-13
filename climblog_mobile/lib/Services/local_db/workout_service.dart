@@ -97,7 +97,6 @@ class WorkoutService {
     });
   }
 
-  // 🔁 NOWA METODA - zwraca Stream zamiast Future
   Stream<List<WorkoutPlanFull>> watchAllWorkoutPlans() {
     return _db.select(_db.workoutPlans).watch().asyncMap((plans) async {
       List<WorkoutPlanFull> result = [];
@@ -143,7 +142,14 @@ class WorkoutService {
     });
   }
 
-  // Opcjonalnie - zachowaj starą metodę dla kompatybilności
+  Future<bool> toogleIsMain(int id) async{
+   
+    await _db.update(_db.workoutPlans).write(const WorkoutPlansCompanion(isMain : Value(false)));
+    
+    await (_db.update(_db.workoutPlans)..where((t) => t.id.equals(id))).write(WorkoutPlansCompanion(isMain: const Value(true)));
+    return true;
+  }
+
   Future<List<WorkoutPlanFull>> getAllWorkoutPlans() async {
     final plans = await _db.select(_db.workoutPlans).get();
 

@@ -1,4 +1,4 @@
-import 'package:climblog_mobile/Riverpod/local_benchamrks_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/local_trening_riverpod.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:climblog_mobile/Widgets/trening/confirm_removal_trening_dialog.dart';
@@ -32,8 +32,17 @@ class _WorkoutPlansAllState extends ConsumerState<WorkoutPlansAll> {
             children: List.generate(plans.length, (index) {
               final plan = plans[index];
               return GestureDetector(
+                onDoubleTap: () async {
+                  final _service = WorkoutService();
+                  try{
+                    await _service.toogleIsMain(plan.plan.id);
+                  }catch (e){
+                    throw Exception(e);
+                  }
+                },
                 onTap: () {
-                
+                  ref.read(selectedWorkoutProvider.notifier).state = plan;
+                  Navigator.of(context).pushNamed("/treningPlanDetails");
                 },
                 onLongPress: () {
                    showDialog(
