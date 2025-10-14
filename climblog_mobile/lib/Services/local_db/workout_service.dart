@@ -1,22 +1,29 @@
 import 'package:drift/drift.dart';
 import 'package:climblog_mobile/database/database.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class WorkoutService {
   final AppDatabase _db = AppDatabase();
-
+  final _storage = const FlutterSecureStorage();
   
   Future<int> addWorkoutPlan({
-    required int userId,
+    
     required String name,
     bool isPublic = false,
     String imagePath = '',
     List<WorkoutDayInput>? days,
   }) async {
+    final userID = await _storage.read(key: "userid");
+      if (userID == null) {
+        throw Exception("User is not logged in");
+      }
+    final userIdToInt = int.parse(userID);
+    
     return await _db.transaction(() async {
       
       final planId = await _db.into(_db.workoutPlans).insert(
             WorkoutPlansCompanion.insert(
-              userId: userId,
+              userId: userIdToInt,
               name: Value(name),
               isPublic: Value(isPublic),
               imagePath: Value(imagePath),

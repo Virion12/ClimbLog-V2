@@ -11,6 +11,10 @@ final workoutPlansProvider = StreamProvider.autoDispose<List<WorkoutPlanFull>>((
   return workoutService.watchAllWorkoutPlans(); 
 });
 
+
+//addition provider
+final addNameWorkoutProvider = StateProvider<String>((ref) => "");
+
 final selectedWorkoutProvider = StateProvider<WorkoutPlanFull?>((ref) => null);
 
 final mainWorkoutPlanProvider = Provider<WorkoutPlanFull?>((ref) {

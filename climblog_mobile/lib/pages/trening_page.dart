@@ -1,4 +1,5 @@
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
+import 'package:climblog_mobile/Widgets/trening/trening_add_button.dart';
 import 'package:climblog_mobile/Widgets/trening/trening_info_dialog.dart';
 import 'package:climblog_mobile/Widgets/trening/workout_add_button.dart';
 import 'package:climblog_mobile/Widgets/trening/workout_plans_all.dart';
@@ -41,8 +42,9 @@ class _TreningPageState extends State<TreningPage> {
             ],
           )),
           WorkoutPlansAll(),
-          SizedBox(height: 40,),
-          WorkoutAddButton(),
+          TreningAddButton(),
+          // SizedBox(height: 40,),
+          // WorkoutAddButton(),
         ],
       ),
     );

@@ -27,7 +27,6 @@ class _TreningDetailsPageState extends ConsumerState<TreningDetailsPage> {
       );
     }
 
-    // Tworzymy mapę dni z bazy danych
     final daysMap = <int, WorkoutDayFull>{};
     for (var day in selected.days) {
       daysMap[day.day.workoutDayOfWeek] = day;
@@ -74,9 +73,9 @@ class _TreningDetailsPageState extends ConsumerState<TreningDetailsPage> {
           Expanded(
             child: PageView.builder(
               controller: pageController,
-              itemCount: 7, // Zawsze 7 dni tygodnia
+              itemCount: 7, 
               itemBuilder: (context, index) {
-                final dayWorkout = daysMap[index]; // Może być null
+                final dayWorkout = daysMap[index]; 
 
                 return AnimatedBuilder(
                   animation: pageController,

@@ -42,7 +42,6 @@ class _WorkoutAddButtonState extends State<WorkoutAddButton> {
         'Sunday'
       ];
 
-      // 🔹 Tworzymy 7 dni z co najmniej 2 sesjami i przykładowymi ćwiczeniami
       final List<WorkoutDayInput> allDays = List.generate(7, (index) {
         return WorkoutDayInput(
           dayOfWeek: index, // 0–6
@@ -72,7 +71,6 @@ class _WorkoutAddButtonState extends State<WorkoutAddButton> {
       });
 
       final planId = await _service.addWorkoutPlan(
-        userId: 1,
         name: 'Full Week Training Plan',
         isPublic: true,
         days: allDays,
