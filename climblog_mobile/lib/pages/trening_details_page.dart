@@ -176,7 +176,7 @@ class _TreningDetailsPageState extends ConsumerState<TreningDetailsPage> {
                             ...session.exercises.map((e) => Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 2),
                                   child: Text(
-                                    '${e.name} - ${e.setNumber} sets × ${e.time?.toInt() ?? 0}s',
+                                    '${e.name} - ${e.setNumber} sets × ${e.time.toInt()}s',
                                     style: const TextStyle(
                                       fontSize: 15,
                                       color: Colors.black87,

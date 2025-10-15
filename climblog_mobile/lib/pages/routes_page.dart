@@ -1,4 +1,3 @@
-import 'package:climblog_mobile/Widgets/Routes/all_routes.dart';
 import 'package:climblog_mobile/Widgets/Routes/data_filter_buttons.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_count.dart';
 import 'package:climblog_mobile/Widgets/Routes/top60_routes.dart';

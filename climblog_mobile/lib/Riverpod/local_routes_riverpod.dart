@@ -1,9 +1,10 @@
+import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 
-final dbProvider = Provider<AppDatabase>((ref) => AppDatabase());
+
 
 final routeServiceProvider = Provider<RouteService>((ref) {
   final db = ref.watch(dbProvider);

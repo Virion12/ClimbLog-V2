@@ -111,7 +111,7 @@ class _MyWidgetState extends State<HomeSessionBox> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          '${exercise.setNumber ?? 0} × ${exercise.repNumber ?? 0} (${exercise.time?.toInt() ?? 0}s)',
+                          '${exercise.setNumber} × ${exercise.repNumber} (${exercise.time.toInt()}s)',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,

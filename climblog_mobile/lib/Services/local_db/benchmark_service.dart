@@ -41,28 +41,16 @@ class BenchmarkService {
   }
 
 // Get all
-Future<Stream<List<Benchmark>>> getAll() async {
-  final userID = await _storage.read(key: "userid");
-  if (userID == null) {
-    throw Exception("User is not logged in");
-  }
-  final userIdToInt = int.parse(userID);
- 
+Stream<List<Benchmark>> getAll(int userId) {
   return (_db.select(_db.benchmarks)
-    ..where((b) => b.userId.equals(userIdToInt))
+    ..where((b) => b.userId.equals(userId))
     ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
     .watch();
 }
-// Get all not to deletion
-Future<Stream<List<Benchmark>>> getAllWithoutToDelete() async {
-  final userID = await _storage.read(key: "userid");
-  if (userID == null) {
-    throw Exception("User is not logged in");
-  }
-  final userIdToInt = int.parse(userID);
- 
+
+Stream<List<Benchmark>> getAllWithoutToDelete(int userId) {
   return (_db.select(_db.benchmarks)
-    ..where((b) => b.userId.equals(userIdToInt) & b.isToDelete.equals(false))
+    ..where((b) => b.userId.equals(userId) & b.isToDelete.equals(false))
     ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
     .watch();
 }
