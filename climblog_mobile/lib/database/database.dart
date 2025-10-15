@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:climblog_mobile/database/benchmark.dart';
 import 'package:climblog_mobile/database/climbing_routes.dart';
 import 'package:climblog_mobile/database/workout.dart';
 import 'package:drift/drift.dart';
@@ -15,6 +16,7 @@ part 'database.g.dart';
     WorkoutDays,
     WorkoutSessions,
     Exercises,
+    Benchmarks,
   ],
 )
 class AppDatabase extends _$AppDatabase {

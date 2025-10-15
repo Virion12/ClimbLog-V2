@@ -3225,6 +3225,662 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
   }
 }
 
+class $BenchmarksTable extends Benchmarks
+    with TableInfo<$BenchmarksTable, Benchmark> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BenchmarksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _backendIdMeta = const VerificationMeta(
+    'backendId',
+  );
+  @override
+  late final GeneratedColumn<int> backendId = GeneratedColumn<int>(
+    'backend_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyWeightMeta = const VerificationMeta(
+    'bodyWeight',
+  );
+  @override
+  late final GeneratedColumn<double> bodyWeight = GeneratedColumn<double>(
+    'body_weight',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ex1PointsMeta = const VerificationMeta(
+    'ex1Points',
+  );
+  @override
+  late final GeneratedColumn<int> ex1Points = GeneratedColumn<int>(
+    'ex1_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ex2PointsMeta = const VerificationMeta(
+    'ex2Points',
+  );
+  @override
+  late final GeneratedColumn<int> ex2Points = GeneratedColumn<int>(
+    'ex2_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ex3PointsMeta = const VerificationMeta(
+    'ex3Points',
+  );
+  @override
+  late final GeneratedColumn<int> ex3Points = GeneratedColumn<int>(
+    'ex3_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ex4PointsMeta = const VerificationMeta(
+    'ex4Points',
+  );
+  @override
+  late final GeneratedColumn<int> ex4Points = GeneratedColumn<int>(
+    'ex4_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isToDeleteMeta = const VerificationMeta(
+    'isToDelete',
+  );
+  @override
+  late final GeneratedColumn<bool> isToDelete = GeneratedColumn<bool>(
+    'is_to_delete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_to_delete" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
+  static const VerificationMeta _isAddedToBackendMeta = const VerificationMeta(
+    'isAddedToBackend',
+  );
+  @override
+  late final GeneratedColumn<bool> isAddedToBackend = GeneratedColumn<bool>(
+    'is_added_to_backend',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_added_to_backend" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    backendId,
+    userId,
+    bodyWeight,
+    ex1Points,
+    ex2Points,
+    ex3Points,
+    ex4Points,
+    isToDelete,
+    isAddedToBackend,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'benchmarks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Benchmark> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('backend_id')) {
+      context.handle(
+        _backendIdMeta,
+        backendId.isAcceptableOrUnknown(data['backend_id']!, _backendIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_backendIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('body_weight')) {
+      context.handle(
+        _bodyWeightMeta,
+        bodyWeight.isAcceptableOrUnknown(data['body_weight']!, _bodyWeightMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyWeightMeta);
+    }
+    if (data.containsKey('ex1_points')) {
+      context.handle(
+        _ex1PointsMeta,
+        ex1Points.isAcceptableOrUnknown(data['ex1_points']!, _ex1PointsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ex1PointsMeta);
+    }
+    if (data.containsKey('ex2_points')) {
+      context.handle(
+        _ex2PointsMeta,
+        ex2Points.isAcceptableOrUnknown(data['ex2_points']!, _ex2PointsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ex2PointsMeta);
+    }
+    if (data.containsKey('ex3_points')) {
+      context.handle(
+        _ex3PointsMeta,
+        ex3Points.isAcceptableOrUnknown(data['ex3_points']!, _ex3PointsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ex3PointsMeta);
+    }
+    if (data.containsKey('ex4_points')) {
+      context.handle(
+        _ex4PointsMeta,
+        ex4Points.isAcceptableOrUnknown(data['ex4_points']!, _ex4PointsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ex4PointsMeta);
+    }
+    if (data.containsKey('is_to_delete')) {
+      context.handle(
+        _isToDeleteMeta,
+        isToDelete.isAcceptableOrUnknown(
+          data['is_to_delete']!,
+          _isToDeleteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_added_to_backend')) {
+      context.handle(
+        _isAddedToBackendMeta,
+        isAddedToBackend.isAcceptableOrUnknown(
+          data['is_added_to_backend']!,
+          _isAddedToBackendMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Benchmark map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Benchmark(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      backendId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}backend_id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      bodyWeight: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}body_weight'],
+      )!,
+      ex1Points: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ex1_points'],
+      )!,
+      ex2Points: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ex2_points'],
+      )!,
+      ex3Points: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ex3_points'],
+      )!,
+      ex4Points: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ex4_points'],
+      )!,
+      isToDelete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_to_delete'],
+      )!,
+      isAddedToBackend: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_added_to_backend'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BenchmarksTable createAlias(String alias) {
+    return $BenchmarksTable(attachedDatabase, alias);
+  }
+}
+
+class Benchmark extends DataClass implements Insertable<Benchmark> {
+  final int id;
+  final int backendId;
+  final int userId;
+  final double bodyWeight;
+  final int ex1Points;
+  final int ex2Points;
+  final int ex3Points;
+  final int ex4Points;
+  final bool isToDelete;
+  final bool isAddedToBackend;
+  final DateTime createdAt;
+  const Benchmark({
+    required this.id,
+    required this.backendId,
+    required this.userId,
+    required this.bodyWeight,
+    required this.ex1Points,
+    required this.ex2Points,
+    required this.ex3Points,
+    required this.ex4Points,
+    required this.isToDelete,
+    required this.isAddedToBackend,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['backend_id'] = Variable<int>(backendId);
+    map['user_id'] = Variable<int>(userId);
+    map['body_weight'] = Variable<double>(bodyWeight);
+    map['ex1_points'] = Variable<int>(ex1Points);
+    map['ex2_points'] = Variable<int>(ex2Points);
+    map['ex3_points'] = Variable<int>(ex3Points);
+    map['ex4_points'] = Variable<int>(ex4Points);
+    map['is_to_delete'] = Variable<bool>(isToDelete);
+    map['is_added_to_backend'] = Variable<bool>(isAddedToBackend);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BenchmarksCompanion toCompanion(bool nullToAbsent) {
+    return BenchmarksCompanion(
+      id: Value(id),
+      backendId: Value(backendId),
+      userId: Value(userId),
+      bodyWeight: Value(bodyWeight),
+      ex1Points: Value(ex1Points),
+      ex2Points: Value(ex2Points),
+      ex3Points: Value(ex3Points),
+      ex4Points: Value(ex4Points),
+      isToDelete: Value(isToDelete),
+      isAddedToBackend: Value(isAddedToBackend),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Benchmark.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Benchmark(
+      id: serializer.fromJson<int>(json['id']),
+      backendId: serializer.fromJson<int>(json['backendId']),
+      userId: serializer.fromJson<int>(json['userId']),
+      bodyWeight: serializer.fromJson<double>(json['bodyWeight']),
+      ex1Points: serializer.fromJson<int>(json['ex1Points']),
+      ex2Points: serializer.fromJson<int>(json['ex2Points']),
+      ex3Points: serializer.fromJson<int>(json['ex3Points']),
+      ex4Points: serializer.fromJson<int>(json['ex4Points']),
+      isToDelete: serializer.fromJson<bool>(json['isToDelete']),
+      isAddedToBackend: serializer.fromJson<bool>(json['isAddedToBackend']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'backendId': serializer.toJson<int>(backendId),
+      'userId': serializer.toJson<int>(userId),
+      'bodyWeight': serializer.toJson<double>(bodyWeight),
+      'ex1Points': serializer.toJson<int>(ex1Points),
+      'ex2Points': serializer.toJson<int>(ex2Points),
+      'ex3Points': serializer.toJson<int>(ex3Points),
+      'ex4Points': serializer.toJson<int>(ex4Points),
+      'isToDelete': serializer.toJson<bool>(isToDelete),
+      'isAddedToBackend': serializer.toJson<bool>(isAddedToBackend),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Benchmark copyWith({
+    int? id,
+    int? backendId,
+    int? userId,
+    double? bodyWeight,
+    int? ex1Points,
+    int? ex2Points,
+    int? ex3Points,
+    int? ex4Points,
+    bool? isToDelete,
+    bool? isAddedToBackend,
+    DateTime? createdAt,
+  }) => Benchmark(
+    id: id ?? this.id,
+    backendId: backendId ?? this.backendId,
+    userId: userId ?? this.userId,
+    bodyWeight: bodyWeight ?? this.bodyWeight,
+    ex1Points: ex1Points ?? this.ex1Points,
+    ex2Points: ex2Points ?? this.ex2Points,
+    ex3Points: ex3Points ?? this.ex3Points,
+    ex4Points: ex4Points ?? this.ex4Points,
+    isToDelete: isToDelete ?? this.isToDelete,
+    isAddedToBackend: isAddedToBackend ?? this.isAddedToBackend,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Benchmark copyWithCompanion(BenchmarksCompanion data) {
+    return Benchmark(
+      id: data.id.present ? data.id.value : this.id,
+      backendId: data.backendId.present ? data.backendId.value : this.backendId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      bodyWeight: data.bodyWeight.present
+          ? data.bodyWeight.value
+          : this.bodyWeight,
+      ex1Points: data.ex1Points.present ? data.ex1Points.value : this.ex1Points,
+      ex2Points: data.ex2Points.present ? data.ex2Points.value : this.ex2Points,
+      ex3Points: data.ex3Points.present ? data.ex3Points.value : this.ex3Points,
+      ex4Points: data.ex4Points.present ? data.ex4Points.value : this.ex4Points,
+      isToDelete: data.isToDelete.present
+          ? data.isToDelete.value
+          : this.isToDelete,
+      isAddedToBackend: data.isAddedToBackend.present
+          ? data.isAddedToBackend.value
+          : this.isAddedToBackend,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Benchmark(')
+          ..write('id: $id, ')
+          ..write('backendId: $backendId, ')
+          ..write('userId: $userId, ')
+          ..write('bodyWeight: $bodyWeight, ')
+          ..write('ex1Points: $ex1Points, ')
+          ..write('ex2Points: $ex2Points, ')
+          ..write('ex3Points: $ex3Points, ')
+          ..write('ex4Points: $ex4Points, ')
+          ..write('isToDelete: $isToDelete, ')
+          ..write('isAddedToBackend: $isAddedToBackend, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    backendId,
+    userId,
+    bodyWeight,
+    ex1Points,
+    ex2Points,
+    ex3Points,
+    ex4Points,
+    isToDelete,
+    isAddedToBackend,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Benchmark &&
+          other.id == this.id &&
+          other.backendId == this.backendId &&
+          other.userId == this.userId &&
+          other.bodyWeight == this.bodyWeight &&
+          other.ex1Points == this.ex1Points &&
+          other.ex2Points == this.ex2Points &&
+          other.ex3Points == this.ex3Points &&
+          other.ex4Points == this.ex4Points &&
+          other.isToDelete == this.isToDelete &&
+          other.isAddedToBackend == this.isAddedToBackend &&
+          other.createdAt == this.createdAt);
+}
+
+class BenchmarksCompanion extends UpdateCompanion<Benchmark> {
+  final Value<int> id;
+  final Value<int> backendId;
+  final Value<int> userId;
+  final Value<double> bodyWeight;
+  final Value<int> ex1Points;
+  final Value<int> ex2Points;
+  final Value<int> ex3Points;
+  final Value<int> ex4Points;
+  final Value<bool> isToDelete;
+  final Value<bool> isAddedToBackend;
+  final Value<DateTime> createdAt;
+  const BenchmarksCompanion({
+    this.id = const Value.absent(),
+    this.backendId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.bodyWeight = const Value.absent(),
+    this.ex1Points = const Value.absent(),
+    this.ex2Points = const Value.absent(),
+    this.ex3Points = const Value.absent(),
+    this.ex4Points = const Value.absent(),
+    this.isToDelete = const Value.absent(),
+    this.isAddedToBackend = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  BenchmarksCompanion.insert({
+    this.id = const Value.absent(),
+    required int backendId,
+    required int userId,
+    required double bodyWeight,
+    required int ex1Points,
+    required int ex2Points,
+    required int ex3Points,
+    required int ex4Points,
+    this.isToDelete = const Value.absent(),
+    this.isAddedToBackend = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : backendId = Value(backendId),
+       userId = Value(userId),
+       bodyWeight = Value(bodyWeight),
+       ex1Points = Value(ex1Points),
+       ex2Points = Value(ex2Points),
+       ex3Points = Value(ex3Points),
+       ex4Points = Value(ex4Points);
+  static Insertable<Benchmark> custom({
+    Expression<int>? id,
+    Expression<int>? backendId,
+    Expression<int>? userId,
+    Expression<double>? bodyWeight,
+    Expression<int>? ex1Points,
+    Expression<int>? ex2Points,
+    Expression<int>? ex3Points,
+    Expression<int>? ex4Points,
+    Expression<bool>? isToDelete,
+    Expression<bool>? isAddedToBackend,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (backendId != null) 'backend_id': backendId,
+      if (userId != null) 'user_id': userId,
+      if (bodyWeight != null) 'body_weight': bodyWeight,
+      if (ex1Points != null) 'ex1_points': ex1Points,
+      if (ex2Points != null) 'ex2_points': ex2Points,
+      if (ex3Points != null) 'ex3_points': ex3Points,
+      if (ex4Points != null) 'ex4_points': ex4Points,
+      if (isToDelete != null) 'is_to_delete': isToDelete,
+      if (isAddedToBackend != null) 'is_added_to_backend': isAddedToBackend,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  BenchmarksCompanion copyWith({
+    Value<int>? id,
+    Value<int>? backendId,
+    Value<int>? userId,
+    Value<double>? bodyWeight,
+    Value<int>? ex1Points,
+    Value<int>? ex2Points,
+    Value<int>? ex3Points,
+    Value<int>? ex4Points,
+    Value<bool>? isToDelete,
+    Value<bool>? isAddedToBackend,
+    Value<DateTime>? createdAt,
+  }) {
+    return BenchmarksCompanion(
+      id: id ?? this.id,
+      backendId: backendId ?? this.backendId,
+      userId: userId ?? this.userId,
+      bodyWeight: bodyWeight ?? this.bodyWeight,
+      ex1Points: ex1Points ?? this.ex1Points,
+      ex2Points: ex2Points ?? this.ex2Points,
+      ex3Points: ex3Points ?? this.ex3Points,
+      ex4Points: ex4Points ?? this.ex4Points,
+      isToDelete: isToDelete ?? this.isToDelete,
+      isAddedToBackend: isAddedToBackend ?? this.isAddedToBackend,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (backendId.present) {
+      map['backend_id'] = Variable<int>(backendId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (bodyWeight.present) {
+      map['body_weight'] = Variable<double>(bodyWeight.value);
+    }
+    if (ex1Points.present) {
+      map['ex1_points'] = Variable<int>(ex1Points.value);
+    }
+    if (ex2Points.present) {
+      map['ex2_points'] = Variable<int>(ex2Points.value);
+    }
+    if (ex3Points.present) {
+      map['ex3_points'] = Variable<int>(ex3Points.value);
+    }
+    if (ex4Points.present) {
+      map['ex4_points'] = Variable<int>(ex4Points.value);
+    }
+    if (isToDelete.present) {
+      map['is_to_delete'] = Variable<bool>(isToDelete.value);
+    }
+    if (isAddedToBackend.present) {
+      map['is_added_to_backend'] = Variable<bool>(isAddedToBackend.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BenchmarksCompanion(')
+          ..write('id: $id, ')
+          ..write('backendId: $backendId, ')
+          ..write('userId: $userId, ')
+          ..write('bodyWeight: $bodyWeight, ')
+          ..write('ex1Points: $ex1Points, ')
+          ..write('ex2Points: $ex2Points, ')
+          ..write('ex3Points: $ex3Points, ')
+          ..write('ex4Points: $ex4Points, ')
+          ..write('isToDelete: $isToDelete, ')
+          ..write('isAddedToBackend: $isAddedToBackend, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3235,6 +3891,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $ExercisesTable exercises = $ExercisesTable(this);
+  late final $BenchmarksTable benchmarks = $BenchmarksTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3245,6 +3902,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     workoutDays,
     workoutSessions,
     exercises,
+    benchmarks,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -5497,6 +6155,317 @@ typedef $$ExercisesTableProcessedTableManager =
       Exercise,
       PrefetchHooks Function({bool workoutSessionId})
     >;
+typedef $$BenchmarksTableCreateCompanionBuilder =
+    BenchmarksCompanion Function({
+      Value<int> id,
+      required int backendId,
+      required int userId,
+      required double bodyWeight,
+      required int ex1Points,
+      required int ex2Points,
+      required int ex3Points,
+      required int ex4Points,
+      Value<bool> isToDelete,
+      Value<bool> isAddedToBackend,
+      Value<DateTime> createdAt,
+    });
+typedef $$BenchmarksTableUpdateCompanionBuilder =
+    BenchmarksCompanion Function({
+      Value<int> id,
+      Value<int> backendId,
+      Value<int> userId,
+      Value<double> bodyWeight,
+      Value<int> ex1Points,
+      Value<int> ex2Points,
+      Value<int> ex3Points,
+      Value<int> ex4Points,
+      Value<bool> isToDelete,
+      Value<bool> isAddedToBackend,
+      Value<DateTime> createdAt,
+    });
+
+class $$BenchmarksTableFilterComposer
+    extends Composer<_$AppDatabase, $BenchmarksTable> {
+  $$BenchmarksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get backendId => $composableBuilder(
+    column: $table.backendId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get bodyWeight => $composableBuilder(
+    column: $table.bodyWeight,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ex1Points => $composableBuilder(
+    column: $table.ex1Points,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ex2Points => $composableBuilder(
+    column: $table.ex2Points,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ex3Points => $composableBuilder(
+    column: $table.ex3Points,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ex4Points => $composableBuilder(
+    column: $table.ex4Points,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isToDelete => $composableBuilder(
+    column: $table.isToDelete,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isAddedToBackend => $composableBuilder(
+    column: $table.isAddedToBackend,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BenchmarksTableOrderingComposer
+    extends Composer<_$AppDatabase, $BenchmarksTable> {
+  $$BenchmarksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get backendId => $composableBuilder(
+    column: $table.backendId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get bodyWeight => $composableBuilder(
+    column: $table.bodyWeight,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ex1Points => $composableBuilder(
+    column: $table.ex1Points,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ex2Points => $composableBuilder(
+    column: $table.ex2Points,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ex3Points => $composableBuilder(
+    column: $table.ex3Points,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ex4Points => $composableBuilder(
+    column: $table.ex4Points,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isToDelete => $composableBuilder(
+    column: $table.isToDelete,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isAddedToBackend => $composableBuilder(
+    column: $table.isAddedToBackend,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BenchmarksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BenchmarksTable> {
+  $$BenchmarksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get backendId =>
+      $composableBuilder(column: $table.backendId, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<double> get bodyWeight => $composableBuilder(
+    column: $table.bodyWeight,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get ex1Points =>
+      $composableBuilder(column: $table.ex1Points, builder: (column) => column);
+
+  GeneratedColumn<int> get ex2Points =>
+      $composableBuilder(column: $table.ex2Points, builder: (column) => column);
+
+  GeneratedColumn<int> get ex3Points =>
+      $composableBuilder(column: $table.ex3Points, builder: (column) => column);
+
+  GeneratedColumn<int> get ex4Points =>
+      $composableBuilder(column: $table.ex4Points, builder: (column) => column);
+
+  GeneratedColumn<bool> get isToDelete => $composableBuilder(
+    column: $table.isToDelete,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isAddedToBackend => $composableBuilder(
+    column: $table.isAddedToBackend,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BenchmarksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BenchmarksTable,
+          Benchmark,
+          $$BenchmarksTableFilterComposer,
+          $$BenchmarksTableOrderingComposer,
+          $$BenchmarksTableAnnotationComposer,
+          $$BenchmarksTableCreateCompanionBuilder,
+          $$BenchmarksTableUpdateCompanionBuilder,
+          (
+            Benchmark,
+            BaseReferences<_$AppDatabase, $BenchmarksTable, Benchmark>,
+          ),
+          Benchmark,
+          PrefetchHooks Function()
+        > {
+  $$BenchmarksTableTableManager(_$AppDatabase db, $BenchmarksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BenchmarksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BenchmarksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BenchmarksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> backendId = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<double> bodyWeight = const Value.absent(),
+                Value<int> ex1Points = const Value.absent(),
+                Value<int> ex2Points = const Value.absent(),
+                Value<int> ex3Points = const Value.absent(),
+                Value<int> ex4Points = const Value.absent(),
+                Value<bool> isToDelete = const Value.absent(),
+                Value<bool> isAddedToBackend = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BenchmarksCompanion(
+                id: id,
+                backendId: backendId,
+                userId: userId,
+                bodyWeight: bodyWeight,
+                ex1Points: ex1Points,
+                ex2Points: ex2Points,
+                ex3Points: ex3Points,
+                ex4Points: ex4Points,
+                isToDelete: isToDelete,
+                isAddedToBackend: isAddedToBackend,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int backendId,
+                required int userId,
+                required double bodyWeight,
+                required int ex1Points,
+                required int ex2Points,
+                required int ex3Points,
+                required int ex4Points,
+                Value<bool> isToDelete = const Value.absent(),
+                Value<bool> isAddedToBackend = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BenchmarksCompanion.insert(
+                id: id,
+                backendId: backendId,
+                userId: userId,
+                bodyWeight: bodyWeight,
+                ex1Points: ex1Points,
+                ex2Points: ex2Points,
+                ex3Points: ex3Points,
+                ex4Points: ex4Points,
+                isToDelete: isToDelete,
+                isAddedToBackend: isAddedToBackend,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BenchmarksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BenchmarksTable,
+      Benchmark,
+      $$BenchmarksTableFilterComposer,
+      $$BenchmarksTableOrderingComposer,
+      $$BenchmarksTableAnnotationComposer,
+      $$BenchmarksTableCreateCompanionBuilder,
+      $$BenchmarksTableUpdateCompanionBuilder,
+      (Benchmark, BaseReferences<_$AppDatabase, $BenchmarksTable, Benchmark>),
+      Benchmark,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5511,4 +6480,6 @@ class $AppDatabaseManager {
       $$WorkoutSessionsTableTableManager(_db, _db.workoutSessions);
   $$ExercisesTableTableManager get exercises =>
       $$ExercisesTableTableManager(_db, _db.exercises);
+  $$BenchmarksTableTableManager get benchmarks =>
+      $$BenchmarksTableTableManager(_db, _db.benchmarks);
 }

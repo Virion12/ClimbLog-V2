@@ -44,12 +44,12 @@ class _TreningAddFormState extends State<TreningAddForm> {
     final minute = _selectedMinutes[dayName];
 
     if (sessionName.isEmpty) {
-      _showSnackBar("Podaj nazwę sesji dla $dayName");
+      _showSnackBar("Enter session name for $dayName");
       return;
     }
 
     if (hour == null || minute == null) {
-      _showSnackBar("Wybierz godzinę rozpoczęcia dla $dayName");
+      _showSnackBar("Select start time for $dayName");
       return;
     }
 
@@ -93,13 +93,13 @@ class _TreningAddFormState extends State<TreningAddForm> {
 
   void _saveWorkout() async {
     if (_nameWorkoutController.text.trim().isEmpty) {
-      _showSnackBar("Podaj nazwę planu treningowego");
+      _showSnackBar("Enter workout plan name");
       return;
     }
 
     final hasAnySessions = _daysSessions.values.any((sessions) => sessions.isNotEmpty);
     if (!hasAnySessions) {
-      _showSnackBar("Dodaj przynajmniej jedną sesję");
+      _showSnackBar("Add at least one session");
       return;
     }
 
@@ -133,12 +133,12 @@ class _TreningAddFormState extends State<TreningAddForm> {
       );
 
       if (mounted) {
-        _showSnackBar("Plan treningowy zapisany (ID: $id)", success: true);
+        _showSnackBar("Workout plan saved (ID: $id)", success: true);
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar("Błąd: $e");
+        _showSnackBar("Error: $e");
       }
     }
   }
@@ -171,7 +171,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Nowy Plan Treningowy"),
+        title: const Text("New Workout Plan"),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -189,7 +189,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                   TextField(
                     controller: _nameWorkoutController,
                     decoration: InputDecoration(
-                      labelText: "Nazwa planu treningowego",
+                      labelText: "Workout plan name",
                       filled: true,
                       fillColor: Colors.white,
                       border: inputBorder,
@@ -201,7 +201,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    "Dni treningowe",
+                    "Training days",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -231,7 +231,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                 width: double.infinity,
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: const Color(0xFF00a896),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -240,7 +240,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                   ),
                   onPressed: _saveWorkout,
                   child: const Text(
-                    "Zapisz plan treningowy",
+                    "Save workout plan",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -312,7 +312,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                 children: [
                   if (hasActiveSessions) ...[
                     const Text(
-                      "Dodane sesje:",
+                      "Added sessions:",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -325,7 +325,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                     const Divider(height: 24),
                   ],
                   const Text(
-                    "Dodaj nową sesję:",
+                    "Add new session:",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -336,7 +336,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                   TextField(
                     controller: _sessionNameControllers[day],
                     decoration: InputDecoration(
-                      labelText: "Nazwa sesji",
+                      labelText: "Session name",
                       border: inputBorder,
                       enabledBorder: inputBorder,
                       focusedBorder: inputBorder.copyWith(
@@ -350,8 +350,9 @@ class _TreningAddFormState extends State<TreningAddForm> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<int>(
+                          dropdownColor: Colors.white,
                           decoration: InputDecoration(
-                            labelText: "Godzina",
+                            labelText: "Hour",
                             border: inputBorder,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           ),
@@ -369,8 +370,10 @@ class _TreningAddFormState extends State<TreningAddForm> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: DropdownButtonFormField<int>(
+                          dropdownColor: Colors.white,
                           decoration: InputDecoration(
-                            labelText: "Minuta",
+                            
+                            labelText: "Minute",
                             border: inputBorder,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           ),
@@ -392,7 +395,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                     width: double.infinity,
                     child: FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: const Color(0xFF00a896),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -401,7 +404,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
                       ),
                       onPressed: () => _addSessionForDay(day),
                       icon: const Icon(Icons.add_rounded, size: 20),
-                      label: const Text("Dodaj sesję"),
+                      label: const Text("Add session"),
                     ),
                   ),
                 ],
@@ -459,7 +462,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
           if (session.exercises.isNotEmpty) ...[
             const Divider(height: 20),
             const Text(
-              "Ćwiczenia:",
+              "Exercises:",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
@@ -524,7 +527,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
               ),
               onPressed: () => _addExerciseToSession(day, sessionIndex),
               icon: const Icon(Icons.fitness_center, size: 16),
-              label: const Text("Dodaj ćwiczenie", style: TextStyle(fontSize: 13)),
+              label: const Text("Add exercise", style: TextStyle(fontSize: 13)),
             ),
           ),
         ],
@@ -535,18 +538,18 @@ class _TreningAddFormState extends State<TreningAddForm> {
   String _buildExerciseDetails(ExerciseInput exercise) {
     List<String> details = [];
     if (exercise.setNumber != null && exercise.setNumber! > 0) {
-      details.add("Serie: ${exercise.setNumber}");
+      details.add("Sets: ${exercise.setNumber}");
     }
     if (exercise.repNumber != null && exercise.repNumber! > 0) {
-      details.add("Powtórzenia: ${exercise.repNumber}");
+      details.add("Reps: ${exercise.repNumber}");
     }
     if (exercise.time != null && exercise.time! > 0) {
-      details.add("Czas: ${exercise.time}s");
+      details.add("Time: ${exercise.time}s");
     }
     if (exercise.breakTime != null && exercise.breakTime! > 0) {
-      details.add("Przerwa: ${exercise.breakTime}s");
+      details.add("Break: ${exercise.breakTime}s");
     }
-    return details.isEmpty ? "Brak szczegółów" : details.join(" • ");
+    return details.isEmpty ? "No details" : details.join(" • ");
   }
 }
 
@@ -592,7 +595,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
     if (_nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Podaj nazwę ćwiczenia"),
+          content: Text("Enter exercise name"),
           backgroundColor: Colors.red,
         ),
       );
@@ -619,6 +622,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
     );
 
     return Dialog(
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: SingleChildScrollView(
         child: Padding(
@@ -628,7 +632,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "Dodaj ćwiczenie",
+                "Add exercise",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -638,7 +642,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: "Nazwa ćwiczenia *",
+                  labelText: "Exercise name *",
                   border: inputBorder,
                   enabledBorder: inputBorder,
                   focusedBorder: inputBorder.copyWith(
@@ -654,7 +658,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
                       controller: _setsController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Serie",
+                        labelText: "Sets",
                         border: inputBorder,
                         enabledBorder: inputBorder,
                         focusedBorder: inputBorder.copyWith(
@@ -669,7 +673,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
                       controller: _repsController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Powtórzenia",
+                        labelText: "Reps",
                         border: inputBorder,
                         enabledBorder: inputBorder,
                         focusedBorder: inputBorder.copyWith(
@@ -688,7 +692,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
                       controller: _timeController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Czas (s)",
+                        labelText: "Time (s)",
                         border: inputBorder,
                         enabledBorder: inputBorder,
                         focusedBorder: inputBorder.copyWith(
@@ -703,7 +707,7 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
                       controller: _breakController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Przerwa (s)",
+                        labelText: "Break (s)",
                         border: inputBorder,
                         enabledBorder: inputBorder,
                         focusedBorder: inputBorder.copyWith(
@@ -720,16 +724,16 @@ class _ExerciseDialogState extends State<_ExerciseDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text("Anuluj"),
+                    child: const Text("Cancel"),
                   ),
                   const SizedBox(width: 12),
                   FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: const Color(0xFF00a896),
                       foregroundColor: Colors.white,
                     ),
                     onPressed: _addExercise,
-                    child: const Text("Dodaj"),
+                    child: const Text("Add"),
                   ),
                 ],
               ),

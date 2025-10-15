@@ -22,7 +22,7 @@ class _WorkoutPlansAllState extends ConsumerState<WorkoutPlansAll> {
       child: plansAsync.when(
         data: (plans) {
           if (plans.isEmpty) {
-            return const Text('Brak planów treningowych');
+            return const Text('You do not have trenings plans yet',textAlign: TextAlign.center,);
           }
           return Wrap(
             spacing: 4,

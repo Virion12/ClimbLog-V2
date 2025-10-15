@@ -4,6 +4,7 @@ import 'package:climblog_mobile/Screens/register_screen.dart';
 import 'package:climblog_mobile/pages/all_routes_page.dart';
 import 'package:climblog_mobile/pages/compare_route_page.dart';
 import 'package:climblog_mobile/pages/statistics_routes_page.dart';
+import 'package:climblog_mobile/pages/trening_add_form.dart';
 import 'package:climblog_mobile/pages/trening_details_page.dart';
 import 'package:climblog_mobile/widget_tree.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         "/routesAll": (context) => const AllRoutesPage(),
         "/routesCompare": (context) => const CompareroutesPage(),
         "/treningPlanDetails": (context) => const TreningDetailsPage(),
+        "/treningAddNew": (context) => const TreningAddForm(),
       },
     );
   }
