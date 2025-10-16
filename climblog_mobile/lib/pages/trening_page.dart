@@ -1,9 +1,10 @@
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
+import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_add_button.dart';
 import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_info_dialog.dart';
 import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_top_20.dart';
-import 'package:climblog_mobile/Widgets/trening/trening_add_button.dart';
-import 'package:climblog_mobile/Widgets/trening/trening_info_dialog.dart';
-import 'package:climblog_mobile/Widgets/trening/workout_plans_all.dart';
+import 'package:climblog_mobile/Widgets/trening/workout/trening_add_button.dart';
+import 'package:climblog_mobile/Widgets/trening/workout/trening_info_dialog.dart';
+import 'package:climblog_mobile/Widgets/trening/workout/workout_plans_all.dart';
 import 'package:flutter/material.dart';
 
 class TreningPage extends StatefulWidget {
@@ -44,7 +45,7 @@ class _TreningPageState extends State<TreningPage> {
           )),
           WorkoutPlansAll(),
           TreningAddButton(),
-          SizedBox(height: 50,),
+          SizedBox(height: 20,),
            BasicContainer(child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -68,7 +69,9 @@ class _TreningPageState extends State<TreningPage> {
               }, icon: Icon(Icons.info)),
             ],
           )),
-          BenchmarkTop20()
+          BenchmarkTop20(),
+          BenchmarkAddButton(),
+          SizedBox(height: 30,),
         ],
       ),
     );

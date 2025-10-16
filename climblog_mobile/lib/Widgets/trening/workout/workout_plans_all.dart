@@ -1,8 +1,8 @@
 import 'package:climblog_mobile/Riverpod/local_trening_riverpod.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
-import 'package:climblog_mobile/Widgets/trening/confirm_removal_trening_dialog.dart';
-import 'package:climblog_mobile/Widgets/trening/trening_card.dart';
+import 'package:climblog_mobile/Widgets/trening/workout/confirm_removal_trening_dialog.dart';
+import 'package:climblog_mobile/Widgets/trening/workout/trening_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

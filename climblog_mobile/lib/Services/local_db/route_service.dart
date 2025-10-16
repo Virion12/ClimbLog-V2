@@ -223,6 +223,7 @@ Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDelete() {
 
 
 
+
 Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDeleteLastCustom(DateTime fromWhen) {
   return (_db.select(_db.climbingRoutes)
         ..where((t) => (t.isToDelete.equals(false) | t.isToDelete.isNull()) & t.createdAt.isBiggerOrEqualValue(fromWhen)))

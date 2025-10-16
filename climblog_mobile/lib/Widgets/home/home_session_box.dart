@@ -65,7 +65,7 @@ class _MyWidgetState extends State<HomeSessionBox> {
                     style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                   Text(
-                    widget.session.session.start, // Dodaj pole 'end' do bazy
+                    widget.session.session.start, 
                     style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ],
