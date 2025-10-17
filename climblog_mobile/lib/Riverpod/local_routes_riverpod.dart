@@ -108,7 +108,7 @@ final sortedRoutesProviderTop60 = Provider.autoDispose<List<ClimbingRoute>>((ref
         return b.createdAt.compareTo(a.createdAt);
       });
 
-      return sorted.take(60).toList();
+      return sorted.take(30).toList();
     },
     orElse: () => [],
   );
@@ -284,26 +284,33 @@ final List<Mountain> mountains = [
   Mountain("Bronx", 0),
 ];
 
-// Providery dla logiki gór
+
 final currentMountainProvider = Provider.autoDispose<Mountain>((ref) {
   final height = ref.watch(totalHeightProvider);
   
-  for (int i = mountains.length - 1; i >= 0; i--) {
+
+  for (int i = 0; i < mountains.length; i++) {
     if (height >= mountains[i].heightMeters) {
       return mountains[i];
     }
   }
+
   return mountains.last;
 });
 
 final nextMountainProvider = Provider.autoDispose<Mountain?>((ref) {
   final height = ref.watch(totalHeightProvider);
+  final current = ref.watch(currentMountainProvider);
   
-  for (int i = mountains.length - 1; i >= 0; i--) {
-    if (height < mountains[i].heightMeters) {
-      return mountains[i];
-    }
+
+  final currentIndex = mountains.indexOf(current);
+  
+
+  if (currentIndex > 0) {
+    return mountains[currentIndex - 1];
   }
+  
+
   return null;
 });
 

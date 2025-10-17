@@ -1,4 +1,5 @@
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
+import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_form_add.dart';
 import 'package:flutter/material.dart';
 
 class BenchmarkAddButton extends StatefulWidget {
@@ -15,7 +16,19 @@ class _TreningAddButtonState extends State<BenchmarkAddButton> {
     return BasicContainer(
       child: TextButton(
         onPressed: () {
-          //Navigator.of(context).pushNamed("/treningAddNew");
+          showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              backgroundColor: Colors.white,
+                              insetPadding: const EdgeInsets.all(10),
+                              child: const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: BenchmarkFormAdd(),
+                              ),
+                            );
+                          },
+                        );
         },
         style: TextButton.styleFrom(
           backgroundColor: const Color(0xFF00a896),

@@ -2,7 +2,6 @@ import 'package:climblog_mobile/Services/local_db/benchmark_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:flutter/material.dart';
-import 'package:climblog_mobile/database/database.dart';
 
 class TestDataGenerator extends StatefulWidget {
   final RouteService routeService;
@@ -10,11 +9,11 @@ class TestDataGenerator extends StatefulWidget {
   final BenchmarkService benchmarkService;
 
   const TestDataGenerator({
-    Key? key,
+    super.key,
     required this.routeService,
     required this.workoutService,
     required this.benchmarkService,
-  }) : super(key: key);
+  });
 
   @override
   State<TestDataGenerator> createState() => _TestDataGeneratorState();
