@@ -104,6 +104,50 @@ class WorkoutService {
     });
   }
 
+    Future<WorkoutPlanFull?> getOneWorkoutPlan(int id) async {
+    final plan = await (_db.select(_db.workoutPlans)
+          ..where((tbl) => tbl.id.equals(id)))
+        .getSingleOrNull();
+
+    if (plan == null) return null;
+
+    final days = await (_db.select(_db.workoutDays)
+          ..where((tbl) => tbl.workoutPlanId.equals(plan.id)))
+        .get();
+
+    final dayList = <WorkoutDayFull>[];
+
+    for (final day in days) {
+      final sessions = await (_db.select(_db.workoutSessions)
+            ..where((tbl) => tbl.workoutDayId.equals(day.id)))
+          .get();
+
+      final sessionList = <WorkoutSessionFull>[];
+
+      for (final session in sessions) {
+        final exercises = await (_db.select(_db.exercises)
+              ..where((tbl) => tbl.workoutSessionId.equals(session.id)))
+            .get();
+
+        sessionList.add(WorkoutSessionFull(
+          session: session,
+          exercises: exercises,
+        ));
+      }
+
+      dayList.add(WorkoutDayFull(
+        day: day,
+        sessions: sessionList,
+      ));
+    }
+
+    return WorkoutPlanFull(
+      plan: plan,
+      days: dayList,
+    );
+  }
+
+
   Stream<List<WorkoutPlanFull>> watchAllWorkoutPlans() {
     return _db.select(_db.workoutPlans).watch().asyncMap((plans) async {
       List<WorkoutPlanFull> result = [];
@@ -156,6 +200,16 @@ class WorkoutService {
     await (_db.update(_db.workoutPlans)..where((t) => t.id.equals(id))).write(WorkoutPlansCompanion(isMain: const Value(true)));
     return true;
   }
+
+
+  Future<void> toogleIsAddedToBackend(int id,int backendId) async{
+    await (_db.update(_db.workoutPlans)..where((t) => t.id.equals(id))).write(WorkoutPlansCompanion(isAddedToBackend: const Value(true),backendId: Value(backendId)));
+  }
+
+  Future<void> toogleIstoDelete(int id,int backendId) async{
+    await (_db.update(_db.workoutPlans)..where((t) => t.id.equals(id))).write(WorkoutPlansCompanion(isToDelete: const Value(true)));
+  }
+
 
   Future<List<WorkoutPlanFull>> getAllWorkoutPlans() async {
     final plans = await _db.select(_db.workoutPlans).get();

@@ -53,7 +53,7 @@ class _WorkoutPlansAllState extends ConsumerState<WorkoutPlansAll> {
                               insetPadding: const EdgeInsets.all(30),
                               child:  Padding(
                                 padding: EdgeInsets.all(16.0),
-                                child: ConfirmRemovalTreningDialog(planId: plan.plan.id),
+                                child: ConfirmRemovalTreningDialog(planId: plan.plan.id, backendId: plan.plan.backendId,),
                               ),
                             );
                           },

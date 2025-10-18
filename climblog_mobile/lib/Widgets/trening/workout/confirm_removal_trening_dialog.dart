@@ -1,15 +1,20 @@
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ConfirmRemovalTreningDialog extends StatefulWidget {
-  final  int planId;
-  const ConfirmRemovalTreningDialog({super.key, required this.planId});
+class ConfirmRemovalTreningDialog extends ConsumerStatefulWidget {
+  final int planId;
+  final int? backendId;
+  const ConfirmRemovalTreningDialog({super.key, required this.planId, this.backendId});
 
   @override
-  State<ConfirmRemovalTreningDialog> createState() => _ConfirmRemovalTreningDialogState();
+  ConsumerState<ConfirmRemovalTreningDialog> createState() => _ConfirmRemovalTreningDialogState();
 }
 
-class _ConfirmRemovalTreningDialogState extends State<ConfirmRemovalTreningDialog> {
+class _ConfirmRemovalTreningDialogState extends ConsumerState<ConfirmRemovalTreningDialog> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -33,7 +38,21 @@ class _ConfirmRemovalTreningDialogState extends State<ConfirmRemovalTreningDialo
             ),
               onPressed: () async {
                       final serviceWorkout = WorkoutService();
-                      await serviceWorkout.removeWorkoutPlan(widget.planId);
+                      final isConnected = await ref.watch(connectivityProvider.future);
+                      final auth = ref.read(authServiceProvider);
+                      
+                      if(isConnected){
+                        final workoutServiceApi = WorkoutApiService(auth, serviceWorkout);
+                        await workoutServiceApi.RemoveWorkoutPlan(widget.planId);
+                      } else {
+                        if(widget.backendId != null && widget.backendId != 0){
+                          await serviceWorkout.toogleIstoDelete(widget.planId, widget.backendId!);
+                        } else {
+                          await serviceWorkout.removeWorkoutPlan(widget.planId);
+                        }
+                       }
+                      
+                      
                       if(mounted){Navigator.of(context).pop();}
                       
             }, child: Text("Yes")),

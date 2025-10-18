@@ -1,19 +1,24 @@
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TreningAddForm extends StatefulWidget {
+class TreningAddForm extends ConsumerStatefulWidget {
   const TreningAddForm({super.key});
 
   @override
-  State<TreningAddForm> createState() => _TreningAddFormState();
+  ConsumerState<TreningAddForm> createState() => _TreningAddFormState();
 }
 
-class _TreningAddFormState extends State<TreningAddForm> {
+class _TreningAddFormState extends ConsumerState<TreningAddForm> {
   final _workoutService = WorkoutService();
   final _nameWorkoutController = TextEditingController();
   
   final Map<String, List<SessionData>> _daysSessions = {};
   final Map<String, TextEditingController> _sessionNameControllers = {};
+  final Map<String, TextEditingController> _sessionLocationControllers = {};
   final Map<String, int?> _selectedHours = {};
   final Map<String, int?> _selectedMinutes = {};
 
@@ -33,6 +38,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
     for (final day in dayNames) {
       _daysSessions[day] = [];
       _sessionNameControllers[day] = TextEditingController();
+      _sessionLocationControllers[day] = TextEditingController();
       _selectedHours[day] = null;
       _selectedMinutes[day] = null;
     }
@@ -40,6 +46,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
 
   void _addSessionForDay(String dayName) {
     final sessionName = _sessionNameControllers[dayName]!.text.trim();
+    final sessionLocation = _sessionLocationControllers[dayName]!.text.trim();
     final hour = _selectedHours[dayName];
     final minute = _selectedMinutes[dayName];
 
@@ -56,11 +63,13 @@ class _TreningAddFormState extends State<TreningAddForm> {
     setState(() {
       _daysSessions[dayName]!.add(SessionData(
         name: sessionName,
+        location: sessionLocation.isEmpty ? null : sessionLocation,
         startTime: "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}",
         exercises: [],
       ));
 
       _sessionNameControllers[dayName]!.clear();
+      _sessionLocationControllers[dayName]!.clear();
       _selectedHours[dayName] = null;
       _selectedMinutes[dayName] = null;
     });
@@ -114,6 +123,7 @@ class _TreningAddFormState extends State<TreningAddForm> {
           final List<WorkoutSessionInput> sessionInputs = sessions.map((s) {
             return WorkoutSessionInput(
               name: s.name,
+              location: s.location,
               start: s.startTime,
               exercises: s.exercises,
             );
@@ -132,14 +142,33 @@ class _TreningAddFormState extends State<TreningAddForm> {
         days: days,
       );
 
+      // Synchronizacja w tle - nie blokuje UI
+      _syncToBackendInBackground(id);
+
       if (mounted) {
-        _showSnackBar("Workout plan saved (ID: $id)", success: true);
+        _showSnackBar("Workout plan saved", success: true);
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
         _showSnackBar("Error: $e");
       }
+    }
+  }
+
+  void _syncToBackendInBackground(int id) async {
+    try {
+      final isConnected = await ref.read(connectivityProvider.future);
+      if (isConnected) {
+        final auth = ref.read(authServiceProvider);
+        final apiWorkoutService = WorkoutApiService(auth, _workoutService);
+        await apiWorkoutService.addWorkoutPlan(id);
+        debugPrint("✅ Workout plan synced to backend (ID: $id)");
+      } else {
+        debugPrint("⚠️ No connection - workout will be synced later");
+      }
+    } catch (e) {
+      debugPrint("❌ Background sync failed: $e");
     }
   }
 
@@ -157,6 +186,9 @@ class _TreningAddFormState extends State<TreningAddForm> {
   void dispose() {
     _nameWorkoutController.dispose();
     for (final controller in _sessionNameControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _sessionLocationControllers.values) {
       controller.dispose();
     }
     super.dispose();
@@ -346,6 +378,19 @@ class _TreningAddFormState extends State<TreningAddForm> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  TextField(
+                    controller: _sessionLocationControllers[day],
+                    decoration: InputDecoration(
+                      labelText: "Location (optional)",
+                      border: inputBorder,
+                      enabledBorder: inputBorder,
+                      focusedBorder: inputBorder.copyWith(
+                        borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -372,7 +417,6 @@ class _TreningAddFormState extends State<TreningAddForm> {
                         child: DropdownButtonFormField<int>(
                           dropdownColor: Colors.white,
                           decoration: InputDecoration(
-                            
                             labelText: "Minute",
                             border: inputBorder,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -449,6 +493,22 @@ class _TreningAddFormState extends State<TreningAddForm> {
                         color: Colors.grey.shade700,
                       ),
                     ),
+                    if (session.location != null) ...[
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on, size: 12, color: Colors.grey.shade700),
+                          const SizedBox(width: 4),
+                          Text(
+                            session.location!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -555,11 +615,13 @@ class _TreningAddFormState extends State<TreningAddForm> {
 
 class SessionData {
   final String name;
+  final String? location;
   final String startTime;
   final List<ExerciseInput> exercises;
 
   SessionData({
     required this.name,
+    this.location,
     required this.startTime,
     required this.exercises,
   });
