@@ -33,9 +33,9 @@ class _WorkoutPlansAllState extends ConsumerState<WorkoutPlansAll> {
               final plan = plans[index];
               return GestureDetector(
                 onDoubleTap: () async {
-                  final _service = WorkoutService();
+                  final service = WorkoutService();
                   try{
-                    await _service.toogleIsMain(plan.plan.id);
+                    await service.toogleIsMain(plan.plan.id);
                   }catch (e){
                     throw Exception(e);
                   }

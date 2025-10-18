@@ -1,3 +1,7 @@
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
+import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/benchmark_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
@@ -256,7 +260,10 @@ class _BenchmarkFormAddState extends ConsumerState<BenchmarkFormAdd> {
                         if (_formKey.currentState!.validate()) {
                           final benchmarkService = BenchmarkService(AppDatabase());
                           try {
-                            await benchmarkService.Addbenchmark(
+
+                            final isConnected = await ref.read(connectivityProvider.future);
+
+                           int benchmarkLocalId = await benchmarkService.Addbenchmark(
                               body_weight:
                                   double.parse(_bodyWeightController.text),
                               ex1_points: int.parse(_exerciseControllers[0].text),
@@ -264,6 +271,12 @@ class _BenchmarkFormAddState extends ConsumerState<BenchmarkFormAdd> {
                               ex3_points: int.parse(_exerciseControllers[2].text),
                               ex4_points: int.parse(_exerciseControllers[3].text),
                             );
+
+                            if(isConnected){
+                              final auth = ref.read(authServiceProvider);
+                              final benchmarkServiceApi = BenchmarkApiService( auth,benchmarkService);
+                              await benchmarkServiceApi.AddBenchmark(benchmarkLocalId, isConnected);
+                            }
 
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(

@@ -1,7 +1,7 @@
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_add_button.dart';
 import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_info_dialog.dart';
-import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_top_20.dart';
+import 'package:climblog_mobile/Widgets/trening/benchmark/benchmark_top_8.dart';
 import 'package:climblog_mobile/Widgets/trening/workout/trening_add_button.dart';
 import 'package:climblog_mobile/Widgets/trening/workout/trening_info_dialog.dart';
 import 'package:climblog_mobile/Widgets/trening/workout/workout_plans_all.dart';

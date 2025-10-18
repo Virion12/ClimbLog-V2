@@ -192,4 +192,19 @@ class AuthService {
 
   return userAccessToken;
 }
+
+Future<String?> getUserId() async {
+    try {
+      final userId = await _storage.read(key: "userid");
+      if (userId == null || userId.isEmpty) {
+        debugPrint("User ID not found in secure storage.");
+        return null;
+      }
+      debugPrint("Loaded user ID: $userId");
+      return userId;
+    } catch (e) {
+      debugPrint("Error while getting user ID: $e");
+      return null;
+    }
+  }
 }

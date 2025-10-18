@@ -107,10 +107,11 @@ class RouteServiceApi {
     if(response.statusCode != 200){
       throw Exception("adding of the route failed");
     }
+    ioClient.close();
     
     final data = jsonDecode(response.body);
     final routeid = data["routeid"];
-    _localRouteService.markRouteAsUploaded(id,routeid);
+    await _localRouteService.markRouteAsUploaded(id,routeid);
 
 
   }

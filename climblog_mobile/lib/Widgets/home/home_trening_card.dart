@@ -16,54 +16,73 @@ class _HomeTreningCardState extends ConsumerState<HomeTreningCard> {
   Widget build(BuildContext context) {
     final day = ref.watch(selectedDay);
     final sessions = ref.watch(sessionsForSelectedDayProvider);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(top: 20, left: 25, right: 25, bottom: 20),
+      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       width: MediaQuery.of(context).size.width * 0.9,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Header
           Text(
             day == null ? "No data" : day.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Color.fromARGB(255, 101, 101, 101)
-            ),
             textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C3E50),
+              letterSpacing: 0.5,
+            ),
           ),
-       
+
+          const SizedBox(height: 16),
+
+          // Sessions or empty state
           if (sessions.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text(
-                "No sessions for this day",
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.fitness_center_outlined,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "No sessions for this day",
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
           else
-            for(int i = 0; i < sessions.length; i++)
-              HomeSessionBox(
-                NumberInLIne: i + 1,
-                session: sessions[i],
-              ),
-          
-          const SizedBox(height: 20),
+            Column(
+              children: [
+                for (int i = 0; i < sessions.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 12),
+                  HomeSessionBox(session: sessions[i]),
+                ],
+              ],
+            ),
         ],
       ),
     );

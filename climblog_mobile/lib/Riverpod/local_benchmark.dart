@@ -13,5 +13,19 @@ final watchAllRoutesWithoutToDeleteStreamProvider = StreamProvider<List<Benchmar
   final userId = await ref.watch(userIdProvider.future);
   yield*  benchmarkService.getAllWithoutToDelete(userId);
 });
-  
+
+final watchAllRoutesWithoutToDeleteStreamProviderTop9 =
+    StreamProvider<List<Benchmark>>((ref) async* {
+  final benchmarkService = ref.watch(benchmarkServiceProvider);
+  final userId = await ref.watch(userIdProvider.future);
+
+  yield* benchmarkService
+      .getAllWithoutToDelete(userId)
+      .map((benchmarks) {
+        
+        benchmarks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+        return benchmarks.take(8).toList();
+      });
+});
  

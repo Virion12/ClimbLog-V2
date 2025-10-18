@@ -40,6 +40,25 @@ class BenchmarkService {
     }
   }
 
+Future<void> ToogleToDelete(int id) async{
+  await (_db.update(_db.benchmarks)..where((b) => b.id.equals(id)))
+  .write(
+    BenchmarksCompanion(
+      isToDelete: Value(true),
+    )
+  );
+}
+
+Future<void> ToogleThatItIsInBackend(int id,int backendId) async{
+  await (_db.update(_db.benchmarks)..where((b) => b.id.equals(id)))
+  .write(
+    BenchmarksCompanion(
+      isAddedToBackend: Value(true),
+      backendId: Value(backendId),
+    )
+  );
+}
+
 // Get all
 Stream<List<Benchmark>> getAll(int userId) {
   return (_db.select(_db.benchmarks)
@@ -56,7 +75,7 @@ Stream<List<Benchmark>> getAllWithoutToDelete(int userId) {
 }
 
 //GetOne
-Future<Benchmark?> getOne(int localId) async {
+Future<Benchmark> getOne(int localId) async {
   final userID = await _storage.read(key: "userid");
   if (userID == null) {
     throw Exception("User is not logged in");
@@ -64,7 +83,7 @@ Future<Benchmark?> getOne(int localId) async {
   final userIdToInt = int.parse(userID);
 
   return (_db.select(_db.benchmarks)
-  ..where((b) => b.id.equals(localId) & b.userId.equals(userIdToInt))).getSingleOrNull();
+  ..where((b) => b.id.equals(localId) & b.userId.equals(userIdToInt))).getSingle();
 }
 
 

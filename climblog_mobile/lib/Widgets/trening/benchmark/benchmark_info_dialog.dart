@@ -11,7 +11,7 @@ class BenchmarkInfoDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-              Text(" 1. To delete benchmark long press concerned trening plan icon, please keep in mind that the trening plan will be permanently deleted" ),
+              Text(" 1. To delete benchmark long press concerned benchmark plan icon, please keep in mind that the trening plan will be permanently deleted" ),
               SizedBox(height: 20,),
               Text(" 2. To open the concerned benchmark plan please one click on it"),
               SizedBox(height: 20,),
