@@ -74,6 +74,18 @@ Stream<List<Benchmark>> getAllWithoutToDelete(int userId) {
     ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
     .watch();
 }
+Future<List<Benchmark>> getOnlytoDelete(int userId) {
+  return (_db.select(_db.benchmarks)
+    ..where((b) => b.userId.equals(userId) & b.isToDelete.equals(true))
+    ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
+    .get();
+}
+Future<List<Benchmark>> getOnlyNotAddedToBackend(int userId) {
+  return (_db.select(_db.benchmarks)
+    ..where((b) => b.userId.equals(userId) & b.isAddedToBackend.equals(false))
+    ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
+    .get();
+}
 
 //GetOne
 Future<Benchmark> getOne(int localId) async {
