@@ -221,6 +221,18 @@ Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDelete() {
 }
 
 
+Future<List<ClimbingRoute>> getAllToDelete(int userID) {
+  return (_db.select(_db.climbingRoutes)
+        ..where((t) => t.isToDelete.equals(true) & t.userId.equals(userID)))
+      .get();
+}
+
+Future<List<ClimbingRoute>> getAllToAdd(int userID) {
+  return (_db.select(_db.climbingRoutes)
+        ..where((t) => t.isAddedToBackend.equals(false) & t.userId.equals(userID)))
+      .get();
+}
+
 
 
 

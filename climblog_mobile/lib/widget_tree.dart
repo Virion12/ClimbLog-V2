@@ -1,6 +1,8 @@
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
+import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/local_db/benchmark_service.dart';
+import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +27,8 @@ class Widgettree extends ConsumerWidget {
               final auth = ref.read(authServiceProvider);
               final benchmarksLocal = BenchmarkService(AppDatabase());
               final benchmarkApi = BenchmarkApiService(auth, benchmarksLocal);
+
+
               //firstly removing all benchmarks to delete
               final benchmarksToDelete = await benchmarksLocal.getOnlytoDelete(parsedId);
                for(var benchamrk in benchmarksToDelete){
@@ -38,6 +42,29 @@ class Widgettree extends ConsumerWidget {
                 debugPrint("trying to add benchmark ${benchamrk.id} to backend");
                 await benchmarkApi.AddBenchmark(benchamrk.id, isConnected);
               }
+
+
+              //Routes adding - removal
+              //TO DO : Update with images and same for removal
+
+              final routeLocalService = RouteService(AppDatabase());
+              final routeApiService = RouteServiceApi(AppDatabase(), auth, routeLocalService);
+              
+              //removal
+              final routesToDelete = await routeLocalService.getAllToDelete(parsedId);
+              for(var route in routesToDelete){
+                  await routeApiService.RemoveRoute(route.id, isConnected);
+                  debugPrint("Removing route ${route.id}");
+              }
+              //addition
+              final routesToUpload = await routeLocalService.getAllToAdd(parsedId);
+              for(var route in routesToUpload){
+                await routeApiService.AddRoute(route.id);
+              }
+
+              
+
+
 
           }
           //getting all routes , benchmarks, workoutplans that are not added to backend

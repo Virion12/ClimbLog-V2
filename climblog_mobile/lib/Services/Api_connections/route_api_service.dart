@@ -122,9 +122,10 @@ class RouteServiceApi {
     //validation if route is added to backend
     final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(id))).getSingle();
     final routeId = route.backendId;
+    final isAdded = route.isAddedToBackend;
     debugPrint(routeId.toString());
 
-    if(routeId == 0){
+    if(routeId == 0 || isAdded == false){
       _localRouteService.removeRoute(id);
       return;
     }
