@@ -146,6 +146,13 @@ class WorkoutService {
       days: dayList,
     );
   }
+  Future<List<WorkoutPlan>> getAllToDelete(int userID) {
+    return (_db.select(_db.workoutPlans)..where((p) => p.userId.equals(userID) & p.isToDelete.equals(true))).get();
+  }
+
+  Future<List<WorkoutPlan>> getAllToAddToApi(int userID) {
+    return (_db.select(_db.workoutPlans)..where((p) => p.userId.equals(userID) & p.isAddedToBackend.equals(false))).get();
+  }
 
 
   Stream<List<WorkoutPlanFull>> watchAllWorkoutPlans() {

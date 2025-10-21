@@ -220,6 +220,17 @@ Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDelete() {
       .watch();
 }
 
+Future<ClimbingRoute> getOne(int id,) async{
+  final userID = await _storage.read(key: "userid");
+  if (userID == null) {
+    throw Exception("User is not logged in");
+  }
+  final userIdToInt = int.parse(userID);
+  
+  return  (_db.select(_db.climbingRoutes)
+          ..where((b) => b.id.equals(id) & b.userId.equals(userIdToInt))).getSingle();
+}
+
 
 Future<List<ClimbingRoute>> getAllToDelete(int userID) {
   return (_db.select(_db.climbingRoutes)

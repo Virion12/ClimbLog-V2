@@ -69,6 +69,8 @@ class FileService {
     if(fileName == null){
       throw Exception("No file name was returned");
     }
+    
+    await uploadFileLocally(file, fileName);
     return fileName;
   }
 

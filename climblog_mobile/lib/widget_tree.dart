@@ -1,8 +1,10 @@
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
+import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
 import 'package:climblog_mobile/Services/local_db/benchmark_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
+import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +47,7 @@ class Widgettree extends ConsumerWidget {
 
 
               //Routes adding - removal
-              //TO DO : Update with images and same for removal
+              //TO DO : Update with images and
 
               final routeLocalService = RouteService(AppDatabase());
               final routeApiService = RouteServiceApi(AppDatabase(), auth, routeLocalService);
@@ -61,6 +63,23 @@ class Widgettree extends ConsumerWidget {
               for(var route in routesToUpload){
                 await routeApiService.AddRoute(route.id);
               }
+
+              //WorkoutPlan 
+              final workoutLocalService = WorkoutService();
+              final workoutApiService = WorkoutApiService(auth, workoutLocalService);
+
+              //removal first
+              final workoutToDelete = await workoutLocalService.getAllToDelete(parsedId);
+              for(var workoutPlan in workoutToDelete){
+                await workoutApiService.RemoveWorkoutPlan(workoutPlan.id);
+              }
+
+              //adding
+              final workoutsToAddToBackend = await workoutLocalService.getAllToAddToApi(parsedId);
+               for(var workoutPlan in workoutsToAddToBackend){
+                await workoutApiService.addWorkoutPlan(workoutPlan.id);
+              }
+
 
               
 

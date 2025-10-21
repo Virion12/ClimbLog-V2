@@ -13,6 +13,7 @@ class RouteServiceApi {
   final AppDatabase _db;
   final AuthService _authService;
   final RouteService _localRouteService;
+  // final FileService _fileService; 
   final String baseUrl = "https://10.0.2.2:7116"; 
 
   IOClient _createIoClient() {
@@ -22,8 +23,9 @@ class RouteServiceApi {
   }
   
 
-  RouteServiceApi(this._db, this._authService,this._localRouteService);
-
+  // RouteServiceApi(this._db, this._authService,this._localRouteService, this._fileService);
+  RouteServiceApi(this._db, this._authService,this._localRouteService,);
+  
   Future<String> tokenValidation() async {
   var userAccessToken = await _authService.getToken();
 
@@ -66,9 +68,19 @@ class RouteServiceApi {
   // }
 
   Future<void> AddRoute(int id) async{
-    final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(id))).getSingle();
+    var route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(id))).getSingle();
 
     final userAccessToken = await tokenValidation();
+
+    // if(route.imagePath != "" && route.is){
+    //   String path = (await getApplicationDocumentsDirectory()).path;
+    //   final file = File('$path/${route.imagePath}');
+    //   if(await file.exists() == false){
+    //     throw Exception("No file in local device");
+    //   }
+    //  String imagePath = await _fileService.uploadFileApi(file);
+    //  route.imagePath = imagePath;
+    // }
 
     final url = Uri.parse("$baseUrl/api/Route/add-one");
     final body = jsonEncode({
@@ -181,7 +193,6 @@ class RouteServiceApi {
   }
 
   //Update Route 
-
   Future<bool> updateRoute(ClimbingRoute route, bool isConnected, File? newFile) async {
   try {
     final fileService = FileService();
