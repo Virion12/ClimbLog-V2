@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
@@ -11,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Screens/home_screen.dart';
 import 'package:climblog_mobile/Screens/login_screen.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Widgettree extends ConsumerWidget {
   const Widgettree({super.key});
@@ -63,6 +66,26 @@ class Widgettree extends ConsumerWidget {
               for(var route in routesToUpload){
                 await routeApiService.AddRoute(route.id);
               }
+
+              //Update
+              final routesToUpdate = await routeLocalService.getAllToUpdate(parsedId);
+              for(var route in routesToUpdate){
+                File? file;
+                if(route.imagePath != ""){
+                  String path = (await getApplicationDocumentsDirectory()).path;
+                   file = File('$path/${route.imagePath}');
+                  if(await file.exists() == false){
+                    throw Exception("No file in local device");
+                  }
+                  
+                }
+              final isUpdated = await routeApiService.updateRoute(route, isConnected,file);
+              if(isUpdated){
+                debugPrint("Route is Updated ${route.id}");
+              }
+              }
+
+
 
               //WorkoutPlan 
               final workoutLocalService = WorkoutService();

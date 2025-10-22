@@ -238,6 +238,12 @@ Future<List<ClimbingRoute>> getAllToDelete(int userID) {
       .get();
 }
 
+Future<List<ClimbingRoute>> getAllToUpdate(int userID) {
+  return (_db.select(_db.climbingRoutes)
+        ..where((t) => t.isToUpdate.equals(true) & t.userId.equals(userID) & t.isAddedToBackend.equals(true)))
+      .get();
+}
+
 Future<List<ClimbingRoute>> getAllToAdd(int userID) {
   return (_db.select(_db.climbingRoutes)
         ..where((t) => t.isAddedToBackend.equals(false) & t.userId.equals(userID)))
