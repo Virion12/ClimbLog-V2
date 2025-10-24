@@ -199,6 +199,9 @@ class RouteServiceApi {
 
     bool isDifferentImage = await _localRouteService.isImagepathSame(route.id, route.imagePath);
     String? newImagePath = route.imagePath;
+    debugPrint("-----------------------------------------------");
+    debugPrint("new image path = ${newImagePath}");
+    debugPrint("-----------------------------------------------");
 
     if (newFile == null && route.imagePath.isNotEmpty) {
       if (isConnected) {
@@ -236,8 +239,8 @@ class RouteServiceApi {
       if (isConnected) {
         String uploadedFileName = await fileService.uploadFileApi(newFile);
         newImagePath = uploadedFileName;
-        String savedFileName = await fileService.uploadFileLocally(newFile, newImagePath);
-        newImagePath = savedFileName;
+        // String savedFileName = await fileService.uploadFileLocally(newFile, newImagePath);
+        // newImagePath = savedFileName;
         await _localRouteService.toogleImagePendingUpdate(route.id, false);
       } else {
         String savedFileName = await fileService.uploadFileLocally(newFile);

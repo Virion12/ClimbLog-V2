@@ -70,10 +70,14 @@ class Widgettree extends ConsumerWidget {
               //Update
               final routesToUpdate = await routeLocalService.getAllToUpdate(parsedId);
               for(var route in routesToUpdate){
+                debugPrint("tring to Update route ${route.backendId}");
+
                 File? file;
                 if(route.imagePath != ""){
                   String path = (await getApplicationDocumentsDirectory()).path;
                    file = File('$path/${route.imagePath}');
+                   debugPrint("-----------------------------------------------------------");
+                   debugPrint("Imagepath ${route.imagePath}");
                   if(await file.exists() == false){
                     throw Exception("No file in local device");
                   }
@@ -81,7 +85,11 @@ class Widgettree extends ConsumerWidget {
                 }
               final isUpdated = await routeApiService.updateRoute(route, isConnected,file);
               if(isUpdated){
+                 debugPrint("-----------------------------------------------------------");
                 debugPrint("Route is Updated ${route.id}");
+              }else{
+                 debugPrint("-----------------------------------------------------------");
+                 debugPrint("Route is not Updated ${route.id}");
               }
               }
 

@@ -66,11 +66,13 @@ class FileService {
     }
     final data = jsonDecode(response.body);
     final fileName = data["filename"];
+    
     if(fileName == null){
       throw Exception("No file name was returned");
     }
-    
+    debugPrint("Uploaded file remotely file ${fileName}");
     await uploadFileLocally(file, fileName);
+    debugPrint("Uplaoding file localy ${fileName}");
     return fileName;
   }
 

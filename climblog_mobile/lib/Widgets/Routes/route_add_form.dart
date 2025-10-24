@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
+import 'package:climblog_mobile/Services/Api_connections/image_segmentation_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
@@ -255,6 +256,13 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
 
                             if (isConnected) {
                               if (_isImagePicked) {
+
+                                debugPrint("---------------------------------------Segmentation-------------------------------");
+                                final predictionService = ImageSegmentationAPi();
+                                
+                                predictionService.predict(File(_image!.path));
+                                debugPrint("---------------------------------------End - Segmentation-------------------------------");
+
                                 final fileUploadService = FileService();
 
                                 try {
