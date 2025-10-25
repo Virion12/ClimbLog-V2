@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/image_segmentation_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
@@ -8,6 +9,7 @@ import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
+import 'package:climblog_mobile/Widgets/Routes/route_image_dialog.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +25,7 @@ class RouteAddForm extends ConsumerStatefulWidget {
 
 class _RouteAddFormState extends ConsumerState<RouteAddForm> {
   final _formKey = GlobalKey<FormState>();
-  XFile? _image;
-  bool _isImagePicked = false;
+  
   final List<String> climbingGrades = [
     "4a", "4a+", "4b", "4b+", "4c", "4c+",
     "5a", "5a+", "5b", "5b+", "5c", "5c+",
@@ -68,6 +69,10 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
 
   @override
   Widget build(BuildContext context) {
+    // Pobieramy obraz z providera
+    final selectedImage = ref.watch(imageFileProvider);
+    final bool isImagePicked = selectedImage != null;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -115,8 +120,6 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                 GestureDetector(
                   onTap: () => _showImagePickerModal(context),
                   child: Container(
-                    
-                    height: 300,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8F9FA),
                       borderRadius: BorderRadius.circular(16),
@@ -126,17 +129,16 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                         style: BorderStyle.solid,
                       ),
                     ),
-                    child: _isImagePicked && _image != null
+                    child: isImagePicked
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(14),
                             child: Image.file(
-                              File(_image!.path),
+                              selectedImage,
                               fit: BoxFit.fill,
                               width: double.infinity,
                             ),
                           )
                         : Column(
-                          
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
@@ -224,7 +226,11 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () {
+                          // Czyścimy provider przy anulowaniu
+                          ref.read(imageFileProvider.notifier).state = null;
+                          Navigator.of(context).pop();
+                        },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           side: BorderSide(color: Colors.grey[300]!),
@@ -247,6 +253,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                       child: ElevatedButton(
                         onPressed: () async {
                           bool isimageToUpdate = false;
+                          final imageFile = ref.read(imageFileProvider);
 
                           final isConnected = await ref.read(connectivityProvider.future);
                           if (_formKey.currentState!.validate()) {
@@ -255,32 +262,31 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                             String filename = "";
 
                             if (isConnected) {
-                              if (_isImagePicked) {
-
+                              if (isImagePicked && imageFile != null) {
                                 debugPrint("---------------------------------------Segmentation-------------------------------");
                                 final predictionService = ImageSegmentationAPi();
                                 
-                                predictionService.predict(File(_image!.path));
+                                predictionService.predict(imageFile);
                                 debugPrint("---------------------------------------End - Segmentation-------------------------------");
 
                                 final fileUploadService = FileService();
 
                                 try {
-                                  filename = await fileUploadService.uploadFileApi(File(_image!.path));
+                                  filename = await fileUploadService.uploadFileApi(imageFile);
                                   debugPrint("filename returned from backend : $filename");
-                                  await saveImage(_image!, filename);
+                                  await saveImage(imageFile, filename);
                                 } catch (e) {
                                   debugPrint("File upload failed due to : $e}");
-                                  debugPrint("Trying to uplad image localy}");
+                                  debugPrint("Trying to upload image locally}");
                                   filename = DateTime.now().millisecondsSinceEpoch.toString();
-                                  await saveImage(_image!, filename);
+                                  await saveImage(imageFile, filename);
                                   isimageToUpdate = true;
                                 }
                               }
                             } else {
-                              if (_isImagePicked) {
+                              if (isImagePicked && imageFile != null) {
                                 filename = DateTime.now().millisecondsSinceEpoch.toString();
-                                await saveImage(_image!, filename);
+                                await saveImage(imageFile, filename);
                                 isimageToUpdate = true;
                               }
                             }
@@ -310,7 +316,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                                 isImagePendingUpdate: isimageToUpdate,
                               );
                               if (newRouteId == 0) {
-                                throw Exception("addind to local db went wrong dute to backend id being 0");
+                                throw Exception("adding to local db went wrong due to backend id being 0");
                               }
 
                               if (isConnected) {
@@ -319,14 +325,16 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                                 try {
                                   await remoteService.AddRoute(newRouteId);
                                 } catch (e) {
-                                  throw Exception("addind to remote serwis route : $newRouteId went wrong due to $e");
+                                  throw Exception("adding to remote service route : $newRouteId went wrong due to $e");
                                 }
                               }
                             } catch (e) {
-                              throw Exception("addind to local db went wrong due to : $e");
+                              throw Exception("adding to local db went wrong due to : $e");
                             }
 
                             if (context.mounted) {
+                              // Czyścimy provider po zapisaniu
+                              ref.read(imageFileProvider.notifier).state = null;
                               Navigator.of(context).pop();
                             }
                           }
@@ -463,12 +471,12 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
-                setState(() {
-                  _isImagePicked = true;
-                  _image = pickedFile;
-                });
+                if (pickedFile != null) {
+                  ref.read(imageFileProvider.notifier).state = File(pickedFile.path);
+                }
               },
             ),
+           
             ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(8),
@@ -482,10 +490,46 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-                setState(() {
-                  _isImagePicked = true;
-                  _image = pickedFile;
-                });
+                if (pickedFile != null) {
+                  ref.read(imageFileProvider.notifier).state = File(pickedFile.path);
+                }
+              },
+            ),
+            
+            // Pokazujemy opcję "Select Holds" tylko gdy obraz jest wybrany
+            Consumer(
+              builder: (context, ref, child) {
+                final isImageSelected = ref.watch(imageFileProvider) != null;
+                
+                if (!isImageSelected) return const SizedBox.shrink();
+                
+                return ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00a896).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.edit, color: Color(0xFF00a896)),
+                  ),
+                  title: const Text("Select Holds"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          backgroundColor: Colors.white,
+                          insetPadding: const EdgeInsets.all(10),
+                          child: const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: RouteImageDialog(),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
               },
             ),
           ],
@@ -494,12 +538,12 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
     );
   }
 
-  Future<void> saveImage(XFile file, [String? filename]) async {
+  Future<void> saveImage(File file, [String? filename]) async {
     String path = (await getApplicationDocumentsDirectory()).path;
 
     filename ??= '${DateTime.now().millisecondsSinceEpoch}';
     try {
-      await File(file.path).copy('$path/$filename');
+      await file.copy('$path/$filename');
     } catch (e) {
       throw Exception(e);
     }

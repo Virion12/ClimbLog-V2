@@ -16,7 +16,7 @@ class ImageSegmentationAPi{
     return IOClient(client);
   }
 
-  Future<List<HoldsModel?>> predict (File file) async{
+  Future<List<HoldsModel>> predict (File file) async{
 
     final url = Uri.parse("$baseUrl/predict");
     final ioClient = _createIoClient();
@@ -67,8 +67,8 @@ class ImageSegmentationAPi{
 
 
     }catch (e){
-      ioClient.close();
-      throw Exception(e);
+      debugPrint("error $e");
+      rethrow;
     }finally{
       ioClient.close();
     }
