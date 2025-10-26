@@ -1,12 +1,16 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
+import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/image_segmentation_api_service.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:climblog_mobile/models/cords.dart';
 import 'package:climblog_mobile/models/holds_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Circle {
   final Offset center; 
@@ -239,11 +243,13 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
         BasicContainer(
           color: const ui.Color.fromARGB(255, 227, 228, 230),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
                 onPressed: _isLoading ? null : () async {
-                  setState(() {
+                  final isConnected = await ref.read(connectivityProvider.future); 
+                  if(isConnected){
+                    setState(() {
                     _isInCircleMode = false;
                     _isInDrawingMode = false;
                     _isInPredictMode = true;
@@ -252,21 +258,25 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
                   });
                   
                   try {
+                    if(_allHoldsFromApi.isEmpty){
                     final apiSegmentation = ImageSegmentationAPi();
                     final result = await apiSegmentation.predict(image);
-                    setState(() {
-                      if(_allHoldsFromApi.isEmpty){
+                     setState(() {
                       _allHoldsFromApi = result;
-                      }
-                      _selectedHoldIndices.clear();
                       _isLoading = false;
                     });
+                    }else{
+                      _isLoading = false;
+                    }
                   } catch (e) {
                     debugPrint("Prediction failed: $e");
                     setState(() {
                       _isLoading = false;
                       _isInPredictMode = false;
                     });
+                  }
+                  }else{
+                     
                   }
                 },
                 icon: _isLoading
@@ -373,9 +383,9 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
                           ),
                           child: ColorFiltered(
                             colorFilter: const ColorFilter.matrix([
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0.2326, 0.7152, 0.0722, 0, 0,
+                              0.2326, 0.7152, 0.0722, 0, 0,
+                              0.226, 0.7152, 0.0722, 0, 0,
                               0, 0, 0, 1, 0,
                             ]),
                             child: Image.file(
@@ -442,7 +452,7 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
                   Icon(Icons.visibility, size: 20),
                   SizedBox(width: 8),
                   Text(
-                    "Preview Selection",
+                    "Apply Mask",
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -515,7 +525,7 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: !_hasSelections() ? null : () {
+                  onPressed: !_hasSelections() ? null : () async {
                     final selectedHolds = _selectedHoldIndices
                         .map((i) => _allHoldsFromApi[i])
                         .toList();
@@ -524,9 +534,28 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
                     debugPrint("Saving ${_freehandStrokes.length} freehand strokes");
                     debugPrint("Saving ${_circles.length} circles");
                     
-                    // TODO: Zapisz selectedHolds, _freehandStrokes, _circles
+                    try{
+                      final boundary = _imageKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+                      if(boundary == null) return;
+                      final ui.Image image = await boundary.toImage(pixelRatio : 3.0);
+                      final bytedata = await image.toByteData(
+                        format: ui.ImageByteFormat.png
+                      );
+                      final bytes = bytedata!.buffer.asUint8List();
+                      final directory = await getTemporaryDirectory();
+                      final filePath = '${directory.path}/widget_capture_${DateTime.now().millisecondsSinceEpoch}.png';
+                      final file = File(filePath);
+                      await file.writeAsBytes(bytes);
+
+                      // Przekazujemy plik do providera
+                      ref.read(imageFileProvider.notifier).state = file;
+                      Navigator.of(context).pop();
+                    }catch(e){
+                     debugPrint("$e");
+                     Navigator.of(context).pop();
+                    }
                     
-                    Navigator.of(context).pop();
+                    
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00a896),

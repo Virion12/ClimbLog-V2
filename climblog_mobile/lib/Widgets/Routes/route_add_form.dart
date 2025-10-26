@@ -333,7 +333,6 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                             }
 
                             if (context.mounted) {
-                              // Czyścimy provider po zapisaniu
                               ref.read(imageFileProvider.notifier).state = null;
                               Navigator.of(context).pop();
                             }
@@ -496,7 +495,6 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
               },
             ),
             
-            // Pokazujemy opcję "Select Holds" tylko gdy obraz jest wybrany
             Consumer(
               builder: (context, ref, child) {
                 final isImageSelected = ref.watch(imageFileProvider) != null;
