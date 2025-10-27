@@ -25,7 +25,8 @@ class RouteService {
   int numberOfTried = 0,
   bool isDone = false,
   String grade = "4a",
-  String imagePath = "",
+  String imagePathLocal = "",
+  String imagePathBackend = "",
   String thumbnailPath = "",
   DateTime? createdAt,
   DateTime? lastUpdatedAt,
@@ -59,7 +60,8 @@ class RouteService {
       numberOfTried: Value(numberOfTried),
       isDone: Value(isDone),
       grade: Value(grade),
-      imagePath: Value(imagePath),
+      imagePathLocal: Value(imagePathLocal),
+      imagePathBackend: Value(imagePathBackend),
       thumbnailPath: Value(thumbnailPath),
       createdAt: Value(createdAt ?? DateTime.now()),
       lastUpdatedAt: Value(lastUpdatedAt ?? DateTime.now()),
@@ -90,7 +92,8 @@ Future<bool> updateRoute({
   int? numberOfTried,
   bool? isDone,
   String? grade,
-  String? imagePath,
+  String? imagePathLocal,
+  String? imagePathBackend,
   String? thumbnailPath,
   DateTime? createdAt,
   bool? isToDelete,
@@ -119,7 +122,8 @@ Future<bool> updateRoute({
       numberOfTried: numberOfTried != null ? Value(numberOfTried) : Value.absent(),
       isDone: isDone != null ? Value(isDone) : Value.absent(),
       grade: grade != null ? Value(grade) : Value.absent(),
-      imagePath: imagePath != null ? Value(imagePath) : Value.absent(),
+      imagePathLocal: imagePathLocal != null ? Value(imagePathLocal) : Value.absent(),
+      imagePathBackend: imagePathBackend != null ? Value(imagePathBackend) : Value.absent(),
       thumbnailPath: thumbnailPath != null ? Value(thumbnailPath) : Value.absent(),
       createdAt: createdAt != null ? Value(createdAt) : Value.absent(),
       lastUpdatedAt: Value(DateTime.now()),
@@ -133,6 +137,50 @@ Future<bool> updateRoute({
   return true;
 }
 
+  Future<void> printRoute(int id) async {
+  final route = await getOne(id);
+  
+  debugPrint("╔════════════════════════════════════════════════════════════════");
+  debugPrint("║ ROUTE DEBUG - ID: $id");
+  debugPrint("╠════════════════════════════════════════════════════════════════");
+  debugPrint("║ Basic Info:");
+  debugPrint("║   ID (local): ${route.id}");
+  debugPrint("║   Backend ID: ${route.backendId}");
+  debugPrint("║   User ID: ${route.userId}");
+  debugPrint("║   Name: ${route.name}");
+  debugPrint("║   Color: ${route.color}");
+  debugPrint("║   Grade: ${route.grade}");
+  debugPrint("║   Height: ${route.height}");
+  debugPrint("╠════════════════════════════════════════════════════════════════");
+  debugPrint("║ Images:");
+  debugPrint("║   imagePathLocal: '${route.imagePathLocal}'");
+  debugPrint("║   imagePathBackend: '${route.imagePathBackend}'");
+  debugPrint("║   thumbnailPath: '${route.thumbnailPath}'");
+  debugPrint("╠════════════════════════════════════════════════════════════════");
+  debugPrint("║ Sync Flags:");
+  debugPrint("║   isAddedToBackend: ${route.isAddedToBackend}");
+  debugPrint("║   isToUpdate: ${route.isToUpdate}");
+  debugPrint("║   isToDelete: ${route.isToDelete}");
+  debugPrint("║   isImagePendingUpdate: ${route.isImagePendingUpdate}");
+  debugPrint("╠════════════════════════════════════════════════════════════════");
+  debugPrint("║ Properties:");
+  debugPrint("║   isPowery: ${route.isPowery}");
+  debugPrint("║   isSloppy: ${route.isSloppy}");
+  debugPrint("║   isDynamic: ${route.isDynamic}");
+  debugPrint("║   isCrimpy: ${route.isCrimpy}");
+  debugPrint("║   isReachy: ${route.isReachy}");
+  debugPrint("║   isOnsighted: ${route.isOnsighted}");
+  debugPrint("║   isRedPointed: ${route.isRedPointed}");
+  debugPrint("║   isFlashed: ${route.isFlashed}");
+  debugPrint("║   isFavorite: ${route.isFavorite}");
+  debugPrint("║   isDone: ${route.isDone}");
+  debugPrint("║   numberOfTried: ${route.numberOfTried}");
+  debugPrint("╠════════════════════════════════════════════════════════════════");
+  debugPrint("║ Timestamps:");
+  debugPrint("║   createdAt: ${route.createdAt}");
+  debugPrint("║   lastUpdatedAt: ${route.lastUpdatedAt}");
+  debugPrint("╚════════════════════════════════════════════════════════════════");
+}
   Future<void> printAllRoutes() async {
   final routes = await _db.select(_db.climbingRoutes).get();
 
@@ -141,7 +189,7 @@ Future<bool> updateRoute({
   } else {
     for (var route in routes) {
       debugPrint(
-        "ID: ${route.id}, Name: ${route.name}, Color: ${route.color}, Height: ${route.height}, UserID: ${route.userId}, Backend id: ${route.backendId}, imagePath : ${route.imagePath}"
+        "ID: ${route.id}, Name: ${route.name}, Color: ${route.color}, Height: ${route.height}, UserID: ${route.userId}, Backend id: ${route.backendId}, imagePathLocal: ${route.imagePathLocal}, imagePathBackend: ${route.imagePathBackend}"
       );
     }
   }
@@ -153,8 +201,10 @@ Future<void> markRouteAsUploaded(int localId, int backendId) async {
       .write(ClimbingRoutesCompanion(
         backendId: Value(backendId),
         isAddedToBackend: Value(true),
+        isToUpdate: Value(false),
       ));
 }
+
 Future<void> markRouteAsToDeletion(int localId) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
@@ -162,14 +212,6 @@ Future<void> markRouteAsToDeletion(int localId) async {
         isToDelete: Value(true),
       ));
 }
-// Future<void> markRouteAsFavorite(int localId) async {
-//   await (_db.update(_db.climbingRoutes)
-//         ..where((t) => t.id.equals(localId)))
-//       .write(ClimbingRoutesCompanion(
-//         isFavorite: Value(true),
-//         isToUpdate: Value(true)
-//       ));
-// }
 
 Future<void> toggleFavorite(int localId) async {
   await (_db.update(_db.climbingRoutes)
@@ -181,6 +223,7 @@ Future<void> toggleFavorite(int localId) async {
         ),
       );
 }
+
 Future<void> toggleUpdate(int localId) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
@@ -190,15 +233,32 @@ Future<void> toggleUpdate(int localId) async {
         ),
       );
 }
-Future<void> addImagePath(int localId,String imagePath) async {
+
+Future<void> addImagePathLocal(int localId, String imagePathLocal) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
       .write(ClimbingRoutesCompanion(
-        imagePath: Value(imagePath),
+        imagePathLocal: Value(imagePathLocal),
       ));
 }
 
-Future<void> toogleImagePendingUpdate(int localId,bool toggle) async {
+Future<void> addImagePathBackend(int localId, String imagePathBackend) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(ClimbingRoutesCompanion(
+        imagePathBackend: Value(imagePathBackend),
+      ));
+}
+
+Future<void> toogleIsPendingUpdate(int localId, bool toggle) async {
+  await (_db.update(_db.climbingRoutes)
+        ..where((t) => t.id.equals(localId)))
+      .write(ClimbingRoutesCompanion(
+        isToUpdate:  Value(toggle),
+      ));
+}
+
+Future<void> toogleImagePendingUpdate(int localId, bool toggle) async {
   await (_db.update(_db.climbingRoutes)
         ..where((t) => t.id.equals(localId)))
       .write(ClimbingRoutesCompanion(
@@ -220,7 +280,7 @@ Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDelete() {
       .watch();
 }
 
-Future<ClimbingRoute> getOne(int id,) async{
+Future<ClimbingRoute> getOne(int id) async{
   final userID = await _storage.read(key: "userid");
   if (userID == null) {
     throw Exception("User is not logged in");
@@ -230,7 +290,6 @@ Future<ClimbingRoute> getOne(int id,) async{
   return  (_db.select(_db.climbingRoutes)
           ..where((b) => b.id.equals(id) & b.userId.equals(userIdToInt))).getSingle();
 }
-
 
 Future<List<ClimbingRoute>> getAllToDelete(int userID) {
   return (_db.select(_db.climbingRoutes)
@@ -250,28 +309,31 @@ Future<List<ClimbingRoute>> getAllToAdd(int userID) {
       .get();
 }
 
-
-
-
 Stream<List<ClimbingRoute>> watchAllRoutesWithoutToDeleteLastCustom(DateTime fromWhen) {
   return (_db.select(_db.climbingRoutes)
         ..where((t) => (t.isToDelete.equals(false) | t.isToDelete.isNull()) & t.createdAt.isBiggerOrEqualValue(fromWhen)))
       .watch();
 }
 
-
-
 Future<bool> isRouteAddedTobackendValidator(int localId) async{
- final route =  await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
+ final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
  if(route.isAddedToBackend && route.backendId != 0){
   return true;
  }
  return false;
 }
 
-Future<bool> isImagepathSame(int localId, String filename) async{
- final route =  await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
- if(route.imagePath == filename){
+Future<bool> isImagePathLocalSame(int localId, String filename) async{
+ final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
+ if(route.imagePathLocal == filename){
+  return true;
+ }
+ return false;
+}
+
+Future<bool> isImagePathBackendSame(int localId, String filename) async{
+ final route = await (_db.select(_db.climbingRoutes)..where((r) => r.id.equals(localId))).getSingle();
+ if(route.imagePathBackend == filename){
   return true;
  }
  return false;
@@ -287,6 +349,5 @@ Stream<List<ClimbingRoute>> getRoutesByDateRange(DateTime startDate, DateTime en
         ))
       .watch();
 }
-
 
 }

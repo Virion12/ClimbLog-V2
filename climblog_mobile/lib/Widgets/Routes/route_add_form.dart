@@ -69,7 +69,6 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Pobieramy obraz z providera
     final selectedImage = ref.watch(imageFileProvider);
     final bool isImagePicked = selectedImage != null;
 
@@ -259,34 +258,32 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                           if (_formKey.currentState!.validate()) {
                             final service = RouteService(AppDatabase());
                             var newRouteId = 0;
-                            String filename = "";
+                            String fileNameLocal = "";
+                            String fileNameBackend = "";
 
                             if (isConnected) {
                               if (isImagePicked && imageFile != null) {
-                                debugPrint("---------------------------------------Segmentation-------------------------------");
-                                final predictionService = ImageSegmentationAPi();
-                                
-                                predictionService.predict(imageFile);
-                                debugPrint("---------------------------------------End - Segmentation-------------------------------");
+
 
                                 final fileUploadService = FileService();
 
                                 try {
-                                  filename = await fileUploadService.uploadFileApi(imageFile);
-                                  debugPrint("filename returned from backend : $filename");
-                                  await saveImage(imageFile, filename);
+                                  fileNameBackend = await fileUploadService.uploadFileApi(imageFile);
+                                  fileNameLocal = fileNameBackend;
+                                  debugPrint("filename returned from backend : $fileNameBackend");
+                                  await saveImage(imageFile, fileNameBackend);
                                 } catch (e) {
                                   debugPrint("File upload failed due to : $e}");
                                   debugPrint("Trying to upload image locally}");
-                                  filename = DateTime.now().millisecondsSinceEpoch.toString();
-                                  await saveImage(imageFile, filename);
+                                  fileNameLocal = DateTime.now().millisecondsSinceEpoch.toString();
+                                  await saveImage(imageFile, fileNameLocal);
                                   isimageToUpdate = true;
                                 }
                               }
                             } else {
                               if (isImagePicked && imageFile != null) {
-                                filename = DateTime.now().millisecondsSinceEpoch.toString();
-                                await saveImage(imageFile, filename);
+                                fileNameLocal = DateTime.now().millisecondsSinceEpoch.toString();
+                                await saveImage(imageFile, fileNameLocal);
                                 isimageToUpdate = true;
                               }
                             }
@@ -297,7 +294,8 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                                 color: _colorController.text,
                                 height: double.tryParse(_heightController.text) ?? 0.0,
                                 grade: _gradeController.text,
-                                imagePath: filename,
+                                imagePathLocal: fileNameLocal,
+                                imagePathBackend: fileNameBackend,
                                 thumbnailPath: _thumbnailPathController.text,
                                 numberOfTried: int.tryParse(_numberOfTriedController.text) ?? 0,
                                 isPowery: _isPowery,

@@ -67,30 +67,23 @@ class Widgettree extends ConsumerWidget {
                 await routeApiService.AddRoute(route.id);
               }
 
-              //Update
+             //Update
               final routesToUpdate = await routeLocalService.getAllToUpdate(parsedId);
               for(var route in routesToUpdate){
-                debugPrint("tring to Update route ${route.backendId}");
-
-                File? file;
-                if(route.imagePath != ""){
-                  String path = (await getApplicationDocumentsDirectory()).path;
-                   file = File('$path/${route.imagePath}');
-                   debugPrint("-----------------------------------------------------------");
-                   debugPrint("Imagepath ${route.imagePath}");
-                  if(await file.exists() == false){
-                    throw Exception("No file in local device");
+                debugPrint("Trying to sync route ${route.backendId}");
+                
+                try {
+                  final isSynced = await routeApiService.syncRoute(route);
+                
+                  if(isSynced){
+                    debugPrint(" Route synced: ${route.id}");
+                  } else {
+                    debugPrint(" Route sync failed (will retry): ${route.id}");
                   }
-                  
+                } catch (e) {
+                  debugPrint(" Error syncing route ${route.id}: $e");
+                  continue;
                 }
-              final isUpdated = await routeApiService.updateRoute(route, isConnected,file);
-              if(isUpdated){
-                 debugPrint("-----------------------------------------------------------");
-                debugPrint("Route is Updated ${route.id}");
-              }else{
-                 debugPrint("-----------------------------------------------------------");
-                 debugPrint("Route is not Updated ${route.id}");
-              }
               }
 
 

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_update_form.dart';
@@ -42,7 +43,7 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
         }
 
         final appDir = snapshot.data!;
-        final fullPath = "${appDir.path}/${selectedRoute.imagePath}";
+        final fullPath = "${appDir.path}/${selectedRoute.imagePathLocal}";
 
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -208,7 +209,9 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
                                         ),
                                       );
                                     },
-                                  );
+                                  ).then((_) {
+                                  ref.invalidate(imageFileProvider);
+                                });
                                 });
                               },
                             ),

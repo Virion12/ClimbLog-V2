@@ -255,12 +255,24 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     requiredDuringInsert: false,
     defaultValue: Constant('4a'),
   );
-  static const VerificationMeta _imagePathMeta = const VerificationMeta(
-    'imagePath',
+  static const VerificationMeta _imagePathLocalMeta = const VerificationMeta(
+    'imagePathLocal',
   );
   @override
-  late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
-    'image_path',
+  late final GeneratedColumn<String> imagePathLocal = GeneratedColumn<String>(
+    'image_path_local',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: Constant(''),
+  );
+  static const VerificationMeta _imagePathBackendMeta = const VerificationMeta(
+    'imagePathBackend',
+  );
+  @override
+  late final GeneratedColumn<String> imagePathBackend = GeneratedColumn<String>(
+    'image_path_backend',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -384,7 +396,8 @@ class $ClimbingRoutesTable extends ClimbingRoutes
     numberOfTried,
     isDone,
     grade,
-    imagePath,
+    imagePathLocal,
+    imagePathBackend,
     thumbnailPath,
     createdAt,
     lastUpdatedAt,
@@ -533,10 +546,22 @@ class $ClimbingRoutesTable extends ClimbingRoutes
         grade.isAcceptableOrUnknown(data['grade']!, _gradeMeta),
       );
     }
-    if (data.containsKey('image_path')) {
+    if (data.containsKey('image_path_local')) {
       context.handle(
-        _imagePathMeta,
-        imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta),
+        _imagePathLocalMeta,
+        imagePathLocal.isAcceptableOrUnknown(
+          data['image_path_local']!,
+          _imagePathLocalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('image_path_backend')) {
+      context.handle(
+        _imagePathBackendMeta,
+        imagePathBackend.isAcceptableOrUnknown(
+          data['image_path_backend']!,
+          _imagePathBackendMeta,
+        ),
       );
     }
     if (data.containsKey('thumbnail_path')) {
@@ -684,9 +709,13 @@ class $ClimbingRoutesTable extends ClimbingRoutes
         DriftSqlType.string,
         data['${effectivePrefix}grade'],
       )!,
-      imagePath: attachedDatabase.typeMapping.read(
+      imagePathLocal: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}image_path'],
+        data['${effectivePrefix}image_path_local'],
+      )!,
+      imagePathBackend: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_path_backend'],
       )!,
       thumbnailPath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -745,7 +774,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
   final int numberOfTried;
   final bool isDone;
   final String grade;
-  final String imagePath;
+  final String imagePathLocal;
+  final String imagePathBackend;
   final String thumbnailPath;
   final DateTime createdAt;
   final DateTime lastUpdatedAt;
@@ -773,7 +803,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     required this.numberOfTried,
     required this.isDone,
     required this.grade,
-    required this.imagePath,
+    required this.imagePathLocal,
+    required this.imagePathBackend,
     required this.thumbnailPath,
     required this.createdAt,
     required this.lastUpdatedAt,
@@ -804,7 +835,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     map['number_of_tried'] = Variable<int>(numberOfTried);
     map['is_done'] = Variable<bool>(isDone);
     map['grade'] = Variable<String>(grade);
-    map['image_path'] = Variable<String>(imagePath);
+    map['image_path_local'] = Variable<String>(imagePathLocal);
+    map['image_path_backend'] = Variable<String>(imagePathBackend);
     map['thumbnail_path'] = Variable<String>(thumbnailPath);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['last_updated_at'] = Variable<DateTime>(lastUpdatedAt);
@@ -836,7 +868,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       numberOfTried: Value(numberOfTried),
       isDone: Value(isDone),
       grade: Value(grade),
-      imagePath: Value(imagePath),
+      imagePathLocal: Value(imagePathLocal),
+      imagePathBackend: Value(imagePathBackend),
       thumbnailPath: Value(thumbnailPath),
       createdAt: Value(createdAt),
       lastUpdatedAt: Value(lastUpdatedAt),
@@ -872,7 +905,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       numberOfTried: serializer.fromJson<int>(json['numberOfTried']),
       isDone: serializer.fromJson<bool>(json['isDone']),
       grade: serializer.fromJson<String>(json['grade']),
-      imagePath: serializer.fromJson<String>(json['imagePath']),
+      imagePathLocal: serializer.fromJson<String>(json['imagePathLocal']),
+      imagePathBackend: serializer.fromJson<String>(json['imagePathBackend']),
       thumbnailPath: serializer.fromJson<String>(json['thumbnailPath']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       lastUpdatedAt: serializer.fromJson<DateTime>(json['lastUpdatedAt']),
@@ -907,7 +941,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
       'numberOfTried': serializer.toJson<int>(numberOfTried),
       'isDone': serializer.toJson<bool>(isDone),
       'grade': serializer.toJson<String>(grade),
-      'imagePath': serializer.toJson<String>(imagePath),
+      'imagePathLocal': serializer.toJson<String>(imagePathLocal),
+      'imagePathBackend': serializer.toJson<String>(imagePathBackend),
       'thumbnailPath': serializer.toJson<String>(thumbnailPath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'lastUpdatedAt': serializer.toJson<DateTime>(lastUpdatedAt),
@@ -938,7 +973,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     int? numberOfTried,
     bool? isDone,
     String? grade,
-    String? imagePath,
+    String? imagePathLocal,
+    String? imagePathBackend,
     String? thumbnailPath,
     DateTime? createdAt,
     DateTime? lastUpdatedAt,
@@ -966,7 +1002,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     numberOfTried: numberOfTried ?? this.numberOfTried,
     isDone: isDone ?? this.isDone,
     grade: grade ?? this.grade,
-    imagePath: imagePath ?? this.imagePath,
+    imagePathLocal: imagePathLocal ?? this.imagePathLocal,
+    imagePathBackend: imagePathBackend ?? this.imagePathBackend,
     thumbnailPath: thumbnailPath ?? this.thumbnailPath,
     createdAt: createdAt ?? this.createdAt,
     lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
@@ -1004,7 +1041,12 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           : this.numberOfTried,
       isDone: data.isDone.present ? data.isDone.value : this.isDone,
       grade: data.grade.present ? data.grade.value : this.grade,
-      imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
+      imagePathLocal: data.imagePathLocal.present
+          ? data.imagePathLocal.value
+          : this.imagePathLocal,
+      imagePathBackend: data.imagePathBackend.present
+          ? data.imagePathBackend.value
+          : this.imagePathBackend,
       thumbnailPath: data.thumbnailPath.present
           ? data.thumbnailPath.value
           : this.thumbnailPath,
@@ -1049,7 +1091,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           ..write('numberOfTried: $numberOfTried, ')
           ..write('isDone: $isDone, ')
           ..write('grade: $grade, ')
-          ..write('imagePath: $imagePath, ')
+          ..write('imagePathLocal: $imagePathLocal, ')
+          ..write('imagePathBackend: $imagePathBackend, ')
           ..write('thumbnailPath: $thumbnailPath, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
@@ -1082,7 +1125,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
     numberOfTried,
     isDone,
     grade,
-    imagePath,
+    imagePathLocal,
+    imagePathBackend,
     thumbnailPath,
     createdAt,
     lastUpdatedAt,
@@ -1114,7 +1158,8 @@ class ClimbingRoute extends DataClass implements Insertable<ClimbingRoute> {
           other.numberOfTried == this.numberOfTried &&
           other.isDone == this.isDone &&
           other.grade == this.grade &&
-          other.imagePath == this.imagePath &&
+          other.imagePathLocal == this.imagePathLocal &&
+          other.imagePathBackend == this.imagePathBackend &&
           other.thumbnailPath == this.thumbnailPath &&
           other.createdAt == this.createdAt &&
           other.lastUpdatedAt == this.lastUpdatedAt &&
@@ -1144,7 +1189,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
   final Value<int> numberOfTried;
   final Value<bool> isDone;
   final Value<String> grade;
-  final Value<String> imagePath;
+  final Value<String> imagePathLocal;
+  final Value<String> imagePathBackend;
   final Value<String> thumbnailPath;
   final Value<DateTime> createdAt;
   final Value<DateTime> lastUpdatedAt;
@@ -1172,7 +1218,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     this.numberOfTried = const Value.absent(),
     this.isDone = const Value.absent(),
     this.grade = const Value.absent(),
-    this.imagePath = const Value.absent(),
+    this.imagePathLocal = const Value.absent(),
+    this.imagePathBackend = const Value.absent(),
     this.thumbnailPath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.lastUpdatedAt = const Value.absent(),
@@ -1201,7 +1248,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     this.numberOfTried = const Value.absent(),
     this.isDone = const Value.absent(),
     this.grade = const Value.absent(),
-    this.imagePath = const Value.absent(),
+    this.imagePathLocal = const Value.absent(),
+    this.imagePathBackend = const Value.absent(),
     this.thumbnailPath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.lastUpdatedAt = const Value.absent(),
@@ -1233,7 +1281,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     Expression<int>? numberOfTried,
     Expression<bool>? isDone,
     Expression<String>? grade,
-    Expression<String>? imagePath,
+    Expression<String>? imagePathLocal,
+    Expression<String>? imagePathBackend,
     Expression<String>? thumbnailPath,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? lastUpdatedAt,
@@ -1262,7 +1311,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
       if (numberOfTried != null) 'number_of_tried': numberOfTried,
       if (isDone != null) 'is_done': isDone,
       if (grade != null) 'grade': grade,
-      if (imagePath != null) 'image_path': imagePath,
+      if (imagePathLocal != null) 'image_path_local': imagePathLocal,
+      if (imagePathBackend != null) 'image_path_backend': imagePathBackend,
       if (thumbnailPath != null) 'thumbnail_path': thumbnailPath,
       if (createdAt != null) 'created_at': createdAt,
       if (lastUpdatedAt != null) 'last_updated_at': lastUpdatedAt,
@@ -1294,7 +1344,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     Value<int>? numberOfTried,
     Value<bool>? isDone,
     Value<String>? grade,
-    Value<String>? imagePath,
+    Value<String>? imagePathLocal,
+    Value<String>? imagePathBackend,
     Value<String>? thumbnailPath,
     Value<DateTime>? createdAt,
     Value<DateTime>? lastUpdatedAt,
@@ -1323,7 +1374,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
       numberOfTried: numberOfTried ?? this.numberOfTried,
       isDone: isDone ?? this.isDone,
       grade: grade ?? this.grade,
-      imagePath: imagePath ?? this.imagePath,
+      imagePathLocal: imagePathLocal ?? this.imagePathLocal,
+      imagePathBackend: imagePathBackend ?? this.imagePathBackend,
       thumbnailPath: thumbnailPath ?? this.thumbnailPath,
       createdAt: createdAt ?? this.createdAt,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
@@ -1394,8 +1446,11 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
     if (grade.present) {
       map['grade'] = Variable<String>(grade.value);
     }
-    if (imagePath.present) {
-      map['image_path'] = Variable<String>(imagePath.value);
+    if (imagePathLocal.present) {
+      map['image_path_local'] = Variable<String>(imagePathLocal.value);
+    }
+    if (imagePathBackend.present) {
+      map['image_path_backend'] = Variable<String>(imagePathBackend.value);
     }
     if (thumbnailPath.present) {
       map['thumbnail_path'] = Variable<String>(thumbnailPath.value);
@@ -1445,7 +1500,8 @@ class ClimbingRoutesCompanion extends UpdateCompanion<ClimbingRoute> {
           ..write('numberOfTried: $numberOfTried, ')
           ..write('isDone: $isDone, ')
           ..write('grade: $grade, ')
-          ..write('imagePath: $imagePath, ')
+          ..write('imagePathLocal: $imagePathLocal, ')
+          ..write('imagePathBackend: $imagePathBackend, ')
           ..write('thumbnailPath: $thumbnailPath, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
@@ -3951,7 +4007,8 @@ typedef $$ClimbingRoutesTableCreateCompanionBuilder =
       Value<int> numberOfTried,
       Value<bool> isDone,
       Value<String> grade,
-      Value<String> imagePath,
+      Value<String> imagePathLocal,
+      Value<String> imagePathBackend,
       Value<String> thumbnailPath,
       Value<DateTime> createdAt,
       Value<DateTime> lastUpdatedAt,
@@ -3981,7 +4038,8 @@ typedef $$ClimbingRoutesTableUpdateCompanionBuilder =
       Value<int> numberOfTried,
       Value<bool> isDone,
       Value<String> grade,
-      Value<String> imagePath,
+      Value<String> imagePathLocal,
+      Value<String> imagePathBackend,
       Value<String> thumbnailPath,
       Value<DateTime> createdAt,
       Value<DateTime> lastUpdatedAt,
@@ -4095,8 +4153,13 @@ class $$ClimbingRoutesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get imagePath => $composableBuilder(
-    column: $table.imagePath,
+  ColumnFilters<String> get imagePathLocal => $composableBuilder(
+    column: $table.imagePathLocal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imagePathBackend => $composableBuilder(
+    column: $table.imagePathBackend,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4240,8 +4303,13 @@ class $$ClimbingRoutesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get imagePath => $composableBuilder(
-    column: $table.imagePath,
+  ColumnOrderings<String> get imagePathLocal => $composableBuilder(
+    column: $table.imagePathLocal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imagePathBackend => $composableBuilder(
+    column: $table.imagePathBackend,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4355,8 +4423,15 @@ class $$ClimbingRoutesTableAnnotationComposer
   GeneratedColumn<String> get grade =>
       $composableBuilder(column: $table.grade, builder: (column) => column);
 
-  GeneratedColumn<String> get imagePath =>
-      $composableBuilder(column: $table.imagePath, builder: (column) => column);
+  GeneratedColumn<String> get imagePathLocal => $composableBuilder(
+    column: $table.imagePathLocal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get imagePathBackend => $composableBuilder(
+    column: $table.imagePathBackend,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get thumbnailPath => $composableBuilder(
     column: $table.thumbnailPath,
@@ -4444,7 +4519,8 @@ class $$ClimbingRoutesTableTableManager
                 Value<int> numberOfTried = const Value.absent(),
                 Value<bool> isDone = const Value.absent(),
                 Value<String> grade = const Value.absent(),
-                Value<String> imagePath = const Value.absent(),
+                Value<String> imagePathLocal = const Value.absent(),
+                Value<String> imagePathBackend = const Value.absent(),
                 Value<String> thumbnailPath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> lastUpdatedAt = const Value.absent(),
@@ -4472,7 +4548,8 @@ class $$ClimbingRoutesTableTableManager
                 numberOfTried: numberOfTried,
                 isDone: isDone,
                 grade: grade,
-                imagePath: imagePath,
+                imagePathLocal: imagePathLocal,
+                imagePathBackend: imagePathBackend,
                 thumbnailPath: thumbnailPath,
                 createdAt: createdAt,
                 lastUpdatedAt: lastUpdatedAt,
@@ -4502,7 +4579,8 @@ class $$ClimbingRoutesTableTableManager
                 Value<int> numberOfTried = const Value.absent(),
                 Value<bool> isDone = const Value.absent(),
                 Value<String> grade = const Value.absent(),
-                Value<String> imagePath = const Value.absent(),
+                Value<String> imagePathLocal = const Value.absent(),
+                Value<String> imagePathBackend = const Value.absent(),
                 Value<String> thumbnailPath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> lastUpdatedAt = const Value.absent(),
@@ -4530,7 +4608,8 @@ class $$ClimbingRoutesTableTableManager
                 numberOfTried: numberOfTried,
                 isDone: isDone,
                 grade: grade,
-                imagePath: imagePath,
+                imagePathLocal: imagePathLocal,
+                imagePathBackend: imagePathBackend,
                 thumbnailPath: thumbnailPath,
                 createdAt: createdAt,
                 lastUpdatedAt: lastUpdatedAt,

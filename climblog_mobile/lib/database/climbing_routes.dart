@@ -22,7 +22,8 @@ class ClimbingRoutes extends Table {
   IntColumn get numberOfTried => integer().withDefault(Constant(0))();
   BoolColumn get isDone => boolean().withDefault(Constant(false))();
   TextColumn get grade => text().withDefault(Constant('4a'))();
-  TextColumn get imagePath => text().withDefault(Constant(''))();
+  TextColumn get imagePathLocal => text().withDefault(Constant(''))();
+  TextColumn get imagePathBackend => text().withDefault(Constant(''))();
   TextColumn get thumbnailPath => text().withDefault(Constant(''))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get lastUpdatedAt => dateTime().withDefault(currentDateAndTime)();

@@ -2,10 +2,12 @@ import 'dart:io';
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
+import 'package:climblog_mobile/Widgets/Routes/route_image_dialog.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,8 +23,6 @@ class RouteUpdateForm extends ConsumerStatefulWidget {
 
 class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
   final _formKey = GlobalKey<FormState>();
-  XFile? _image;
-  bool _isImagePicked = false;
   final List<String> climbingGrades = [
     "4a", "4a+", "4b", "4b+", "4c", "4c+",
     "5a", "5a+", "5b", "5b+", "5c", "5c+",
@@ -74,15 +74,12 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
     final route = ref.read(selectedRouteProvider);
 
     if (route != null) {
-      if (route.imagePath.isNotEmpty) {
+      if (route.imagePathLocal.isNotEmpty) {
         final dir = await getApplicationDocumentsDirectory();
-        final filePath = '${dir.path}/${route.imagePath}';
+        final filePath = '${dir.path}/${route.imagePathLocal}';
 
         if (await File(filePath).exists()) {
-          setState(() {
-            _image = XFile(filePath);
-            _isImagePicked = true;
-          });
+          ref.read(imageFileProvider.notifier).state = File(filePath);
         }
       }
 
@@ -92,7 +89,7 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
         _heightController.text = route.height.toString();
         _gradeController.text = route.grade;
         _numberOfTriedController.text = (route.numberOfTried).toString();
-        _imagePathController.text = route.imagePath;
+        _imagePathController.text = route.imagePathLocal;
         _isPowery = route.isPowery;
         _isSloppy = route.isSloppy;
         _isDynamic = route.isDynamic;
@@ -141,10 +138,9 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
-                setState(() {
-                  _isImagePicked = true;
-                  _image = pickedFile;
-                });
+                if (pickedFile != null) {
+                  ref.read(imageFileProvider.notifier).state = File(pickedFile.path);
+                }
               },
             ),
             ListTile(
@@ -160,10 +156,44 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-                setState(() {
-                  _isImagePicked = true;
-                  _image = pickedFile;
-                });
+                if (pickedFile != null) {
+                  ref.read(imageFileProvider.notifier).state = File(pickedFile.path);
+                }
+              },
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                final isImageSelected = ref.watch(imageFileProvider) != null;
+                
+                if (!isImageSelected) return const SizedBox.shrink();
+                
+                return ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00a896).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.edit, color: Color(0xFF00a896)),
+                  ),
+                  title: const Text("Select Holds"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          backgroundColor: Colors.white,
+                          insetPadding: const EdgeInsets.all(10),
+                          child: const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: RouteImageDialog(),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
               },
             ),
           ],
@@ -174,6 +204,8 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedImage = ref.watch(imageFileProvider);
+    
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -229,11 +261,11 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
                       width: 2,
                     ),
                   ),
-                  child: _isImagePicked && _image != null
+                  child: selectedImage != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: Image.file(
-                            File(_image!.path),
+                            selectedImage,
                             fit: BoxFit.cover,
                             width: double.infinity,
                           ),
@@ -394,7 +426,8 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
                             debugPrint("no route provided");
                             return;
                           }
-                          File? file = _image != null ? File(_image!.path) : null;
+                          
+                          File? file = selectedImage;
 
                           ClimbingRoute routeToUpdate = ClimbingRoute(
                             id: route.id,
@@ -416,7 +449,8 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
                             numberOfTried: int.parse(_numberOfTriedController.text),
                             isDone: _isDone,
                             grade: _gradeController.text,
-                            imagePath: route.imagePath,
+                            imagePathLocal: route.imagePathLocal,
+                            imagePathBackend: route.imagePathBackend,
                             thumbnailPath: route.thumbnailPath,
                             createdAt: route.createdAt,
                             lastUpdatedAt: route.lastUpdatedAt,
