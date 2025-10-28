@@ -2,6 +2,7 @@ import 'package:climblog_mobile/Widgets/Routes/charts/alast_4_years_route.dart';
 import 'package:climblog_mobile/Widgets/Routes/charts/all_by_month_route.dart';
 import 'package:climblog_mobile/Widgets/Routes/charts/grade_chart_route.dart';
 import 'package:climblog_mobile/Widgets/Routes/charts/radar_chart_route_details.dart';
+import 'package:climblog_mobile/Widgets/Routes/routes_home_stats.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class _StatisticsRoutesPageState extends State<StatisticsRoutesPage> {
         child: Column(
           children: [
             BasicContainer(child: Text("Details",textAlign: TextAlign.center, style: TextStyle(fontSize: 16),)),
+            RoutesHomeStats(),
             BasicContainer(child: Text("By grade :", textAlign: TextAlign.center,)),
             BasicContainer(child: 
             RoutesChart(height: 200,)),

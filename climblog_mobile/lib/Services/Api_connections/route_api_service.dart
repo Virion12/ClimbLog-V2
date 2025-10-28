@@ -177,7 +177,7 @@ class RouteServiceApi {
     }
   }
 
- /// Synchronizuje trasę z backendem
+/// Synchronizuje trasę z backendem
 /// Używane w background sync do synchronizacji tras z oczekującymi zmianami
 /// Obsługuje zarówno aktualizację danych jak i synchronizację obrazów
 Future<bool> syncRoute(ClimbingRoute route) async {

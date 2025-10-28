@@ -327,3 +327,65 @@ final mountainProgressProvider = Provider.autoDispose<double>((ref) {
   return (progress / range).clamp(0.0, 1.0);
 });
 
+class RouteCharacteristicsCount {
+  final int powery;
+  final int sloppy;
+  final int dynamic;
+  final int crimpy;
+  final int reachy;
+  final int onsighted;
+  final int redPointed;
+  final int flashed;
+  final int favorite;
+  final int total;
+
+  const RouteCharacteristicsCount({
+    required this.powery,
+    required this.sloppy,
+    required this.dynamic,
+    required this.crimpy,
+    required this.reachy,
+    required this.onsighted,
+    required this.redPointed,
+    required this.flashed,
+    required this.favorite,
+    required this.total,
+  });
+
+  const RouteCharacteristicsCount.empty()
+      : powery = 0,
+        sloppy = 0,
+        dynamic = 0,
+        crimpy = 0,
+        reachy = 0,
+        onsighted = 0,
+        redPointed = 0,
+        flashed = 0,
+        favorite = 0,
+        total = 0;
+}
+
+final routeCharacteristicsCountProvider = Provider.autoDispose<RouteCharacteristicsCount>((ref) {
+  final routesAsync = ref.watch(filteredRoutesProvider);
+
+  return routesAsync.maybeWhen(
+    data: (routes) {
+      if (routes.isEmpty) return const RouteCharacteristicsCount.empty();
+
+      return RouteCharacteristicsCount(
+        powery: routes.where((r) => r.isPowery).length,
+        sloppy: routes.where((r) => r.isSloppy).length,
+        dynamic: routes.where((r) => r.isDynamic).length,
+        crimpy: routes.where((r) => r.isCrimpy).length,
+        reachy: routes.where((r) => r.isReachy).length,
+        onsighted: routes.where((r) => r.isOnsighted).length,
+        redPointed: routes.where((r) => r.isRedPointed).length,
+        flashed: routes.where((r) => r.isFlashed).length,
+        favorite: routes.where((r) => r.isFavorite).length,
+        total: routes.length,
+      );
+    },
+    orElse: () => const RouteCharacteristicsCount.empty(),
+  );
+});
+
