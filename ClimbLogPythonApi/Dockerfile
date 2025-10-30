@@ -18,11 +18,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# --- Copy requirements before build to leverage cache ---
+
 COPY requirements.txt .
 
-# --- Create Conda env and install PyTorch Nightly with CUDA 12.8 ---
-# (Nightly >= 2.7.0 required for Blackwell GPUs)
+
 RUN conda create -n yolo python=3.10 -y && \
     conda run -n yolo pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128 && \
     conda run -n yolo pip install --no-cache-dir -r requirements.txt
@@ -34,4 +33,4 @@ COPY ./Model ./Model
 EXPOSE 8000
 
 # --- Start FastAPI ---
-CMD ["conda", "run", "-n", "yolo", "--no-capture-output", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["conda", "run", "-n", "yolo", "--no-capture-output", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

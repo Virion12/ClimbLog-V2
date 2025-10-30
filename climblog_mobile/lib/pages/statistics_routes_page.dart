@@ -28,6 +28,7 @@ class _StatisticsRoutesPageState extends State<StatisticsRoutesPage> {
           children: [
             BasicContainer(child: Text("Details",textAlign: TextAlign.center, style: TextStyle(fontSize: 16),)),
             RoutesHomeStats(),
+            SizedBox(height: 30,),
             BasicContainer(child: Text("By grade :", textAlign: TextAlign.center,)),
             BasicContainer(child: 
             RoutesChart(height: 200,)),
@@ -43,6 +44,8 @@ class _StatisticsRoutesPageState extends State<StatisticsRoutesPage> {
             BasicContainer(child: Text("Last 4 years :", textAlign: TextAlign.center,)),
             BasicContainer(child: 
             ChartRoutesByYear(height: 200,)),
+            //end
+            SizedBox(height: 50,),
           ],
         ),
       ),

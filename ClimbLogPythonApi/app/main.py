@@ -1,13 +1,11 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from ultralytics import YOLO
-import cv2
 import numpy as np
 import torch
-from PIL import Image
-import io
-from typing import List, Dict
 import logging
+from io import BytesIO
+import cv2
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,10 +14,12 @@ app = FastAPI(title="YOLO11 Segmentation API with CUDA")
 
 model = None
 device = None
+TRAIN_IMG_SIZE = None
+CONF_THRESHOLD = 0.7
 
 @app.on_event("startup")
 async def load_model():
-    global model, device
+    global model, device, TRAIN_IMG_SIZE
     try:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         logger.info(f"Używane urządzenie: {device}")
@@ -34,9 +34,14 @@ async def load_model():
         model = YOLO("Model/best.pt")
         model.to(device)
         
-        logger.info("Model YOLO11 załadowany pomyślnie!")
+        if hasattr(model, 'yaml'):
+            TRAIN_IMG_SIZE = model.yaml.get('img_size') or model.yaml.get('imgsz') or 640
+        else:
+            TRAIN_IMG_SIZE = 640
         
-        dummy_img = np.zeros((640, 640, 3), dtype=np.uint8)
+        logger.info(f"Rozmiar obrazu treningowego: {TRAIN_IMG_SIZE}")
+        
+        dummy_img = np.zeros((TRAIN_IMG_SIZE, TRAIN_IMG_SIZE, 3), dtype=np.uint8)
         _ = model(dummy_img, verbose=False)
         logger.info("Model rozgrzany i gotowy do użycia!")
         
@@ -53,32 +58,8 @@ async def root():
         "cuda_available": torch.cuda.is_available()
     }
 
-@app.get("/health")
-async def health_check():
-    gpu_info = {}
-    if torch.cuda.is_available():
-        gpu_info = {
-            "gpu_name": torch.cuda.get_device_name(0),
-            "gpu_memory_allocated": f"{torch.cuda.memory_allocated(0) / 1024**3:.2f} GB",
-            "gpu_memory_reserved": f"{torch.cuda.memory_reserved(0) / 1024**3:.2f} GB",
-            "gpu_memory_total": f"{torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB"
-        }
-    
-    return {
-        "status": "healthy",
-        "model_loaded": model is not None,
-        "device": device,
-        "cuda_available": torch.cuda.is_available(),
-        "pytorch_version": torch.__version__,
-        "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
-        **gpu_info
-    }
-
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    """
-    Endpoint do predykcji segmentacji na przesłanym obrazie (używa GPU)
-    """
     if model is None:
         raise HTTPException(status_code=503, detail="Model nie jest załadowany")
     
@@ -86,35 +67,37 @@ async def predict(file: UploadFile = File(...)):
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        
         if img is None:
             raise HTTPException(status_code=400, detail="Nie można wczytać obrazu")
-        
-        with torch.cuda.amp.autocast():  
-            results = model(img, verbose=False)
-        
+
+        results = model.predict(
+            img,
+            imgsz=TRAIN_IMG_SIZE,
+            conf=CONF_THRESHOLD,  # <-- tutaj używamy globalnego progu
+            device=device,
+            verbose=False
+        )
+
         predictions = []
         for result in results:
-            if result.masks is not None:
-                for i, (mask, box, conf, cls) in enumerate(zip(
-                    result.masks.data,
-                    result.boxes.xyxy,
-                    result.boxes.conf,
-                    result.boxes.cls
-                )):
+            if result.masks is not None and result.masks.xy is not None:
+                for i, mask_xy in enumerate(result.masks.xy):
+                    box = result.boxes.xyxy[i]
+                    cls = int(result.boxes.cls[i].item())
+                    confidence = float(result.boxes.conf[i].item())
                     predictions.append({
-                        "class_id": int(cls),
-                        "class_name": result.names[int(cls)],
-                        "confidence": float(conf),
+                        "class_id": cls,
+                        "class_name": result.names[cls],
+                        "confidence": confidence,
                         "bbox": {
                             "x1": float(box[0]),
                             "y1": float(box[1]),
                             "x2": float(box[2]),
                             "y2": float(box[3])
                         },
-                        "mask_shape": list(mask.cpu().numpy().shape)
+                        "mask_xy": mask_xy.tolist()
                     })
-        
+
         return JSONResponse(content={
             "success": True,
             "device_used": device,
@@ -126,158 +109,50 @@ async def predict(file: UploadFile = File(...)):
                 "channels": img.shape[2]
             }
         })
-        
+
     except Exception as e:
         logger.error(f"Błąd podczas przetwarzania: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
-@app.post("/predict/detailed")
-async def predict_detailed(
-    file: UploadFile = File(...),
-    conf_threshold: float = 0.25,
-    iou_threshold: float = 0.7,
-    img_size: int = 640
-):
-    """
-    Endpoint z bardziej szczegółowymi opcjami predykcji (GPU accelerated)
-    """
+@app.post("/test_masks")
+async def test_masks(file: UploadFile = File(...)):
     if model is None:
         raise HTTPException(status_code=503, detail="Model nie jest załadowany")
-    
+
     try:
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        
         if img is None:
             raise HTTPException(status_code=400, detail="Nie można wczytać obrazu")
-        
-        with torch.cuda.amp.autocast():
-            results = model.predict(
-                img,
-                conf=conf_threshold,
-                iou=iou_threshold,
-                imgsz=img_size,
-                verbose=False,
-                device=device
-            )
-        
-        predictions = []
-        for result in results:
-            if result.masks is not None:
-                masks_array = result.masks.data.cpu().numpy()
-                
-                for i, (box, conf, cls) in enumerate(zip(
-                    result.boxes.xyxy,
-                    result.boxes.conf,
-                    result.boxes.cls
-                )):
-                    mask = masks_array[i]
-                    
-                    predictions.append({
-                        "id": i,
-                        "class_id": int(cls),
-                        "class_name": result.names[int(cls)],
-                        "confidence": float(conf),
-                        "bbox": {
-                            "x1": float(box[0]),
-                            "y1": float(box[1]),
-                            "x2": float(box[2]),
-                            "y2": float(box[3]),
-                            "width": float(box[2] - box[0]),
-                            "height": float(box[3] - box[1])
-                        },
-                        "mask_shape": list(mask.shape),
-                        "mask_area_pixels": int(np.sum(mask > 0.5))
-                    })
-        
-        gpu_stats = {}
-        if torch.cuda.is_available():
-            gpu_stats = {
-                "memory_allocated_mb": f"{torch.cuda.memory_allocated(0) / 1024**2:.2f}",
-                "memory_reserved_mb": f"{torch.cuda.memory_reserved(0) / 1024**2:.2f}"
-            }
-        
-        return JSONResponse(content={
-            "success": True,
-            "device_used": device,
-            "parameters": {
-                "confidence_threshold": conf_threshold,
-                "iou_threshold": iou_threshold,
-                "image_size": img_size
-            },
-            "predictions_count": len(predictions),
-            "predictions": predictions,
-            "image_info": {
-                "height": img.shape[0],
-                "width": img.shape[1],
-                "channels": img.shape[2]
-            },
-            "gpu_stats": gpu_stats
-        })
-        
-    except Exception as e:
-        logger.error(f"Błąd podczas przetwarzania: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
-@app.post("/predict/batch")
-async def predict_batch(files: List[UploadFile] = File(...)):
-    """
-    Endpoint do przetwarzania wielu obrazów jednocześnie (batch processing)
-    """
-    if model is None:
-        raise HTTPException(status_code=503, detail="Model nie jest załadowany")
-    
-    if len(files) > 10:
-        raise HTTPException(status_code=400, detail="Maksymalnie 10 obrazów na raz")
-    
-    try:
-        all_results = []
-        
-        for idx, file in enumerate(files):
-            contents = await file.read()
-            nparr = np.frombuffer(contents, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            
-            if img is None:
-                all_results.append({
-                    "file_name": file.filename,
-                    "success": False,
-                    "error": "Nie można wczytać obrazu"
-                })
-                continue
-            
-            with torch.cuda.amp.autocast():
-                results = model(img, verbose=False)
-            
-            predictions = []
-            for result in results:
-                if result.masks is not None:
-                    for i, (box, conf, cls) in enumerate(zip(
-                        result.boxes.xyxy,
-                        result.boxes.conf,
-                        result.boxes.cls
-                    )):
-                        predictions.append({
-                            "class_id": int(cls),
-                            "class_name": result.names[int(cls)],
-                            "confidence": float(conf)
-                        })
-            
-            all_results.append({
-                "file_name": file.filename,
-                "success": True,
-                "predictions_count": len(predictions),
-                "predictions": predictions
-            })
-        
-        return JSONResponse(content={
-            "success": True,
-            "device_used": device,
-            "total_images": len(files),
-            "results": all_results
-        })
-        
+        results = model.predict(
+            img,
+            imgsz=TRAIN_IMG_SIZE,
+            conf=CONF_THRESHOLD, 
+            device=device,
+            verbose=False
+        )
+        overlay = img.copy()
+
+        for result in results:
+            if result.masks is not None and result.masks.xy is not None:
+                for i, mask_xy in enumerate(result.masks.xy):
+                    if mask_xy is None or len(mask_xy) == 0:
+                        continue
+                    pts = np.array(mask_xy, np.int32).reshape((-1, 1, 2))
+                    cv2.polylines(overlay, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+
+                    cls_id = int(result.boxes.cls[i].item())
+                    cls_name = result.names[cls_id]
+                    confidence = float(result.boxes.conf[i].item())
+                    x, y = int(pts[0][0][0]), int(pts[0][0][1])
+                    cv2.putText(overlay, f"{cls_name} {confidence:.2f}", (x, y-10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,0,255), 2)
+
+        _, buffer = cv2.imencode(".png", overlay)
+        return StreamingResponse(BytesIO(buffer.tobytes()), media_type="image/png")
+
     except Exception as e:
-        logger.error(f"Błąd podczas przetwarzania batch: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Błąd: {str(e)}")
+        logger.error(f"Błąd podczas przetwarzania obrazu w /test_masks: {e}")
+        raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")

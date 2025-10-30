@@ -82,89 +82,94 @@ class _AllRoutesState extends ConsumerState<Top60Routes> {
               ],
             ),
           ),
-        BasicContainer(
-          child: Wrap(
-            spacing: 4,
-            runSpacing: 4,
-            alignment: WrapAlignment.start,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: [
-              RouteAddButton(),
-              ...List.generate(routes.length, (index) {
-                final route = routes[index];
-                return GestureDetector(
-                  onDoubleTap: () {
-                    serviceLocal.toggleFavorite(route.id);
-                  },
-                  onTap: () {
-                    if (isInSelectionMode) {
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: 300
+          ),
+          child: BasicContainer(
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              children: [
+                RouteAddButton(),
+                ...List.generate(routes.length, (index) {
+                  final route = routes[index];
+                  return GestureDetector(
+                    onDoubleTap: () {
+                      serviceLocal.toggleFavorite(route.id);
+                    },
+                    onTap: () {
+                      if (isInSelectionMode) {
+                        setState(() {
+                          if (selectedRoutes.contains(route.id)) {
+                            selectedRoutes.remove(route.id);
+                          } else {
+                            selectedRoutes.add(route.id);
+                          }
+                        });
+                      } else {
+                        ref.read(selectedRouteProvider.notifier).state = route;
+                        showDialog(
+                          context: context,
+                          builder: (context) => const RouteSingle(),
+                        );
+                      }
+                    },
+                    onLongPress: () {
                       setState(() {
-                        if (selectedRoutes.contains(route.id)) {
-                          selectedRoutes.remove(route.id);
+                        if (!isInSelectionMode) {
+                          isInSelectionMode = true;
                         } else {
-                          selectedRoutes.add(route.id);
+                          isInSelectionMode = false;
+                          selectedRoutes = {};
                         }
                       });
-                    } else {
-                      ref.read(selectedRouteProvider.notifier).state = route;
-                      showDialog(
-                        context: context,
-                        builder: (context) => const RouteSingle(),
-                      );
-                    }
-                  },
-                  onLongPress: () {
-                    setState(() {
-                      if (!isInSelectionMode) {
-                        isInSelectionMode = true;
-                      } else {
-                        isInSelectionMode = false;
-                        selectedRoutes = {};
-                      }
-                    });
-                  },
-                  child: Stack(
-                    children: [
-                      RouteCard(
-                        color: route.color,
-                        grade: route.grade,
-                        timestamp: route.createdAt,
-                      ),
-                      if (isInSelectionMode)
-                        Positioned(
-                          top: 0.0,
-                          right: 0.0,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: selectedRoutes.contains(route.id)
-                                  ? const Color.fromARGB(69, 137, 139, 139)
-                                  : Colors.transparent,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: const Color.fromARGB(69, 137, 139, 139),
-                                width: 1.2,
+                    },
+                    child: Stack(
+                      children: [
+                        RouteCard(
+                          color: route.color,
+                          grade: route.grade,
+                          timestamp: route.createdAt,
+                        ),
+                        if (isInSelectionMode)
+                          Positioned(
+                            top: 0.0,
+                            right: 0.0,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: selectedRoutes.contains(route.id)
+                                    ? const Color.fromARGB(69, 137, 139, 139)
+                                    : Colors.transparent,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color.fromARGB(69, 137, 139, 139),
+                                  width: 1.2,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      if (route.isFavorite)
-                        Positioned(
-                          top: 4,
-                          left: 4,
-                          child: Icon(
-                            Icons.star,
-                            size: MediaQuery.of(context).size.width * 0.045,
-                            color: const Color(0xFF00a896),
+                        if (route.isFavorite)
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            child: Icon(
+                              Icons.star,
+                              size: MediaQuery.of(context).size.width * 0.045,
+                              color: const Color(0xFF00a896),
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
-                );
-              }),
-              MoreRoutesButton(),
-            ],
+                      ],
+                    ),
+                  );
+                }),
+                MoreRoutesButton(),
+              ],
+            ),
           ),
         ),
       ],
