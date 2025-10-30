@@ -6,11 +6,13 @@ import torch
 import logging
 from io import BytesIO
 import cv2
+from pydantic import BaseModel, Field
+from app.services.ai_service import get_ai_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="YOLO11 Segmentation API with CUDA")
+app = FastAPI(title="YOLO11 Segmentation + Training Plan API")
 
 model = None
 device = None
@@ -43,7 +45,12 @@ async def load_model():
         
         dummy_img = np.zeros((TRAIN_IMG_SIZE, TRAIN_IMG_SIZE, 3), dtype=np.uint8)
         _ = model(dummy_img, verbose=False)
-        logger.info("Model rozgrzany i gotowy do użycia!")
+        logger.info("✅ Model YOLO gotowy!")
+        
+        # Ładuj DeepSeek
+        logger.info("🔄 Ładuję DeepSeek...")
+        get_ai_service()
+        logger.info("✅ Wszystkie modele gotowe!")
         
     except Exception as e:
         logger.error(f"Błąd podczas ładowania modelu: {e}")
@@ -52,7 +59,7 @@ async def load_model():
 @app.get("/")
 async def root():
     return {
-        "message": "YOLO11 Segmentation API with CUDA",
+        "message": "YOLO11 Segmentation + Training Plan API",
         "status": "running",
         "device": device,
         "cuda_available": torch.cuda.is_available()
@@ -73,7 +80,7 @@ async def predict(file: UploadFile = File(...)):
         results = model.predict(
             img,
             imgsz=TRAIN_IMG_SIZE,
-            conf=CONF_THRESHOLD,  # <-- tutaj używamy globalnego progu
+            conf=CONF_THRESHOLD,
             device=device,
             verbose=False
         )
@@ -156,3 +163,30 @@ async def test_masks(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Błąd podczas przetwarzania obrazu w /test_masks: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
+
+
+# --- NOWE: Training Plan Endpoints ---
+
+class TrainingPlanRequest(BaseModel):
+    prompt: str = Field(..., description="Opis potrzeb treningowych")
+
+class TrainingPlanResponse(BaseModel):
+    plan: str
+
+@app.post("/generate-training-plan", response_model=TrainingPlanResponse)
+async def generate_training_plan(request: TrainingPlanRequest):
+    """
+    Generuje spersonalizowany plan treningowy używając DeepSeek 7B
+    
+    Przykład:
+    {
+        "prompt": "Chcę zbudować masę. 2 lata doświadczenia, pełna siłownia, 4x tydzień po 90min. Waga 75kg, wzrost 178cm. Cel: +8kg w 4 miesiące."
+    }
+    """
+    try:
+        ai_service = get_ai_service()
+        plan = ai_service.generate_training_plan(request.prompt)
+        return TrainingPlanResponse(plan=plan)
+    except Exception as e:
+        logger.error(f"❌ Błąd: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -18,9 +18,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-
 COPY requirements.txt .
-
 
 RUN conda create -n yolo python=3.10 -y && \
     conda run -n yolo pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128 && \
