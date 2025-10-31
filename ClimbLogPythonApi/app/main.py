@@ -1,22 +1,27 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse
 from ultralytics import YOLO
 import numpy as np
 import torch
 import logging
 from io import BytesIO
 import cv2
+from pydantic import BaseModel, Field
+from app.services.ai_service import get_ai_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="YOLO11 Segmentation API with CUDA")
+app = FastAPI(title="YOLO11 Segmentation + Training Plan API")
 
 model = None
 device = None
 TRAIN_IMG_SIZE = None
 CONF_THRESHOLD = 0.7
 
+# ----------------------------
+# Startup - ładowanie modeli
+# ----------------------------
 @app.on_event("startup")
 async def load_model():
     global model, device, TRAIN_IMG_SIZE
@@ -43,21 +48,32 @@ async def load_model():
         
         dummy_img = np.zeros((TRAIN_IMG_SIZE, TRAIN_IMG_SIZE, 3), dtype=np.uint8)
         _ = model(dummy_img, verbose=False)
-        logger.info("Model rozgrzany i gotowy do użycia!")
+        logger.info(" Model YOLO gotowy!")
+        
+        # Ładuj DeepSeek
+        logger.info("Ładuję DeepSeek...")
+        get_ai_service()
+        logger.info(" Wszystkie modele gotowe!")
         
     except Exception as e:
         logger.error(f"Błąd podczas ładowania modelu: {e}")
         raise
 
+# ----------------------------
+# Root
+# ----------------------------
 @app.get("/")
 async def root():
     return {
-        "message": "YOLO11 Segmentation API with CUDA",
+        "message": "YOLO11 Segmentation + Training Plan API",
         "status": "running",
         "device": device,
         "cuda_available": torch.cuda.is_available()
     }
 
+# ----------------------------
+# YOLO - predykcja
+# ----------------------------
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     if model is None:
@@ -73,7 +89,7 @@ async def predict(file: UploadFile = File(...)):
         results = model.predict(
             img,
             imgsz=TRAIN_IMG_SIZE,
-            conf=CONF_THRESHOLD,  # <-- tutaj używamy globalnego progu
+            conf=CONF_THRESHOLD,
             device=device,
             verbose=False
         )
@@ -114,6 +130,9 @@ async def predict(file: UploadFile = File(...)):
         logger.error(f"Błąd podczas przetwarzania: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
+# ----------------------------
+# YOLO - test masek
+# ----------------------------
 @app.post("/test_masks")
 async def test_masks(file: UploadFile = File(...)):
     if model is None:
@@ -156,3 +175,24 @@ async def test_masks(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Błąd podczas przetwarzania obrazu w /test_masks: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
+
+# ----------------------------
+# DeepSeek - Training Plan
+# ----------------------------
+class TrainingPlanRequest(BaseModel):
+    prompt: str = Field(..., description="Opis potrzeb treningowych (np. poziom, cele, dostępność)")
+
+@app.post("/generate-training-plan", response_class=PlainTextResponse)
+async def generate_training_plan(request: TrainingPlanRequest):
+    """
+    Generuje spersonalizowany plan treningowy wspinaczkowy używając DeepSeek 7B.
+    Zwraca odpowiedź modelu jako zwykły string.
+    """
+    try:
+        ai_service = get_ai_service()
+        plan_str = ai_service.generate_training_plan(request.prompt)
+        return plan_str
+
+    except Exception as e:
+        logger.error(f"Błąd generowania planu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Błąd generowania planu: {str(e)}")
