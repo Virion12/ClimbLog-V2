@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse
 from ultralytics import YOLO
 import numpy as np
 import torch
@@ -19,6 +19,9 @@ device = None
 TRAIN_IMG_SIZE = None
 CONF_THRESHOLD = 0.7
 
+# ----------------------------
+# Startup - ładowanie modeli
+# ----------------------------
 @app.on_event("startup")
 async def load_model():
     global model, device, TRAIN_IMG_SIZE
@@ -45,17 +48,20 @@ async def load_model():
         
         dummy_img = np.zeros((TRAIN_IMG_SIZE, TRAIN_IMG_SIZE, 3), dtype=np.uint8)
         _ = model(dummy_img, verbose=False)
-        logger.info("✅ Model YOLO gotowy!")
+        logger.info(" Model YOLO gotowy!")
         
         # Ładuj DeepSeek
-        logger.info("🔄 Ładuję DeepSeek...")
+        logger.info("Ładuję DeepSeek...")
         get_ai_service()
-        logger.info("✅ Wszystkie modele gotowe!")
+        logger.info(" Wszystkie modele gotowe!")
         
     except Exception as e:
         logger.error(f"Błąd podczas ładowania modelu: {e}")
         raise
 
+# ----------------------------
+# Root
+# ----------------------------
 @app.get("/")
 async def root():
     return {
@@ -65,6 +71,9 @@ async def root():
         "cuda_available": torch.cuda.is_available()
     }
 
+# ----------------------------
+# YOLO - predykcja
+# ----------------------------
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     if model is None:
@@ -121,6 +130,9 @@ async def predict(file: UploadFile = File(...)):
         logger.error(f"Błąd podczas przetwarzania: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
+# ----------------------------
+# YOLO - test masek
+# ----------------------------
 @app.post("/test_masks")
 async def test_masks(file: UploadFile = File(...)):
     if model is None:
@@ -164,29 +176,23 @@ async def test_masks(file: UploadFile = File(...)):
         logger.error(f"Błąd podczas przetwarzania obrazu w /test_masks: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
-
-# --- NOWE: Training Plan Endpoints ---
-
+# ----------------------------
+# DeepSeek - Training Plan
+# ----------------------------
 class TrainingPlanRequest(BaseModel):
-    prompt: str = Field(..., description="Opis potrzeb treningowych")
+    prompt: str = Field(..., description="Opis potrzeb treningowych (np. poziom, cele, dostępność)")
 
-class TrainingPlanResponse(BaseModel):
-    plan: str
-
-@app.post("/generate-training-plan", response_model=TrainingPlanResponse)
+@app.post("/generate-training-plan", response_class=PlainTextResponse)
 async def generate_training_plan(request: TrainingPlanRequest):
     """
-    Generuje spersonalizowany plan treningowy używając DeepSeek 7B
-    
-    Przykład:
-    {
-        "prompt": "Chcę zbudować masę. 2 lata doświadczenia, pełna siłownia, 4x tydzień po 90min. Waga 75kg, wzrost 178cm. Cel: +8kg w 4 miesiące."
-    }
+    Generuje spersonalizowany plan treningowy wspinaczkowy używając DeepSeek 7B.
+    Zwraca odpowiedź modelu jako zwykły string.
     """
     try:
         ai_service = get_ai_service()
-        plan = ai_service.generate_training_plan(request.prompt)
-        return TrainingPlanResponse(plan=plan)
+        plan_str = ai_service.generate_training_plan(request.prompt)
+        return plan_str
+
     except Exception as e:
-        logger.error(f"❌ Błąd: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Błąd generowania planu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Błąd generowania planu: {str(e)}")
