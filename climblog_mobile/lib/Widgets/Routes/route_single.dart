@@ -6,6 +6,7 @@ import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_update_form.dart';
+import 'package:climblog_mobile/Widgets/Shared/action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -191,7 +192,7 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
                       Row(
                         children: [
                           Expanded(
-                            child: _ActionButton(
+                            child: ActionButton(
                               icon: Icons.edit_outlined,
                               label: "Edit",
                               onPressed: () {
@@ -218,7 +219,7 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _ActionButton(
+                            child: ActionButton(
                               icon: Icons.delete_outline,
                               label: "Delete",
                               isDestructive: true,
@@ -322,46 +323,3 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-  final bool isDestructive;
-
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-    this.isDestructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(
-        icon,
-        size: 20,
-        color: isDestructive ? Colors.red : const Color(0xFF00a896),
-      ),
-      label: Text(
-        label,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: isDestructive ? Colors.red : const Color(0xFF00a896),
-        ),
-      ),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        side: BorderSide(
-          color: isDestructive ? Colors.red.withOpacity(0.3) : const Color(0xFF00a896).withOpacity(0.3),
-          width: 1.5,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
-}

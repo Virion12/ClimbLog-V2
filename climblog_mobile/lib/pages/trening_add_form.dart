@@ -2,6 +2,9 @@ import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
+import 'package:climblog_mobile/Widgets/Shared/action_button.dart';
+import 'package:climblog_mobile/Widgets/trening/workout/preselect_trening_card.dart';
+import 'package:climblog_mobile/models/predefined_workout_plans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -142,7 +145,6 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
         days: days,
       );
 
-      // Synchronizacja w tle - nie blokuje UI
       _syncToBackendInBackground(id);
 
       if (mounted) {
@@ -163,13 +165,37 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
         final auth = ref.read(authServiceProvider);
         final apiWorkoutService = WorkoutApiService(auth, _workoutService);
         await apiWorkoutService.addWorkoutPlan(id);
-        debugPrint("✅ Workout plan synced to backend (ID: $id)");
+        debugPrint("Workout plan synced to backend (ID: $id)");
       } else {
-        debugPrint("⚠️ No connection - workout will be synced later");
+        debugPrint("No connection - workout will be synced later");
       }
     } catch (e) {
-      debugPrint("❌ Background sync failed: $e");
+      debugPrint("Background sync failed: $e");
     }
+  }
+
+  void _loadPredefinedPlan(PredefinedPlan plan) {
+    setState(() {
+      _nameWorkoutController.text = plan.name;
+      
+      for (final day in dayNames) {
+        _daysSessions[day] = [];
+      }
+      
+      for (final day in plan.days) {
+        final dayName = dayNames[day.dayOfWeek - 1];
+        final sessions = day.sessions.map((s) => SessionData(
+          name: s.name,
+          location: s.location,
+          startTime: s.start ?? "09:00", 
+          exercises: s.exercises,
+        )).toList();
+        
+        _daysSessions[dayName] = sessions;
+      }
+    });
+    
+    _showSnackBar("Loaded: ${plan.name}", success: true);
   }
 
   void _showSnackBar(String message, {bool success = false}) {
@@ -203,7 +229,11 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("New Workout Plan"),
+        title: Row( mainAxisAlignment: MainAxisAlignment.center ,children: [Text("New Workout Plan"),SizedBox(width: 10,), GestureDetector(
+          onTap: () {
+            
+          },
+          child: Icon(Icons.info_outline,size: 26,color: const Color.fromARGB(255, 122, 158, 225),))], ) ,
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -218,6 +248,163 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ActionButton(icon: Icons.auto_awesome, label: "Generate",onPressed: () {
+                          
+                        },),
+                      ),
+                      const SizedBox(width: 10,),
+                     Expanded(
+                        child: ActionButton(
+                          icon: Icons.widgets_outlined, 
+                          label: "Predefined",
+                          onPressed: () {
+                            showDialog(
+                              context: context, 
+                              builder: (context) {
+                                return Dialog(
+                                  backgroundColor: Colors.white,
+                                  insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.all(20.0),
+                                        child: Text(
+                                          'Training Plans',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      const Divider(height: 1),
+                                      Flexible(
+                                        child: ListView(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.all(20),
+                                          children: [
+                                           GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.strengthAndPowerPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Strength & Power Plan", 
+                                                backgroundImage: './assets/plan1.jpg',
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.beginnerFoundationPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Beginner Foundation Plan",
+                                                backgroundImage: './assets/plan2.jpg',
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.techniqueEfficiencyPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Technique & Efficiency Plan",
+                                                backgroundImage: './assets/plan1.jpg',
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.enduranceStaminaPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Endurance & Stamina Plan",
+                                                backgroundImage: './assets/plan2.jpg',
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.outdoorProjectPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Outdoor Project Preparation Plan",
+                                                backgroundImage: './assets/plan1.jpg',
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.competitionReadinessPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Competition Readiness Plan",
+                                                backgroundImage: './assets/plan2.jpg',
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                _loadPredefinedPlan(PredefinedWorkoutPlans.fingerStrengthPlan);
+                                              },
+                                              child: const PreselectTreningCard(
+                                                name: "Finger Strength Plan",
+                                                backgroundImage: './assets/plan1.jpg',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Divider(height: 1),
+                                     Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: ActionButton(
+                                            icon: Icons.close,
+                                            label: "Close",
+                                            isDestructive: true,
+                                            onPressed: () => Navigator.pop(context),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(width: 10,),
+                      Expanded(
+                        child: ActionButton(icon: Icons.delete, label: "clear",onPressed: () {
+                          setState(() {
+                            for (final day in dayNames) {
+                              _daysSessions[day] = [];
+                            }
+                            _nameWorkoutController.text = "";
+                          });
+                        }, isDestructive: true,),
+                      ),
+
+                    ],
+                  ),
+                  const SizedBox(height: 40,),
                   TextField(
                     controller: _nameWorkoutController,
                     decoration: InputDecoration(
@@ -232,6 +419,7 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  
                   const Text(
                     "Training days",
                     style: TextStyle(
