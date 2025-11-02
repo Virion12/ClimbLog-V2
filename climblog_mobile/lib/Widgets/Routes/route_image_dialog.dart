@@ -547,7 +547,6 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
                       final file = File(filePath);
                       await file.writeAsBytes(bytes);
 
-                      // Przekazujemy plik do providera
                       ref.read(imageFileProvider.notifier).state = file;
                       Navigator.of(context).pop();
                     }catch(e){
