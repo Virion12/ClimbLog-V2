@@ -1,0 +1,22 @@
+services:
+  python-api:
+    build:
+      context: ./ClimbLogPythonApi
+      dockerfile: Dockerfile
+    container_name: climblog-python-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Hot reload dla kodu aplikacji
+      - ./ClimbLogPythonApi/app:/app/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    # Konfiguracja GPU - Docker Compose v2 składnia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

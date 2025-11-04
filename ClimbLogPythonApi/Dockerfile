@@ -18,17 +18,21 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# --- Copy requirements first (cache layer) ---
 COPY requirements.txt .
 
+# --- Install dependencies ---
 RUN conda create -n yolo python=3.10 -y && \
     conda run -n yolo pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128 && \
     conda run -n yolo pip install --no-cache-dir -r requirements.txt
 
-# --- Copy application code ---
-COPY ./app ./app
+# --- Copy Model ---
 COPY ./Model ./Model
+
+# --- Copy application code  ---
+COPY ./app ./app
 
 EXPOSE 8000
 
-# --- Start FastAPI ---
+# --- Start FastAPI z hot reload ---
 CMD ["conda", "run", "-n", "yolo", "--no-capture-output", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
