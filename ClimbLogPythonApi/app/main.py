@@ -3,9 +3,10 @@ from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse
 from ultralytics import YOLO
 import numpy as np
 import torch
+import cv2
+import json
 import logging
 from io import BytesIO
-import cv2
 from pydantic import BaseModel, Field
 from app.services.ai_service import get_ai_service
 
@@ -16,52 +17,43 @@ app = FastAPI(title="YOLO11 Segmentation + Training Plan API")
 
 model = None
 device = None
-TRAIN_IMG_SIZE = None
+TRAIN_IMG_SIZE = None 
 CONF_THRESHOLD = 0.7
 
-# ----------------------------
-# Startup - ładowanie modeli
-# ----------------------------
+
+class TrainingPlanRequest(BaseModel):
+    prompt: str = Field(..., description="Opis potrzeb treningowych (np. poziom, cele, dostępność)")
+
+
 @app.on_event("startup")
 async def load_model():
     global model, device, TRAIN_IMG_SIZE
     try:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         logger.info(f"Używane urządzenie: {device}")
-        
+
         if torch.cuda.is_available():
             logger.info(f"GPU: {torch.cuda.get_device_name(0)}")
             logger.info(f"CUDA Version: {torch.version.cuda}")
             logger.info(f"Pamięć GPU: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
         else:
             logger.warning("CUDA nie jest dostępne! Używam CPU.")
-        
+
         model = YOLO("Model/best.pt")
         model.to(device)
-        
-        if hasattr(model, 'yaml'):
-            TRAIN_IMG_SIZE = model.yaml.get('img_size') or model.yaml.get('imgsz') or 640
-        else:
-            TRAIN_IMG_SIZE = 640
-        
-        logger.info(f"Rozmiar obrazu treningowego: {TRAIN_IMG_SIZE}")
-        
+        TRAIN_IMG_SIZE = getattr(model, "imgsz", 640)
         dummy_img = np.zeros((TRAIN_IMG_SIZE, TRAIN_IMG_SIZE, 3), dtype=np.uint8)
         _ = model(dummy_img, verbose=False)
-        logger.info(" Model YOLO gotowy!")
-        
-        # Ładuj DeepSeek
+        logger.info("Model YOLO gotowy!")
+
         logger.info("Ładuję DeepSeek...")
         get_ai_service()
-        logger.info(" Wszystkie modele gotowe!")
-        
+        logger.info("Wszystkie modele gotowe!")
     except Exception as e:
         logger.error(f"Błąd podczas ładowania modelu: {e}")
         raise
 
-# ----------------------------
-# Root
-# ----------------------------
+
 @app.get("/")
 async def root():
     return {
@@ -71,14 +63,12 @@ async def root():
         "cuda_available": torch.cuda.is_available()
     }
 
-# ----------------------------
-# YOLO - predykcja
-# ----------------------------
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     if model is None:
         raise HTTPException(status_code=503, detail="Model nie jest załadowany")
-    
+
     try:
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
@@ -86,13 +76,7 @@ async def predict(file: UploadFile = File(...)):
         if img is None:
             raise HTTPException(status_code=400, detail="Nie można wczytać obrazu")
 
-        results = model.predict(
-            img,
-            imgsz=TRAIN_IMG_SIZE,
-            conf=CONF_THRESHOLD,
-            device=device,
-            verbose=False
-        )
+        results = model.predict(img, imgsz=TRAIN_IMG_SIZE, conf=CONF_THRESHOLD, device=device, verbose=False)
 
         predictions = []
         for result in results:
@@ -130,9 +114,7 @@ async def predict(file: UploadFile = File(...)):
         logger.error(f"Błąd podczas przetwarzania: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
-# ----------------------------
-# YOLO - test masek
-# ----------------------------
+
 @app.post("/test_masks")
 async def test_masks(file: UploadFile = File(...)):
     if model is None:
@@ -145,15 +127,9 @@ async def test_masks(file: UploadFile = File(...)):
         if img is None:
             raise HTTPException(status_code=400, detail="Nie można wczytać obrazu")
 
-        results = model.predict(
-            img,
-            imgsz=TRAIN_IMG_SIZE,
-            conf=CONF_THRESHOLD, 
-            device=device,
-            verbose=False
-        )
-        overlay = img.copy()
+        results = model.predict(img, imgsz=TRAIN_IMG_SIZE, conf=CONF_THRESHOLD, device=device, verbose=False)
 
+        overlay = img.copy()
         for result in results:
             if result.masks is not None and result.masks.xy is not None:
                 for i, mask_xy in enumerate(result.masks.xy):
@@ -166,8 +142,8 @@ async def test_masks(file: UploadFile = File(...)):
                     cls_name = result.names[cls_id]
                     confidence = float(result.boxes.conf[i].item())
                     x, y = int(pts[0][0][0]), int(pts[0][0][1])
-                    cv2.putText(overlay, f"{cls_name} {confidence:.2f}", (x, y-10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,0,255), 2)
+                    cv2.putText(overlay, f"{cls_name} {confidence:.2f}", (x, y - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
         _, buffer = cv2.imencode(".png", overlay)
         return StreamingResponse(BytesIO(buffer.tobytes()), media_type="image/png")
@@ -176,22 +152,23 @@ async def test_masks(file: UploadFile = File(...)):
         logger.error(f"Błąd podczas przetwarzania obrazu w /test_masks: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd podczas przetwarzania: {str(e)}")
 
-# ----------------------------
-# DeepSeek - Training Plan
-# ----------------------------
-class TrainingPlanRequest(BaseModel):
-    prompt: str = Field(..., description="Opis potrzeb treningowych (np. poziom, cele, dostępność)")
 
-@app.post("/generate-training-plan", response_class=PlainTextResponse)
+@app.post("/generate-training-plan")
 async def generate_training_plan(request: TrainingPlanRequest):
     """
     Generuje spersonalizowany plan treningowy wspinaczkowy używając DeepSeek 7B.
-    Zwraca odpowiedź modelu jako zwykły string.
+    Jeśli odpowiedź nie jest poprawnym JSON-em — zwraca surowy tekst jako test.
     """
     try:
         ai_service = get_ai_service()
         plan_str = ai_service.generate_training_plan(request.prompt)
-        return plan_str
+
+        try:
+            plan_json = json.loads(plan_str)
+            return JSONResponse(content=plan_json)
+        except json.JSONDecodeError:
+            logger.warning("Odpowiedź modelu nie jest poprawnym JSON-em — zwracam tekst.")
+            return PlainTextResponse(content=plan_str)
 
     except Exception as e:
         logger.error(f"Błąd generowania planu: {str(e)}")
