@@ -1,9 +1,7 @@
 import 'package:climblog_mobile/Widgets/Routes/data_filter_buttons.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_count.dart';
 import 'package:climblog_mobile/Widgets/Routes/routes_all_suggestion_box.dart';
-import 'package:climblog_mobile/Widgets/Routes/routes_home_stats.dart';
 import 'package:climblog_mobile/Widgets/Routes/top60_routes.dart';
-import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_half_container.dart';
 import 'package:flutter/material.dart';
 

@@ -7,12 +7,10 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Hot reload dla kodu aplikacji
       - ./ClimbLogPythonApi/app:/app/app
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
-    # Konfiguracja GPU - Docker Compose v2 składnia
     deploy:
       resources:
         reservations:

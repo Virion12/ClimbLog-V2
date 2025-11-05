@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:climblog_mobile/models/cords.dart';
 
