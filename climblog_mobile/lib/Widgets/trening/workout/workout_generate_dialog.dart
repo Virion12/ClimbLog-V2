@@ -1,3 +1,4 @@
+import 'package:climblog_mobile/Services/Api_connections/predict_service.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutGenerateDialog extends StatefulWidget {
@@ -52,6 +53,7 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: DropdownButton<String>(
+                dropdownColor: Colors.white,
                 value: selectedLevel,
                 isExpanded: true,
                 underline: const SizedBox(),
@@ -174,29 +176,62 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
             ),
             const SizedBox(height: 32),
             
-            // Generate button
-            SizedBox(
-              width: double.infinity,
-              height: 44,
-              child: TextButton(
-                onPressed: () {
-                  print({
-                    'level': selectedLevel,
-                    'gender': selectedGender,
-                    'areas': selectedAreas.toList(),
-                    'weight': weightController.text,
-                    'height': heightController.text,
-                    'age': ageController.text,
-                  });
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF00a896),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text('Generate plan', style: TextStyle(fontSize: 15)),
-              ),
-            ),
+            // Generate buttons
+Row(
+  children: [
+     Expanded(
+      child: SizedBox(
+        height: 44,
+        child: TextButton(
+          onPressed: () {
+           Navigator.of(context).pop();
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 196, 33, 55),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('Cancel', style: TextStyle(fontSize: 15)),
+        ),
+      ),
+    ),
+        const SizedBox(width: 12),
+    Expanded(
+      child: SizedBox(
+        height: 44,
+        child: TextButton(
+          onPressed: () async{
+            print({
+              'level': selectedLevel,
+              'gender': selectedGender,
+              'areas': selectedAreas.toList(),
+              'weight': weightController.text,
+              'height': heightController.text,
+              'age': ageController.text,
+            });
+            try{
+              final predictService = PredictService();
+              final prediction = await predictService.predict(
+                                  "create training plan for ${selectedGender == "Default" ? "" : selectedGender} "
+                                  "with weight: ${weightController.text}, height: ${heightController.text}, "
+                                  "age: ${ageController.text}, with areas to focus on ${selectedAreas.toList()}"
+                                );
+            }catch(e){
+              throw Exception(e);
+            }
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: const Color(0xFF00a896),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('Generate plan', style: TextStyle(fontSize: 15)),
+        ),
+      ),
+    ),
+   
+  ],
+),
           ],
         ),
       ),
