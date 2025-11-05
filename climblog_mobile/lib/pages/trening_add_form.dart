@@ -1,5 +1,7 @@
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/trening.riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/predict_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:climblog_mobile/Widgets/Shared/action_button.dart';
@@ -8,6 +10,7 @@ import 'package:climblog_mobile/Widgets/trening/workout/workout_generate_dialog.
 import 'package:climblog_mobile/models/predefined_workout_plans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class TreningAddForm extends ConsumerStatefulWidget {
   const TreningAddForm({super.key});
@@ -198,6 +201,29 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
     
     _showSnackBar("Loaded: ${plan.name}", success: true);
   }
+  void _loadGeneratedPlan(GeneratedPlanData generatedPlan) {
+  setState(() {
+    _nameWorkoutController.text = generatedPlan.name;
+    
+    for (final day in dayNames) {
+      _daysSessions[day] = [];
+    }
+    
+    for (final dayInput in generatedPlan.days) {
+      final dayName = dayNames[dayInput.dayOfWeek - 1];
+      final sessions = dayInput.sessions.map((sessionInput) => SessionData(
+        name: sessionInput.name,
+        location: sessionInput.location,
+        startTime: sessionInput.start ?? "09:00",
+        exercises: sessionInput.exercises,
+      )).toList();
+      
+      _daysSessions[dayName] = sessions;
+    }
+  });
+  
+  _showSnackBar("Załadowano: ${generatedPlan.name}", success: true);
+}
 
   void _showSnackBar(String message, {bool success = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -223,6 +249,12 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<GeneratedPlanData?>(generatedPlanProvider, (previous, next) {
+    if (next != null) {
+      _loadGeneratedPlan(next);
+      ref.read(generatedPlanProvider.notifier).clear();
+    }
+  });
     final inputBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: const BorderSide(color: Colors.grey, width: 0.8),

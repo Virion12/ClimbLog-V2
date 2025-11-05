@@ -156,20 +156,38 @@ async def test_masks(file: UploadFile = File(...)):
 @app.post("/generate-training-plan")
 async def generate_training_plan(request: TrainingPlanRequest):
     """
-    Generuje spersonalizowany plan treningowy wspinaczkowy używając DeepSeek 7B.
-    Jeśli odpowiedź nie jest poprawnym JSON-em — zwraca surowy tekst jako test.
+    Generuje spersonalizowany plan treningowy wspinaczkowy używając Mistral 7B.
+    Zwraca 200 tylko gdy JSON jest poprawny, w przeciwnym razie 422.
     """
     try:
         ai_service = get_ai_service()
         plan_str = ai_service.generate_training_plan(request.prompt)
 
+        print("\n" + "=" * 80)
+        print("PEŁNA ODPOWIEDŹ MODELU:")
+        print("=" * 80)
+        print(plan_str)
+        print("=" * 80)
+        print(f"Długość odpowiedzi: {len(plan_str)} znaków")
+        print("=" * 80 + "\n")
+
         try:
             plan_json = json.loads(plan_str)
-            return JSONResponse(content=plan_json)
-        except json.JSONDecodeError:
-            logger.warning("Odpowiedź modelu nie jest poprawnym JSON-em — zwracam tekst.")
-            return PlainTextResponse(content=plan_str)
+            logger.info("Wygenerowano poprawny JSON")
+            return JSONResponse(content=plan_json, status_code=200)
+        except json.JSONDecodeError as e:
+            logger.error(f"Błąd parsowania JSON: {e}")
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "Invalid JSON generated",
+                    "message": str(e),
+                    "raw_response": plan_str[:500] 
+                }
+            )
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Błąd generowania planu: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Błąd generowania planu: {str(e)}")

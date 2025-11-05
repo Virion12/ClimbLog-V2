@@ -1,17 +1,20 @@
+import 'package:climblog_mobile/Riverpod/trening.riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/predict_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class WorkoutGenerateDialog extends StatefulWidget {
+class WorkoutGenerateDialog extends ConsumerStatefulWidget {
   const WorkoutGenerateDialog({super.key});
 
   @override
-  State<WorkoutGenerateDialog> createState() => _WorkoutGenerateDialogState();
+  ConsumerState<WorkoutGenerateDialog> createState() => _WorkoutGenerateDialogState();
 }
 
-class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
+class _WorkoutGenerateDialogState extends ConsumerState<WorkoutGenerateDialog> {
   String selectedLevel = 'Default';
   String selectedGender = 'Default';
   Set<String> selectedAreas = {'Core strength'};
+  bool isLoading = false;
   
   final TextEditingController weightController = TextEditingController(text: '65');
   final TextEditingController heightController = TextEditingController(text: '175');
@@ -23,6 +26,49 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
     heightController.dispose();
     ageController.dispose();
     super.dispose();
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color.fromARGB(255, 196, 33, 55),
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
+      ),
+    );
+  }
+
+  Future<void> _generatePlan() async {
+    setState(() => isLoading = true);
+    
+    try {
+      final predictService = PredictService();
+      final plan = await predictService.predict(
+        "create training plan for ${selectedGender == "Default" ? "" : selectedGender} "
+        "with weight: ${weightController.text}, height: ${heightController.text}, "
+        "age: ${ageController.text} and is $selectedLevel climber, with focus on ${selectedAreas.toList()}"
+      );
+      
+      ref.read(generatedPlanProvider.notifier).setPlan(plan);
+      
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackBar('Błąd podczas generowania planu: ${e.toString()}');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   @override
@@ -60,7 +106,7 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
                 items: ['Default', 'Beginner', 'Intermediate', 'Advanced']
                     .map((level) => DropdownMenuItem(value: level, child: Text(level)))
                     .toList(),
-                onChanged: (value) => setState(() => selectedLevel = value!),
+                onChanged: isLoading ? null : (value) => setState(() => selectedLevel = value!),
               ),
             ),
             const SizedBox(height: 24),
@@ -74,7 +120,7 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
                   child: _MinimalButton(
                     label: 'Default',
                     isSelected: selectedGender == 'Default',
-                    onTap: () => setState(() => selectedGender = 'Default'),
+                    onTap: isLoading ? () {} : () => setState(() => selectedGender = 'Default'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -82,7 +128,7 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
                   child: _MinimalButton(
                     label: 'Male',
                     isSelected: selectedGender == 'Male',
-                    onTap: () => setState(() => selectedGender = 'Male'),
+                    onTap: isLoading ? () {} : () => setState(() => selectedGender = 'Male'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -90,7 +136,7 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
                   child: _MinimalButton(
                     label: 'Female',
                     isSelected: selectedGender == 'Female',
-                    onTap: () => setState(() => selectedGender = 'Female'),
+                    onTap: isLoading ? () {} : () => setState(() => selectedGender = 'Female'),
                   ),
                 ),
               ],
@@ -107,56 +153,56 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
                 _MinimalChip(
                   label: 'Strength',
                   isSelected: selectedAreas.contains('Strength'),
-                  onTap: () => setState(() => selectedAreas.contains('Strength') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Strength') 
                       ? selectedAreas.remove('Strength') 
                       : selectedAreas.add('Strength')),
                 ),
                 _MinimalChip(
                   label: 'Endurance',
                   isSelected: selectedAreas.contains('Endurance'),
-                  onTap: () => setState(() => selectedAreas.contains('Endurance') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Endurance') 
                       ? selectedAreas.remove('Endurance') 
                       : selectedAreas.add('Endurance')),
                 ),
                 _MinimalChip(
                   label: 'Technique',
                   isSelected: selectedAreas.contains('Technique'),
-                  onTap: () => setState(() => selectedAreas.contains('Technique') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Technique') 
                       ? selectedAreas.remove('Technique') 
                       : selectedAreas.add('Technique')),
                 ),
                 _MinimalChip(
                   label: 'Core strength',
                   isSelected: selectedAreas.contains('Core strength'),
-                  onTap: () => setState(() => selectedAreas.contains('Core strength') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Core strength') 
                       ? selectedAreas.remove('Core strength') 
                       : selectedAreas.add('Core strength')),
                 ),
                 _MinimalChip(
                   label: 'Finger strength',
                   isSelected: selectedAreas.contains('Finger strength'),
-                  onTap: () => setState(() => selectedAreas.contains('Finger strength') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Finger strength') 
                       ? selectedAreas.remove('Finger strength') 
                       : selectedAreas.add('Finger strength')),
                 ),
                 _MinimalChip(
                   label: 'Dynamic',
                   isSelected: selectedAreas.contains('Dynamic'),
-                  onTap: () => setState(() => selectedAreas.contains('Dynamic') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Dynamic') 
                       ? selectedAreas.remove('Dynamic') 
                       : selectedAreas.add('Dynamic')),
                 ),
                 _MinimalChip(
                   label: 'Coordination',
                   isSelected: selectedAreas.contains('Coordination'),
-                  onTap: () => setState(() => selectedAreas.contains('Coordination') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Coordination') 
                       ? selectedAreas.remove('Coordination') 
                       : selectedAreas.add('Coordination')),
                 ),
                 _MinimalChip(
                   label: 'Footwork',
                   isSelected: selectedAreas.contains('Footwork'),
-                  onTap: () => setState(() => selectedAreas.contains('Footwork') 
+                  onTap: isLoading ? () {} : () => setState(() => selectedAreas.contains('Footwork') 
                       ? selectedAreas.remove('Footwork') 
                       : selectedAreas.add('Footwork')),
                 ),
@@ -167,71 +213,60 @@ class _WorkoutGenerateDialogState extends State<WorkoutGenerateDialog> {
             // Inputs
             Row(
               children: [
-                Expanded(child: _MinimalInput(label: 'Weight', controller: weightController)),
+                Expanded(child: _MinimalInput(label: 'Weight', controller: weightController, enabled: !isLoading)),
                 const SizedBox(width: 12),
-                Expanded(child: _MinimalInput(label: 'Height', controller: heightController)),
+                Expanded(child: _MinimalInput(label: 'Height', controller: heightController, enabled: !isLoading)),
                 const SizedBox(width: 12),
-                Expanded(child: _MinimalInput(label: 'Age', controller: ageController)),
+                Expanded(child: _MinimalInput(label: 'Age', controller: ageController, enabled: !isLoading)),
               ],
             ),
             const SizedBox(height: 32),
             
             // Generate buttons
-Row(
-  children: [
-     Expanded(
-      child: SizedBox(
-        height: 44,
-        child: TextButton(
-          onPressed: () {
-           Navigator.of(context).pop();
-          },
-          style: TextButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 196, 33, 55),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Cancel', style: TextStyle(fontSize: 15)),
-        ),
-      ),
-    ),
-        const SizedBox(width: 12),
-    Expanded(
-      child: SizedBox(
-        height: 44,
-        child: TextButton(
-          onPressed: () async{
-            print({
-              'level': selectedLevel,
-              'gender': selectedGender,
-              'areas': selectedAreas.toList(),
-              'weight': weightController.text,
-              'height': heightController.text,
-              'age': ageController.text,
-            });
-            try{
-              final predictService = PredictService();
-              final prediction = await predictService.predict(
-                                  "create training plan for ${selectedGender == "Default" ? "" : selectedGender} "
-                                  "with weight: ${weightController.text}, height: ${heightController.text}, "
-                                  "age: ${ageController.text}, with areas to focus on ${selectedAreas.toList()}"
-                                );
-            }catch(e){
-              throw Exception(e);
-            }
-          },
-          style: TextButton.styleFrom(
-            backgroundColor: const Color(0xFF00a896),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Generate plan', style: TextStyle(fontSize: 15)),
-        ),
-      ),
-    ),
-   
-  ],
-),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: TextButton(
+                      onPressed: isLoading ? null : () {
+                        Navigator.of(context).pop(false);
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: isLoading ? Colors.grey : const Color.fromARGB(255, 196, 33, 55),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Cancel', style: TextStyle(fontSize: 15)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: TextButton(
+                      onPressed: isLoading ? null : _generatePlan,
+                      style: TextButton.styleFrom(
+                        backgroundColor: isLoading ? Colors.grey : const Color(0xFF00a896),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text('Generate plan', style: TextStyle(fontSize: 15)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -242,8 +277,13 @@ Row(
 class _MinimalInput extends StatelessWidget {
   final String label;
   final TextEditingController controller;
+  final bool enabled;
 
-  const _MinimalInput({required this.label, required this.controller});
+  const _MinimalInput({
+    required this.label,
+    required this.controller,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -254,6 +294,7 @@ class _MinimalInput extends StatelessWidget {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
+          enabled: enabled,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -262,6 +303,10 @@ class _MinimalInput extends StatelessWidget {
               borderSide: const BorderSide(color: Colors.black12),
             ),
             enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.black12),
+            ),
+            disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Colors.black12),
             ),
