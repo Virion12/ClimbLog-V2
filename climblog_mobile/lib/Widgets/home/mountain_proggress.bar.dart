@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 
 class MountainProgressBar extends ConsumerWidget {
-  const MountainProgressBar({Key? key}) : super(key: key);
+  const MountainProgressBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

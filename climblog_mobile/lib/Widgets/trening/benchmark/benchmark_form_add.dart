@@ -1,7 +1,6 @@
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
-import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/benchmark_service.dart';
 import 'package:climblog_mobile/database/database.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';

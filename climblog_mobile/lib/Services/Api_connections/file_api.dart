@@ -70,9 +70,9 @@ class FileService {
     if(fileName == null){
       throw Exception("No file name was returned");
     }
-    debugPrint("Uploaded file remotely file ${fileName}");
+    debugPrint("Uploaded file remotely file $fileName");
     await uploadFileLocally(file, fileName);
-    debugPrint("Uplaoding file localy ${fileName}");
+    debugPrint("Uplaoding file localy $fileName");
     return fileName;
   }
 

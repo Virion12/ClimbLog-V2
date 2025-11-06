@@ -51,7 +51,7 @@ class _RoutesAllSuggestionBoxState extends ConsumerState<RoutesAllSuggestionBox>
                     Container(
                       padding: const EdgeInsets.all(9),
                       decoration: BoxDecoration(
-                        color: _primaryColor.withOpacity(0.12),
+                        color: _primaryColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
@@ -103,8 +103,8 @@ class _RoutesAllSuggestionBoxState extends ConsumerState<RoutesAllSuggestionBox>
                             _InsightCard(
                               icon: Icons.trending_up_rounded,
                               iconColor: _primaryColor,
-                              backgroundColor: _primaryColor.withOpacity(0.1),
-                              borderColor: _primaryColor.withOpacity(0.3),
+                              backgroundColor: _primaryColor.withValues(alpha: 0.1),
+                              borderColor: _primaryColor.withValues(alpha: 0.3),
                               label: "High Focus",
                               value: mostFocused,
                               count: routesMapToSort[mostFocused] as int,
@@ -170,7 +170,7 @@ class _InsightCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(11),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.15),
+              color: iconColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(11),
             ),
             child: Icon(

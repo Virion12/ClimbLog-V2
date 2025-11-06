@@ -36,7 +36,7 @@ class ImageSegmentationAPi{
           final data = jsonDecode(response.body);
           final predictions = data["predictions"];
 
-          var predictionsList = <HoldsModel>[];;
+          var predictionsList = <HoldsModel>[];
           
           for(var prediction in predictions){
             debugPrint("------------------------------");

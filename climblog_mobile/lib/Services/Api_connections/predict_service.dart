@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
-import 'package:climblog_mobile/models/predefined_workout_plans.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/io_client.dart';
 
@@ -37,7 +36,6 @@ class PredictService {
         throw Exception("Prediction failed: ${response.body}");
       }
 
-      // Parsowanie JSON - API zwraca bezpośrednio obiekt planu
       final Map<String, dynamic> planJson = jsonDecode(response.body);
       
       return _convertJsonToWorkoutData(planJson);
@@ -57,7 +55,6 @@ class PredictService {
     
     for (var workoutDay in workoutDays) {
       try {
-        // API zwraca 0-6, WorkoutDayInput potrzebuje 1-7 (Monday=1)
         final int dayOfWeek = (workoutDay['workoutDayOfWeek'] as int?) ?? 0;
         final List<dynamic> sessions = workoutDay['sessions'] ?? [];
 
@@ -118,7 +115,6 @@ class PredictService {
   }
 }
 
-// Prosta klasa do przechowywania wygenerowanych danych
 class GeneratedPlanData {
   final String name;
   final List<WorkoutDayInput> days;

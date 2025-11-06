@@ -101,11 +101,10 @@ class _RadarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxValue = [
+    [
       ...data1,
       ...data2,
     ].reduce((a, b) => a > b ? a : b);
-    final chartMax = (maxValue == 0) ? 1.0 : (maxValue * 1.2);
 
     final color1 = Colors.blue;
     final color2 = Colors.orange;

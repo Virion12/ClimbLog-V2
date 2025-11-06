@@ -10,8 +10,10 @@ class RouteAddButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
+        ref.invalidate(imageFileProvider);
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (context) {
             return Dialog(
               backgroundColor: Colors.white,

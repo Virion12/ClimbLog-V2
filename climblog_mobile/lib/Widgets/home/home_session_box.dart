@@ -135,7 +135,7 @@ class _HomeSessionBoxState extends State<HomeSessionBox> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF00a896).withOpacity(0.1),
+                        color: const Color(0xFF00a896).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -150,7 +150,7 @@ class _HomeSessionBoxState extends State<HomeSessionBox> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ],
       ),

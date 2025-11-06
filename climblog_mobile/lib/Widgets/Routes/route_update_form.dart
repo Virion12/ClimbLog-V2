@@ -129,7 +129,7 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00a896).withOpacity(0.1),
+                  color: const Color(0xFF00a896).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.camera_alt, color: Color(0xFF00a896)),
@@ -147,7 +147,7 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00a896).withOpacity(0.1),
+                  color: const Color(0xFF00a896).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.photo_library, color: Color(0xFF00a896)),
@@ -171,7 +171,7 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00a896).withOpacity(0.1),
+                      color: const Color(0xFF00a896).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.edit, color: Color(0xFF00a896)),
@@ -388,7 +388,9 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        ref.read(imageFileProvider.notifier).state = null;
+                        Navigator.of(context).pop();},
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         side: BorderSide(color: Colors.grey[300]!),
@@ -497,7 +499,7 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
       label: Text(label),
       selected: value,
       onSelected: onChanged,
-      selectedColor: const Color(0xFF00a896).withOpacity(0.2),
+      selectedColor: const Color(0xFF00a896).withValues(alpha: 0.2),
       checkmarkColor: const Color(0xFF00a896),
       backgroundColor: const Color(0xFFF8F9FA),
       side: BorderSide(
