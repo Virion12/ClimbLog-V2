@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:climblog_mobile/database/benchmark.dart';
 import 'package:climblog_mobile/database/climbing_routes.dart';
+import 'package:climblog_mobile/database/streak.dart';
 import 'package:climblog_mobile/database/workout.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -18,6 +19,7 @@ part 'database.g.dart';
     WorkoutSessions,
     Exercises,
     Benchmarks,
+    Streaks,
   ],
 )
 class AppDatabase extends _$AppDatabase {

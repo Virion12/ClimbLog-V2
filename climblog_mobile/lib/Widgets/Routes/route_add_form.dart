@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
+import 'package:climblog_mobile/Services/local_db/streak_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_image_dialog.dart';
@@ -328,7 +330,8 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                             } catch (e) {
                               throw Exception("adding to local db went wrong due to : $e");
                             }
-
+                            final streakService = StreakService(AppDatabase(),ref.read(authServiceProvider));
+                            streakService.ManageStreak();
                             if (context.mounted) {
                               ref.read(imageFileProvider.notifier).state = null;
                               Navigator.of(context).pop();

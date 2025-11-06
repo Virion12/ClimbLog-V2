@@ -3937,6 +3937,411 @@ class BenchmarksCompanion extends UpdateCompanion<Benchmark> {
   }
 }
 
+class $StreaksTable extends Streaks with TableInfo<$StreaksTable, Streak> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StreaksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _backendIdMeta = const VerificationMeta(
+    'backendId',
+  );
+  @override
+  late final GeneratedColumn<int> backendId = GeneratedColumn<int>(
+    'backend_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _counterMeta = const VerificationMeta(
+    'counter',
+  );
+  @override
+  late final GeneratedColumn<int> counter = GeneratedColumn<int>(
+    'counter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastUpdatedAtMeta = const VerificationMeta(
+    'lastUpdatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastUpdatedAt =
+      GeneratedColumn<DateTime>(
+        'last_updated_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
+      );
+  static const VerificationMeta _startOfStreakMeta = const VerificationMeta(
+    'startOfStreak',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startOfStreak =
+      GeneratedColumn<DateTime>(
+        'start_of_streak',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    backendId,
+    userId,
+    counter,
+    lastUpdatedAt,
+    startOfStreak,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'streaks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Streak> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('backend_id')) {
+      context.handle(
+        _backendIdMeta,
+        backendId.isAcceptableOrUnknown(data['backend_id']!, _backendIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_backendIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('counter')) {
+      context.handle(
+        _counterMeta,
+        counter.isAcceptableOrUnknown(data['counter']!, _counterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_counterMeta);
+    }
+    if (data.containsKey('last_updated_at')) {
+      context.handle(
+        _lastUpdatedAtMeta,
+        lastUpdatedAt.isAcceptableOrUnknown(
+          data['last_updated_at']!,
+          _lastUpdatedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('start_of_streak')) {
+      context.handle(
+        _startOfStreakMeta,
+        startOfStreak.isAcceptableOrUnknown(
+          data['start_of_streak']!,
+          _startOfStreakMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Streak map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Streak(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      backendId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}backend_id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      counter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}counter'],
+      )!,
+      lastUpdatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_updated_at'],
+      )!,
+      startOfStreak: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_of_streak'],
+      )!,
+    );
+  }
+
+  @override
+  $StreaksTable createAlias(String alias) {
+    return $StreaksTable(attachedDatabase, alias);
+  }
+}
+
+class Streak extends DataClass implements Insertable<Streak> {
+  final int id;
+  final int backendId;
+  final int userId;
+  final int counter;
+  final DateTime lastUpdatedAt;
+  final DateTime startOfStreak;
+  const Streak({
+    required this.id,
+    required this.backendId,
+    required this.userId,
+    required this.counter,
+    required this.lastUpdatedAt,
+    required this.startOfStreak,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['backend_id'] = Variable<int>(backendId);
+    map['user_id'] = Variable<int>(userId);
+    map['counter'] = Variable<int>(counter);
+    map['last_updated_at'] = Variable<DateTime>(lastUpdatedAt);
+    map['start_of_streak'] = Variable<DateTime>(startOfStreak);
+    return map;
+  }
+
+  StreaksCompanion toCompanion(bool nullToAbsent) {
+    return StreaksCompanion(
+      id: Value(id),
+      backendId: Value(backendId),
+      userId: Value(userId),
+      counter: Value(counter),
+      lastUpdatedAt: Value(lastUpdatedAt),
+      startOfStreak: Value(startOfStreak),
+    );
+  }
+
+  factory Streak.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Streak(
+      id: serializer.fromJson<int>(json['id']),
+      backendId: serializer.fromJson<int>(json['backendId']),
+      userId: serializer.fromJson<int>(json['userId']),
+      counter: serializer.fromJson<int>(json['counter']),
+      lastUpdatedAt: serializer.fromJson<DateTime>(json['lastUpdatedAt']),
+      startOfStreak: serializer.fromJson<DateTime>(json['startOfStreak']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'backendId': serializer.toJson<int>(backendId),
+      'userId': serializer.toJson<int>(userId),
+      'counter': serializer.toJson<int>(counter),
+      'lastUpdatedAt': serializer.toJson<DateTime>(lastUpdatedAt),
+      'startOfStreak': serializer.toJson<DateTime>(startOfStreak),
+    };
+  }
+
+  Streak copyWith({
+    int? id,
+    int? backendId,
+    int? userId,
+    int? counter,
+    DateTime? lastUpdatedAt,
+    DateTime? startOfStreak,
+  }) => Streak(
+    id: id ?? this.id,
+    backendId: backendId ?? this.backendId,
+    userId: userId ?? this.userId,
+    counter: counter ?? this.counter,
+    lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
+    startOfStreak: startOfStreak ?? this.startOfStreak,
+  );
+  Streak copyWithCompanion(StreaksCompanion data) {
+    return Streak(
+      id: data.id.present ? data.id.value : this.id,
+      backendId: data.backendId.present ? data.backendId.value : this.backendId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      counter: data.counter.present ? data.counter.value : this.counter,
+      lastUpdatedAt: data.lastUpdatedAt.present
+          ? data.lastUpdatedAt.value
+          : this.lastUpdatedAt,
+      startOfStreak: data.startOfStreak.present
+          ? data.startOfStreak.value
+          : this.startOfStreak,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Streak(')
+          ..write('id: $id, ')
+          ..write('backendId: $backendId, ')
+          ..write('userId: $userId, ')
+          ..write('counter: $counter, ')
+          ..write('lastUpdatedAt: $lastUpdatedAt, ')
+          ..write('startOfStreak: $startOfStreak')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, backendId, userId, counter, lastUpdatedAt, startOfStreak);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Streak &&
+          other.id == this.id &&
+          other.backendId == this.backendId &&
+          other.userId == this.userId &&
+          other.counter == this.counter &&
+          other.lastUpdatedAt == this.lastUpdatedAt &&
+          other.startOfStreak == this.startOfStreak);
+}
+
+class StreaksCompanion extends UpdateCompanion<Streak> {
+  final Value<int> id;
+  final Value<int> backendId;
+  final Value<int> userId;
+  final Value<int> counter;
+  final Value<DateTime> lastUpdatedAt;
+  final Value<DateTime> startOfStreak;
+  const StreaksCompanion({
+    this.id = const Value.absent(),
+    this.backendId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.counter = const Value.absent(),
+    this.lastUpdatedAt = const Value.absent(),
+    this.startOfStreak = const Value.absent(),
+  });
+  StreaksCompanion.insert({
+    this.id = const Value.absent(),
+    required int backendId,
+    required int userId,
+    required int counter,
+    this.lastUpdatedAt = const Value.absent(),
+    this.startOfStreak = const Value.absent(),
+  }) : backendId = Value(backendId),
+       userId = Value(userId),
+       counter = Value(counter);
+  static Insertable<Streak> custom({
+    Expression<int>? id,
+    Expression<int>? backendId,
+    Expression<int>? userId,
+    Expression<int>? counter,
+    Expression<DateTime>? lastUpdatedAt,
+    Expression<DateTime>? startOfStreak,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (backendId != null) 'backend_id': backendId,
+      if (userId != null) 'user_id': userId,
+      if (counter != null) 'counter': counter,
+      if (lastUpdatedAt != null) 'last_updated_at': lastUpdatedAt,
+      if (startOfStreak != null) 'start_of_streak': startOfStreak,
+    });
+  }
+
+  StreaksCompanion copyWith({
+    Value<int>? id,
+    Value<int>? backendId,
+    Value<int>? userId,
+    Value<int>? counter,
+    Value<DateTime>? lastUpdatedAt,
+    Value<DateTime>? startOfStreak,
+  }) {
+    return StreaksCompanion(
+      id: id ?? this.id,
+      backendId: backendId ?? this.backendId,
+      userId: userId ?? this.userId,
+      counter: counter ?? this.counter,
+      lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
+      startOfStreak: startOfStreak ?? this.startOfStreak,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (backendId.present) {
+      map['backend_id'] = Variable<int>(backendId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (counter.present) {
+      map['counter'] = Variable<int>(counter.value);
+    }
+    if (lastUpdatedAt.present) {
+      map['last_updated_at'] = Variable<DateTime>(lastUpdatedAt.value);
+    }
+    if (startOfStreak.present) {
+      map['start_of_streak'] = Variable<DateTime>(startOfStreak.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StreaksCompanion(')
+          ..write('id: $id, ')
+          ..write('backendId: $backendId, ')
+          ..write('userId: $userId, ')
+          ..write('counter: $counter, ')
+          ..write('lastUpdatedAt: $lastUpdatedAt, ')
+          ..write('startOfStreak: $startOfStreak')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3948,6 +4353,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $ExercisesTable exercises = $ExercisesTable(this);
   late final $BenchmarksTable benchmarks = $BenchmarksTable(this);
+  late final $StreaksTable streaks = $StreaksTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3959,6 +4365,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     workoutSessions,
     exercises,
     benchmarks,
+    streaks,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -6545,6 +6952,217 @@ typedef $$BenchmarksTableProcessedTableManager =
       Benchmark,
       PrefetchHooks Function()
     >;
+typedef $$StreaksTableCreateCompanionBuilder =
+    StreaksCompanion Function({
+      Value<int> id,
+      required int backendId,
+      required int userId,
+      required int counter,
+      Value<DateTime> lastUpdatedAt,
+      Value<DateTime> startOfStreak,
+    });
+typedef $$StreaksTableUpdateCompanionBuilder =
+    StreaksCompanion Function({
+      Value<int> id,
+      Value<int> backendId,
+      Value<int> userId,
+      Value<int> counter,
+      Value<DateTime> lastUpdatedAt,
+      Value<DateTime> startOfStreak,
+    });
+
+class $$StreaksTableFilterComposer
+    extends Composer<_$AppDatabase, $StreaksTable> {
+  $$StreaksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get backendId => $composableBuilder(
+    column: $table.backendId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get counter => $composableBuilder(
+    column: $table.counter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastUpdatedAt => $composableBuilder(
+    column: $table.lastUpdatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startOfStreak => $composableBuilder(
+    column: $table.startOfStreak,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$StreaksTableOrderingComposer
+    extends Composer<_$AppDatabase, $StreaksTable> {
+  $$StreaksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get backendId => $composableBuilder(
+    column: $table.backendId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get counter => $composableBuilder(
+    column: $table.counter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastUpdatedAt => $composableBuilder(
+    column: $table.lastUpdatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startOfStreak => $composableBuilder(
+    column: $table.startOfStreak,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$StreaksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StreaksTable> {
+  $$StreaksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get backendId =>
+      $composableBuilder(column: $table.backendId, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<int> get counter =>
+      $composableBuilder(column: $table.counter, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastUpdatedAt => $composableBuilder(
+    column: $table.lastUpdatedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get startOfStreak => $composableBuilder(
+    column: $table.startOfStreak,
+    builder: (column) => column,
+  );
+}
+
+class $$StreaksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StreaksTable,
+          Streak,
+          $$StreaksTableFilterComposer,
+          $$StreaksTableOrderingComposer,
+          $$StreaksTableAnnotationComposer,
+          $$StreaksTableCreateCompanionBuilder,
+          $$StreaksTableUpdateCompanionBuilder,
+          (Streak, BaseReferences<_$AppDatabase, $StreaksTable, Streak>),
+          Streak,
+          PrefetchHooks Function()
+        > {
+  $$StreaksTableTableManager(_$AppDatabase db, $StreaksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StreaksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StreaksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StreaksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> backendId = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<int> counter = const Value.absent(),
+                Value<DateTime> lastUpdatedAt = const Value.absent(),
+                Value<DateTime> startOfStreak = const Value.absent(),
+              }) => StreaksCompanion(
+                id: id,
+                backendId: backendId,
+                userId: userId,
+                counter: counter,
+                lastUpdatedAt: lastUpdatedAt,
+                startOfStreak: startOfStreak,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int backendId,
+                required int userId,
+                required int counter,
+                Value<DateTime> lastUpdatedAt = const Value.absent(),
+                Value<DateTime> startOfStreak = const Value.absent(),
+              }) => StreaksCompanion.insert(
+                id: id,
+                backendId: backendId,
+                userId: userId,
+                counter: counter,
+                lastUpdatedAt: lastUpdatedAt,
+                startOfStreak: startOfStreak,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$StreaksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StreaksTable,
+      Streak,
+      $$StreaksTableFilterComposer,
+      $$StreaksTableOrderingComposer,
+      $$StreaksTableAnnotationComposer,
+      $$StreaksTableCreateCompanionBuilder,
+      $$StreaksTableUpdateCompanionBuilder,
+      (Streak, BaseReferences<_$AppDatabase, $StreaksTable, Streak>),
+      Streak,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6561,4 +7179,6 @@ class $AppDatabaseManager {
       $$ExercisesTableTableManager(_db, _db.exercises);
   $$BenchmarksTableTableManager get benchmarks =>
       $$BenchmarksTableTableManager(_db, _db.benchmarks);
+  $$StreaksTableTableManager get streaks =>
+      $$StreaksTableTableManager(_db, _db.streaks);
 }

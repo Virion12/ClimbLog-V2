@@ -3,10 +3,12 @@ import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/trening.riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/predict_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
+import 'package:climblog_mobile/Services/local_db/streak_service.dart';
 import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:climblog_mobile/Widgets/Shared/action_button.dart';
 import 'package:climblog_mobile/Widgets/trening/workout/preselect_trening_card.dart';
 import 'package:climblog_mobile/Widgets/trening/workout/workout_generate_dialog.dart';
+import 'package:climblog_mobile/database/database.dart';
 import 'package:climblog_mobile/models/predefined_workout_plans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -150,7 +152,8 @@ class _TreningAddFormState extends ConsumerState<TreningAddForm> {
       );
 
       _syncToBackendInBackground(id);
-
+      final streakService = StreakService(AppDatabase(),ref.read(authServiceProvider));
+                            streakService.ManageStreak();
       if (mounted) {
         _showSnackBar("Workout plan saved", success: true);
         Navigator.of(context).pop();

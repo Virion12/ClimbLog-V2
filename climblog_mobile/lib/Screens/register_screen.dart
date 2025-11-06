@@ -80,7 +80,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      child: const Text("Login"),
+                      child: const Text("Register"),
                     ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 16),

@@ -1,4 +1,5 @@
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/streak_riverpod.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,7 @@ class _HomeContanerState extends ConsumerState<HomeContaner> {
     final routesAsync = ref.watch(routesProvider);
     final highestGrade = ref.watch(highestGradeProvider);
     final totalheigth = ref.watch(totalHeightProvider);
+    final streakAsync = ref.watch(streakProvider);
 
     return BasicContainer(
       child: Column(
@@ -35,7 +37,11 @@ class _HomeContanerState extends ConsumerState<HomeContaner> {
               const SizedBox(width: 12),
               Expanded(
                 child: _StatCard(
-                  value: "0",
+                  value: streakAsync.when(
+                    data: (streak) => streak?.counter.toString() ?? '0',
+                    loading: () => '...',
+                    error: (_, __) => '-',
+                  ),
                   label: "Streak",
                 ),
               ),

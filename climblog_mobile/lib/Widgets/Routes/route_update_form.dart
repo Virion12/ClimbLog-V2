@@ -5,6 +5,8 @@ import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
+import 'package:climblog_mobile/Services/Auth/auth_service.dart';
+import 'package:climblog_mobile/Services/local_db/streak_service.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_grade_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_height_dropdown.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_image_dialog.dart';
@@ -462,6 +464,8 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
                             isImagePendingUpdate: route.isImagePendingUpdate,
                           );
                           remoteRouteService.updateRoute(routeToUpdate, isConnected, file);
+                          final streakService = StreakService(AppDatabase(),ref.read(authServiceProvider));
+                          streakService.ManageStreak();
                           if (context.mounted) {
                             Navigator.of(context).pop();
                           }
