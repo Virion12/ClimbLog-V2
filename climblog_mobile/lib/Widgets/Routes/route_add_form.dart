@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
-import 'package:climblog_mobile/Services/Api_connections/image_segmentation_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/Services/local_db/route_service.dart';
@@ -396,7 +395,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
       label: Text(label),
       selected: value,
       onSelected: onChanged,
-      selectedColor: const Color(0xFF00a896).withOpacity(0.2),
+      selectedColor: const Color(0xFF00a896).withValues(alpha: 0.2),
       checkmarkColor: const Color(0xFF00a896),
       backgroundColor: const Color(0xFFF8F9FA),
       side: BorderSide(
@@ -459,7 +458,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00a896).withOpacity(0.1),
+                  color: const Color(0xFF00a896).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.camera_alt, color: Color(0xFF00a896)),
@@ -478,7 +477,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00a896).withOpacity(0.1),
+                  color: const Color(0xFF00a896).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.photo_library, color: Color(0xFF00a896)),
@@ -503,7 +502,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00a896).withOpacity(0.1),
+                      color: const Color(0xFF00a896).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.edit, color: Color(0xFF00a896)),

@@ -6,7 +6,7 @@ class ActionButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isDestructive;
 
-  const ActionButton({
+  const ActionButton({super.key, 
     required this.icon,
     required this.label,
     required this.onPressed,
@@ -33,7 +33,7 @@ class ActionButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 12),
         side: BorderSide(
-          color: isDestructive ? Colors.red.withOpacity(0.3) : const Color(0xFF00a896).withOpacity(0.3),
+          color: isDestructive ? Colors.red.withValues(alpha: 0.3) : const Color(0xFF00a896).withValues(alpha: 0.3),
           width: 1.5,
         ),
         shape: RoundedRectangleBorder(

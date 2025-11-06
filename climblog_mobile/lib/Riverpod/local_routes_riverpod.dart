@@ -299,7 +299,7 @@ final currentMountainProvider = Provider.autoDispose<Mountain>((ref) {
 });
 
 final nextMountainProvider = Provider.autoDispose<Mountain?>((ref) {
-  final height = ref.watch(totalHeightProvider);
+  ref.watch(totalHeightProvider);
   final current = ref.watch(currentMountainProvider);
   
 

@@ -33,7 +33,7 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
   bool _isGrayScaleMode = false;
   
   List<HoldsModel> _allHoldsFromApi = [];
-  Set<int> _selectedHoldIndices = {};
+  final Set<int> _selectedHoldIndices = {};
   ui.Image? _decodedImage;
   final GlobalKey _imageKey = GlobalKey();
   
@@ -548,10 +548,14 @@ class _RouteImageDialogState extends ConsumerState<RouteImageDialog> {
                       await file.writeAsBytes(bytes);
 
                       ref.read(imageFileProvider.notifier).state = file;
+                      if(context.mounted){
                       Navigator.of(context).pop();
+                      }
                     }catch(e){
                      debugPrint("$e");
+                     if(context.mounted){
                      Navigator.of(context).pop();
+                     }
                     }
                     
                     
@@ -626,8 +630,8 @@ class SelectablePolygonPainter extends CustomPainter {
 
       final fillPaint = Paint()
         ..color = isSelected 
-            ? const Color(0xFF00a896).withOpacity(0.5)
-            : Colors.grey.withOpacity(0.2)
+            ? const Color(0xFF00a896).withValues(alpha: 0.5)
+            : Colors.grey.withValues(alpha: 0.2)
         ..style = PaintingStyle.fill;
       canvas.drawPath(path, fillPaint);
 
@@ -681,7 +685,7 @@ class DrawingOverlayPainter extends CustomPainter {
     final offsetY = (displaySize.height - scaledImageHeight) / 2;
 
     final strokePaint = Paint()
-      ..color = Colors.blue.withOpacity(0.7)
+      ..color = Colors.blue.withValues(alpha: 0.7)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
 
@@ -721,7 +725,7 @@ class DrawingOverlayPainter extends CustomPainter {
     }
 
     final circlePaint = Paint()
-      ..color = Colors.green.withOpacity(0.7)
+      ..color = Colors.green.withValues(alpha: 0.7)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
 

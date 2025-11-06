@@ -54,7 +54,7 @@ Future<String> _getUserId() async {
   final body = {
     "isPublic": plan.isPublic,
     "name": plan.name,
-    "imagePath": plan.imagePath ?? "",
+    "imagePath": plan.imagePath,
     "workoutDays": days.map((dayFull) {
       final day = dayFull.day;
       return {
@@ -64,17 +64,17 @@ Future<String> _getUserId() async {
           final session = sessionFull.session;
           return {
             "workoutDayId": session.workoutDayId,
-            "start": session.start ?? "00:00",
-            "location": session.location ?? "Default",
+            "start": session.start,
+            "location": session.location,
             "name": session.name,
             "exercises": sessionFull.exercises.map((ex) {
               return {
                 "workoutSessionId": ex.workoutSessionId,
                 "name": ex.name,
-                "time": ex.time ?? 0,
-                "breakTime": ex.breakTime ?? 0,
-                "setNumber": ex.setNumber ?? 0,
-                "repNumber": ex.repNumber ?? 0,
+                "time": ex.time,
+                "breakTime": ex.breakTime,
+                "setNumber": ex.setNumber,
+                "repNumber": ex.repNumber,
               };
             }).toList(),
           };

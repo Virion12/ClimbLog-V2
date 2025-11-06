@@ -53,7 +53,7 @@ class _ConfirmRemovalTreningDialogState extends ConsumerState<ConfirmRemovalTren
                        }
                       
                       
-                      if(mounted){Navigator.of(context).pop();}
+                      if(context.mounted){Navigator.of(context).pop();}
                       
             }, child: Text("Yes")),
                       TextButton(

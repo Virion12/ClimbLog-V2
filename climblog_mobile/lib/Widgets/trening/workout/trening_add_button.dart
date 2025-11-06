@@ -1,6 +1,4 @@
-import 'package:climblog_mobile/Services/local_db/workout_service.dart';
 import 'package:climblog_mobile/Widgets/Shared/basic_container.dart';
-import 'package:climblog_mobile/pages/trening_add_form.dart';
 import 'package:flutter/material.dart';
 
 class TreningAddButton extends StatefulWidget {

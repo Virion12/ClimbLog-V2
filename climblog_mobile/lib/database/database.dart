@@ -4,6 +4,7 @@ import 'package:climblog_mobile/database/climbing_routes.dart';
 import 'package:climblog_mobile/database/workout.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 

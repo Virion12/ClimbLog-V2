@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
@@ -13,7 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Screens/home_screen.dart';
 import 'package:climblog_mobile/Screens/login_screen.dart';
-import 'package:path_provider/path_provider.dart';
 
 class Widgettree extends ConsumerWidget {
   const Widgettree({super.key});

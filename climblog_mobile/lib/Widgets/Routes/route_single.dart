@@ -200,6 +200,7 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
                                 WidgetsBinding.instance.addPostFrameCallback((_) {
                                   showDialog(
                                     context: context,
+                                    barrierDismissible: false,
                                     builder: (context) {
                                       return Dialog(
                                         backgroundColor: Colors.white,
