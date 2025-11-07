@@ -1,6 +1,8 @@
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/local_benchmark.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
 import 'package:climblog_mobile/Widgets/LoginScreen/register_message.dart';
 import 'package:climblog_mobile/Widgets/Shared/Login&Register/logo_widget.dart';
@@ -40,6 +42,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final db = ref.watch(dbProvider);
       final routeApiService = RouteServiceApi(db, auth, localService);
       await routeApiService.getMyAll();
+
+      
+      final benchmarkLocal = ref.watch(benchmarkServiceProvider);
+      final benchmarkApiService = BenchmarkApiService(auth, benchmarkLocal);
+      await benchmarkApiService.GetAll();
 
       if (mounted) {
        Navigator.of(context).pushNamed('/home');

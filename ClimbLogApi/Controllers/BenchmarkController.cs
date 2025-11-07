@@ -40,17 +40,32 @@ namespace ClimbLogApi.Controllers
         public async Task<IActionResult> GetAll()
         {
             int userId = GetUserId();
+            Console.WriteLine($"========== GetAll Benchmark ==========");
+            Console.WriteLine($"UserId from token: {userId}");
+
             try
             {
                 var benchmarks = await _benchmarkService.GetBenchmarks(userId);
-                if(benchmarks == null || benchmarks.Any());
+                Console.WriteLine($"Benchmarks from service: {benchmarks?.Count() ?? 0}");
+
+                if (benchmarks != null && benchmarks.Any())
                 {
+                    Console.WriteLine($"First benchmark ID: {benchmarks.First().Id}");
+                }
+
+                if (benchmarks == null || !benchmarks.Any())
+                {
+                    Console.WriteLine("Returning NotFound - no benchmarks");
                     return NotFound();
                 }
+
+                Console.WriteLine($"Returning OK with {benchmarks.Count()} benchmarks");
                 return Ok(benchmarks);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 return BadRequest(ex.Message);
             }
         }

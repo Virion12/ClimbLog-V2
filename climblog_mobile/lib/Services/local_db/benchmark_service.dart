@@ -15,10 +15,17 @@ class BenchmarkService {
     required int ex2_points,
     required int ex3_points,
     required int ex4_points,
+    int? backendId,
   })async{
     final userID = await _storage.read(key: "userid");
       if (userID == null) {
         throw Exception("User is not logged in");
+      }
+      if(backendId != null && backendId !=0){
+       bool isInBackend = await checkIfBackendIdIsAlreadyAdded(backendId);
+       if(isInBackend){
+        throw Exception("benchmark is already added locally");
+       }
       }
       final userIdToInt = int.parse(userID);
       final newId = await _db.into(_db.benchmarks).insert(BenchmarksCompanion.insert
@@ -85,6 +92,20 @@ Future<List<Benchmark>> getOnlyNotAddedToBackend(int userId) {
     ..where((b) => b.userId.equals(userId) & b.isAddedToBackend.equals(false))
     ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
     .get();
+}
+Future<bool> checkIfBackendIdIsAlreadyAdded(int backendID,) async{
+  final userID = await _storage.read(key: "userid");
+  if (userID == null) {
+    throw Exception("User is not logged in");
+  }
+  final userIdToInt = int.parse(userID);
+  var benchamrk = await (_db.select(_db.benchmarks)
+  ..where((b) => b.backendId.equals(backendID) & b.userId.equals(userIdToInt))).getSingleOrNull();
+
+  if(benchamrk == null){
+    return false;
+  }
+  return true;
 }
 
 //GetOne

@@ -76,6 +76,49 @@ Future<String> _getUserId() async {
 
   }
 
+  Future<void> GetAll()async{
+      final userAccessToken = await _validateToken();
+      final ioClient = _createIoClient();
+      try{
+        final url =Uri.parse("$baseUrl/api/Benchmark");
+        final response = await ioClient.get(
+            url,
+            headers: {"Content-Type": "application/json", "Accept": "application/json","Authorization" : "Bearer $userAccessToken"},
+          );
+
+        debugPrint("------------------------------Response from backend------------------------------");
+        debugPrint("Response status: ${response.statusCode}");
+        debugPrint("Response body: ${response.body}");
+        if(response.statusCode != 200){
+          throw Exception("Error retriving benchmarks from server");
+        }
+        final data = jsonDecode(response.body);
+        
+        for(var benchmark in data){
+          try{
+           await _benchmarkServiceLocal.Addbenchmark(
+            backendId: benchmark["id"],
+            body_weight: benchmark["bodyWeight"],
+             ex1_points: benchmark["ex1Points"],
+              ex2_points: benchmark["ex2Points"],
+               ex3_points: benchmark["ex3Points"],
+                ex4_points: benchmark["ex4Points"]);
+        
+          }catch (e){
+            debugPrint("$e");
+            continue;
+          }
+        }
+        
+
+      }catch (e){
+        
+        rethrow; 
+      }finally{
+        ioClient.close();
+      }
+  }
+
   //Remove Benchmark
   Future<void> RemoveBenchmark(int id) async{
     final userAccessToken = await _validateToken();
