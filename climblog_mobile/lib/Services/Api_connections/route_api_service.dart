@@ -21,6 +21,9 @@ class RouteServiceApi {
   }
 
   RouteServiceApi(this._db, this._authService, this._localRouteService);
+
+
+
   
   Future<String> tokenValidation() async {
     var userAccessToken = await _authService.getToken();
@@ -45,6 +48,79 @@ class RouteServiceApi {
 
     return userAccessToken;
   }
+
+    Future<void> getMyAll() async{
+      // List<ClimbingRoute> routesFromBackend = ;
+      final userAccessToken = await tokenValidation();
+
+
+
+      final ioClient = _createIoClient();
+      try{
+        final url = Uri.parse("$baseUrl/api/Route/my-all");
+        final response = await ioClient.get(
+          url,
+          headers: {
+            "Content-Type": "application/json", 
+            "Accept": "application/json",
+            "Authorization": "Bearer $userAccessToken"
+          }
+        );
+        debugPrint("Response status: ${response.statusCode}");
+        debugPrint("Response body: ${response.body}");
+        if (response.statusCode != 200) {
+          throw Exception("adding of the route failed");
+        }
+        final List<dynamic> data = jsonDecode(response.body);
+        final fileService = FileService();
+        for(var route in data){
+          try{
+            String? localPath;
+            if(route['imagePath'] != null && route['imagePath'] != ""){
+              
+              await fileService.downloadFileApi(route['imagePath']);
+              localPath = route['imagePath'];
+            }
+            await _localRouteService.addRoute(
+                  name: route['name'] ?? '',
+                  color: route['color'] ?? '',
+                  height: (route['heigth'] is num) ? (route['heigth'] as num).toDouble() : 0.0,
+                  isPowery: route['isPowery'] ?? false,
+                  isSloppy: route['isSloppy'] ?? false,
+                  isDynamic: route['isDynamic'] ?? false,
+                  isCrimpy: route['isCrimpy'] ?? false,
+                  isReachy: route['isReachy'] ?? false,
+                  isOnsighted: route['isOnsighted'] ?? false,
+                  isRedPointed: route['isRedPointed'] ?? false,
+                  isFlashed: route['isFlashed'] ?? false,
+                  isFavorite: route['isFavorite'] ?? false,
+                  backendId: route['id'],
+                  numberOfTried: route['numberOfTried'] ?? 0,
+                  isDone: route['isDone'] ?? false,
+                  grade: route['grade'] ?? '4a',
+                  imagePathLocal: localPath ?? '',
+                  imagePathBackend: route['imagePath'] ?? '',
+                  thumbnailPath: route['thumbnailPath'] ?? '',
+                  createdAt: DateTime.tryParse(route['createdAt'] ?? ''),
+                  lastUpdatedAt: DateTime.tryParse(route['lastUpdatedAt'] ?? ''),
+                  isToUpdate: false,
+                  isToDelete: false,
+                  isAddedToBackend: true,
+                  isImagePendingUpdate: false,
+                );
+
+          }catch (e){
+            debugPrint("Failed to add route due to : $e");
+            continue;
+          }
+        }
+
+      }catch(e){
+        throw Exception(e);
+      }
+
+
+    }
 
   /// Dodaje trasę do backendu
   /// Wysyła imagePathBackend (jeśli istnieje) do API

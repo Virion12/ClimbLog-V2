@@ -76,6 +76,48 @@ class FileService {
     return fileName;
   }
 
+Future<void> downloadFileApi(String filename) async {
+  if (filename.isEmpty) {
+    debugPrint("Filename is empty — skipping download");
+    return;
+  }
+
+  final token = await _authService.tokenValidation();
+  final ioClient = _createIoClient();
+  final url = Uri.parse("$baseUrl/api/FileUpload/$filename");
+
+  try {
+    final response = await ioClient.get(
+      url,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/octet-stream",
+      },
+    );
+
+    if (response.statusCode == 404) {
+      debugPrint("File not found on server: $filename");
+      return;
+    }
+
+    if (response.statusCode != 200) {
+      debugPrint("Failed to download file: ${response.statusCode}");
+      return;
+    }
+
+    final appDir = await getApplicationDocumentsDirectory();
+    final localPath = '${appDir.path}/$filename';
+    final file = File(localPath);
+
+    await file.writeAsBytes(response.bodyBytes);
+    debugPrint("File saved locally: $localPath");
+  } catch (e) {
+    debugPrint("Error downloading file '$filename': $e");
+  }
+}
+
+
+
   Future<bool>  RemoveFileAPi(String fileName)  async {
     var token = await _authService.tokenValidation();
     final url = Uri.parse("$baseUrl/api/FileUpload/$fileName");

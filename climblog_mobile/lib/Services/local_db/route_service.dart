@@ -22,6 +22,7 @@ class RouteService {
   bool isRedPointed = false,
   bool isFlashed = false,
   bool isFavorite = false,
+  int? backendId,
   int numberOfTried = 0,
   bool isDone = false,
   String grade = "4a",
@@ -40,10 +41,19 @@ class RouteService {
     throw Exception("User is not logged in");
   }
   final userIdToInt = int.parse(userID);
+  if(backendId != null && backendId != 0){
+    bool isRouteAlreadyInLocalDB = await checkIfRouteWithThisBAckendIDIsAlreadyInDB(userIdToInt,backendId);
+
+    if(isRouteAlreadyInLocalDB){
+      throw Exception("Route with this backend id is already in DB");
+    }
+  }
+
+  
 
   final newId = await _db.into(_db.climbingRoutes).insert(
     ClimbingRoutesCompanion.insert(
-      backendId: 0, 
+      backendId: backendId ?? 0, 
       userId: userIdToInt,
       name: name,
       color: color,
@@ -301,6 +311,17 @@ Future<List<ClimbingRoute>> getAllToUpdate(int userID) {
   return (_db.select(_db.climbingRoutes)
         ..where((t) => t.isToUpdate.equals(true) & t.userId.equals(userID) & t.isAddedToBackend.equals(true)))
       .get();
+}
+
+Future<bool> checkIfRouteWithThisBAckendIDIsAlreadyInDB(int userID,int backendId) async {
+  var route = await (_db.select(_db.climbingRoutes)
+        ..where((t) => t.backendId.equals(backendId) & t.userId.equals(userID)))
+      .getSingleOrNull();
+
+  if(route != null){
+    return true;
+  }
+  return false;
 }
 
 Future<List<ClimbingRoute>> getAllToAdd(int userID) {
