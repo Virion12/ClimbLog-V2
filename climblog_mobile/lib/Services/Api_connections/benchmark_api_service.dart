@@ -96,9 +96,10 @@ Future<String> _getUserId() async {
         
         for(var benchmark in data){
           try{
+          final weight = (benchmark["bodyWeight"] as num).toDouble();
            await _benchmarkServiceLocal.Addbenchmark(
             backendId: benchmark["id"],
-            body_weight: benchmark["bodyWeight"],
+            body_weight: weight,
              ex1_points: benchmark["ex1Points"],
               ex2_points: benchmark["ex2Points"],
                ex3_points: benchmark["ex3Points"],

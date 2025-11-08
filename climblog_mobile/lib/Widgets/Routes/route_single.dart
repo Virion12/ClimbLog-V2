@@ -42,9 +42,11 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-
+        
         final appDir = snapshot.data!;
-        final fullPath = "${appDir.path}/${selectedRoute.imagePathLocal}";
+        
+        
+        final fullPath = "${appDir.path}/${selectedRoute.userId}/${selectedRoute.imagePathLocal}";
 
         return Dialog(
           backgroundColor: Colors.transparent,

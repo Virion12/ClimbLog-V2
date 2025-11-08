@@ -1,5 +1,6 @@
 import 'package:climblog_mobile/database/database.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BenchmarkService {
@@ -29,7 +30,7 @@ class BenchmarkService {
       }
       final userIdToInt = int.parse(userID);
       final newId = await _db.into(_db.benchmarks).insert(BenchmarksCompanion.insert
-      (backendId: 0, userId:userIdToInt , 
+      (backendId: backendId ?? 0, userId:userIdToInt , 
       bodyWeight: body_weight, ex1Points: ex1_points, 
       ex2Points: ex2_points, ex3Points: ex3_points, 
       ex4Points: ex4_points, createdAt: Value(DateTime.now()),
@@ -44,6 +45,27 @@ class BenchmarkService {
     return true;
     }catch (e){
       return false;
+    }
+  }
+
+  /// Purge all local benchmarks for the current user
+  Future<int> purgeAllUserBenchmarks() async {
+    final userID = await _storage.read(key: "userid");
+    if (userID == null) {
+      throw Exception("User is not logged in");
+    }
+    final userIdToInt = int.parse(userID);
+    
+    try {
+      final deletedCount = await (_db.delete(_db.benchmarks)
+            ..where((b) => b.userId.equals(userIdToInt)))
+          .go();
+      
+      debugPrint('Purged $deletedCount benchmarks for user $userIdToInt');
+      return deletedCount;
+    } catch (e) {
+      debugPrint('Error purging benchmarks: $e');
+      throw Exception('Failed to purge benchmarks: $e');
     }
   }
 

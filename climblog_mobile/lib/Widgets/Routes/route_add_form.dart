@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/connectivity_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
@@ -15,7 +14,6 @@ import 'package:climblog_mobile/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class RouteAddForm extends ConsumerStatefulWidget {
   const RouteAddForm({super.key});
@@ -227,7 +225,6 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          // Czyścimy provider przy anulowaniu
                           ref.read(imageFileProvider.notifier).state = null;
                           Navigator.of(context).pop();
                         },
@@ -252,40 +249,34 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
-                          bool isimageToUpdate = false;
+                          bool isImageToUpdate = false;
                           final imageFile = ref.read(imageFileProvider);
 
                           final isConnected = await ref.read(connectivityProvider.future);
                           if (_formKey.currentState!.validate()) {
                             final service = RouteService(AppDatabase());
+                            final fileUploadService = FileService();
                             var newRouteId = 0;
                             String fileNameLocal = "";
                             String fileNameBackend = "";
 
                             if (isConnected) {
                               if (isImagePicked && imageFile != null) {
-
-
-                                final fileUploadService = FileService();
-
                                 try {
                                   fileNameBackend = await fileUploadService.uploadFileApi(imageFile);
                                   fileNameLocal = fileNameBackend;
-                                  debugPrint("filename returned from backend : $fileNameBackend");
-                                  await saveImage(imageFile, fileNameBackend);
+                                  debugPrint("filename returned from backend: $fileNameBackend");
                                 } catch (e) {
-                                  debugPrint("File upload failed due to : $e}");
-                                  debugPrint("Trying to upload image locally}");
-                                  fileNameLocal = DateTime.now().millisecondsSinceEpoch.toString();
-                                  await saveImage(imageFile, fileNameLocal);
-                                  isimageToUpdate = true;
+                                  debugPrint("File upload failed due to: $e");
+                                  debugPrint("Trying to upload image locally");
+                                  fileNameLocal = await fileUploadService.uploadFileLocally(imageFile);
+                                  isImageToUpdate = true;
                                 }
                               }
                             } else {
                               if (isImagePicked && imageFile != null) {
-                                fileNameLocal = DateTime.now().millisecondsSinceEpoch.toString();
-                                await saveImage(imageFile, fileNameLocal);
-                                isimageToUpdate = true;
+                                fileNameLocal = await fileUploadService.uploadFileLocally(imageFile);
+                                isImageToUpdate = true;
                               }
                             }
 
@@ -312,7 +303,7 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                                 isToUpdate: false,
                                 isToDelete: false,
                                 isAddedToBackend: false,
-                                isImagePendingUpdate: isimageToUpdate,
+                                isImagePendingUpdate: isImageToUpdate,
                               );
                               if (newRouteId == 0) {
                                 throw Exception("adding to local db went wrong due to backend id being 0");
@@ -324,13 +315,13 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
                                 try {
                                   await remoteService.AddRoute(newRouteId);
                                 } catch (e) {
-                                  throw Exception("adding to remote service route : $newRouteId went wrong due to $e");
+                                  throw Exception("adding to remote service route: $newRouteId went wrong due to $e");
                                 }
                               }
                             } catch (e) {
-                              throw Exception("adding to local db went wrong due to : $e");
+                              throw Exception("adding to local db went wrong due to: $e");
                             }
-                            final streakService = StreakService(AppDatabase(),ref.read(authServiceProvider));
+                            final streakService = StreakService(AppDatabase(), ref.read(authServiceProvider));
                             streakService.ManageStreak();
                             if (context.mounted) {
                               ref.read(imageFileProvider.notifier).state = null;
@@ -534,17 +525,6 @@ class _RouteAddFormState extends ConsumerState<RouteAddForm> {
         ),
       ),
     );
-  }
-
-  Future<void> saveImage(File file, [String? filename]) async {
-    String path = (await getApplicationDocumentsDirectory()).path;
-
-    filename ??= '${DateTime.now().millisecondsSinceEpoch}';
-    try {
-      await file.copy('$path/$filename');
-    } catch (e) {
-      throw Exception(e);
-    }
   }
 }
 

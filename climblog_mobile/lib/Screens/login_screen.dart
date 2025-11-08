@@ -33,7 +33,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final success = await ref.read(authStateProvider.notifier).login(username, password);
     debugPrint(success.toString());
-    setState(() => _loading = false);
 
     if(success){
       //After login get all routes from backend
@@ -43,11 +42,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final routeApiService = RouteServiceApi(db, auth, localService);
       await routeApiService.getMyAll();
 
-      
+      debugPrint("-------------------------------------------  Tring to get all benchamrks from db  -------------------------------------------");
       final benchmarkLocal = ref.watch(benchmarkServiceProvider);
       final benchmarkApiService = BenchmarkApiService(auth, benchmarkLocal);
       await benchmarkApiService.GetAll();
-
+      setState(() => _loading = false);
       if (mounted) {
        Navigator.of(context).pushNamed('/home');
      }
@@ -55,6 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (!success) {
       setState(() {
+        _loading = false;
         _errorMessage = "Invalid username or password";
       });
     }

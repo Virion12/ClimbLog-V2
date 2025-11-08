@@ -539,15 +539,4 @@ class _RouteUpdateFormState extends ConsumerState<RouteUpdateForm> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
-
-  Future<void> saveImage(XFile file, [String? filename]) async {
-    String path = (await getApplicationDocumentsDirectory()).path;
-
-    filename ??= '${DateTime.now().millisecondsSinceEpoch}';
-    try {
-      await File(file.path).copy('$path/$filename');
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
 }

@@ -1,17 +1,22 @@
+import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/local_benchmark.dart';
+import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
+import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
 import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/pages/home_page.dart';
 import 'package:climblog_mobile/pages/routes_page.dart';
 import 'package:climblog_mobile/pages/trening_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
    int _selectedIndex = 0;
    void _onItemTapped(int index) {
     setState(() {
@@ -40,6 +45,18 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
+              final auth = ref.read(authServiceProvider);
+              final fileService = FileService(auth);
+              await fileService.clearUserFiles();
+
+              final benchmarkService = ref.read(benchmarkServiceProvider);
+              await benchmarkService.purgeAllUserBenchmarks();
+
+              final routeService = ref.read(routeServiceProvider);
+              await routeService.purgeAllUserRoutes();
+
+              //To add: purge for all workouts
+
               await AuthService().logout();
               if (context.mounted) {
                 Navigator.pushReplacementNamed(context, "/login");

@@ -191,19 +191,19 @@ Future<bool> updateRoute({
   debugPrint("║   lastUpdatedAt: ${route.lastUpdatedAt}");
   debugPrint("╚════════════════════════════════════════════════════════════════");
 }
-  Future<void> printAllRoutes() async {
-  final routes = await _db.select(_db.climbingRoutes).get();
+//   Future<void> printAllRoutes() async {
+//   final routes = await _db.select(_db.climbingRoutes).get();
 
-  if (routes.isEmpty) {
-    debugPrint("Brak dróg w bazie.");
-  } else {
-    for (var route in routes) {
-      debugPrint(
-        "ID: ${route.id}, Name: ${route.name}, Color: ${route.color}, Height: ${route.height}, UserID: ${route.userId}, Backend id: ${route.backendId}, imagePathLocal: ${route.imagePathLocal}, imagePathBackend: ${route.imagePathBackend}"
-      );
-    }
-  }
-}
+//   if (routes.isEmpty) {
+//     debugPrint("Brak dróg w bazie.");
+//   } else {
+//     for (var route in routes) {
+//       debugPrint(
+//         "ID: ${route.id}, Name: ${route.name}, Color: ${route.color}, Height: ${route.height}, UserID: ${route.userId}, Backend id: ${route.backendId}, imagePathLocal: ${route.imagePathLocal}, imagePathBackend: ${route.imagePathBackend}"
+//       );
+//     }
+//   }
+// }
 
 Future<void> markRouteAsUploaded(int localId, int backendId) async {
   await (_db.update(_db.climbingRoutes)
@@ -370,5 +370,25 @@ Stream<List<ClimbingRoute>> getRoutesByDateRange(DateTime startDate, DateTime en
         ))
       .watch();
 }
+
+ /// Purge all local routes for the current user
+  Future<int> purgeAllUserRoutes() async {
+    final userID = await _storage.read(key: "userid");
+    if (userID == null) {
+      throw Exception("User is not logged in");
+    }
+    final userIdToInt = int.parse(userID);
+    try {
+      final deletedCount = await (_db.delete(_db.climbingRoutes)
+            ..where((b) => b.userId.equals(userIdToInt)))
+          .go();
+      
+      debugPrint('Purged $deletedCount routes for user $userIdToInt');
+      return deletedCount;
+    } catch (e) {
+      debugPrint('Error purging benchmarks: $e');
+      throw Exception('Failed to purge benchmarks: $e');
+    }
+  }
 
 }
