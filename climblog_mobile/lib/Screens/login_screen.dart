@@ -2,8 +2,10 @@ import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_benchmark.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/local_trening_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/benchmark_api_service.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
+import 'package:climblog_mobile/Services/Api_connections/workout_api_service.dart';
 import 'package:climblog_mobile/Widgets/LoginScreen/register_message.dart';
 import 'package:climblog_mobile/Widgets/Shared/Login&Register/logo_widget.dart';
 import 'package:flutter/material.dart';
@@ -39,13 +41,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final auth = ref.watch(authServiceProvider);
       final localService = ref.watch(routeServiceProvider);
       final db = ref.watch(dbProvider);
+
       final routeApiService = RouteServiceApi(db, auth, localService);
       await routeApiService.getMyAll();
 
       debugPrint("-------------------------------------------  Tring to get all benchamrks from db  -------------------------------------------");
-      final benchmarkLocal = ref.watch(benchmarkServiceProvider);
+      final benchmarkLocal = ref.read(benchmarkServiceProvider);
       final benchmarkApiService = BenchmarkApiService(auth, benchmarkLocal);
       await benchmarkApiService.GetAll();
+
+      final workoutServiceLocal = ref.read(workoutServiceProvider);
+      final workoutApiService = WorkoutApiService(auth,workoutServiceLocal);
+      await workoutApiService.getMyAll();
+      debugPrint("-------------------------------------------  Tring to get all Workouts from db  -------------------------------------------");
+
       setState(() => _loading = false);
       if (mounted) {
        Navigator.of(context).pushNamed('/home');

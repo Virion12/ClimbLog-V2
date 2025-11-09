@@ -137,15 +137,48 @@ namespace ClimbLogApi.Services
             };
         }
 
-        public async Task<IEnumerable<WorkoutPlan>> GetUsersPlansAsync(int userId)
+        public async Task<IEnumerable<WorkoutPlanDto>> GetUsersPlansAsync(int userId)
         {
             var plans = await _context.WorkoutPlans
-                    .Include(p => p.WorkoutDays)
-                        .ThenInclude(d => d.Sessions)
-                            .ThenInclude(s => s.Exercises)
-                    .Where(p => p.UserId == userId).ToListAsync();
+                .Include(p => p.WorkoutDays)
+                    .ThenInclude(d => d.Sessions)
+                        .ThenInclude(s => s.Exercises)
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
 
-            return plans;
+            return plans.Select(plan => new WorkoutPlanDto
+            {
+                Id = plan.Id,
+                Name = plan.Name,
+                ImagePath = plan.ImagePath,
+                IsPublic = plan.IsPublic,
+                CreatedAt = plan.CreatedAt,
+                LastUpdatedAt = plan.LastUpdatedAt,
+                WorkoutDays = plan.WorkoutDays.Select(d => new WorkoutDayDto
+                {
+                    Id = d.Id,
+                    WorkoutPlanId = plan.Id, 
+                    WorkoutDayOfWeek = d.WorkoutDayOfWeek,
+                    Sessions = d.Sessions.Select(s => new WorkoutSesssionDto
+                    {
+                        Id = s.Id,
+                        WorkoutDayId = d.Id, 
+                        Name = s.Name,
+                        Location = s.Location,
+                        Start = s.Start,
+                        Exercises = s.Exercises.Select(e => new ExerciseDto
+                        {
+                            Id = e.Id,
+                            WorkoutSessionId = s.Id, 
+                            Name = e.Name,
+                            SetNumber = e.SetNumber,
+                            RepNumber = e.RepNumber,
+                            Time = e.Time,
+                            BreakTime = e.BreakTime
+                        }).ToList()
+                    }).ToList()
+                }).ToList()
+            }).ToList();
         }
 
         public async Task<bool> UpdateWorkoutPlanAsync(WorkoutPlanDto dto, int userId)

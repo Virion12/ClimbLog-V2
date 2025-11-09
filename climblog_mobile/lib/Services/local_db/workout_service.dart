@@ -11,12 +11,19 @@ class WorkoutService {
     required String name,
     bool isPublic = false,
     String imagePath = '',
+    int? backendId,
     List<WorkoutDayInput>? days,
   }) async {
     final userID = await _storage.read(key: "userid");
       if (userID == null) {
         throw Exception("User is not logged in");
       }
+      if(backendId != null && backendId !=0){
+        bool isInBackend = await checkIfBackendIdIsAlreadyAdded(backendId);
+        if(isInBackend){
+          throw Exception("Benchmark is already in backend");
+        }
+      } 
     final userIdToInt = int.parse(userID);
     
     return await _db.transaction(() async {
@@ -24,6 +31,7 @@ class WorkoutService {
       final planId = await _db.into(_db.workoutPlans).insert(
             WorkoutPlansCompanion.insert(
               userId: userIdToInt,
+              backendId: Value(backendId ?? 0),
               name: Value(name),
               isPublic: Value(isPublic),
               imagePath: Value(imagePath),
@@ -72,6 +80,20 @@ class WorkoutService {
     });
   }
 
+  Future<void> purge() async {
+  await _db.transaction(() async {
+
+    await _db.delete(_db.exercises).go();
+
+    await _db.delete(_db.workoutSessions).go();
+
+    await _db.delete(_db.workoutDays).go();
+
+    await _db.delete(_db.workoutPlans).go();
+  });
+}
+
+
   Future<void> removeWorkoutPlan(int planId) async {
     await _db.transaction(() async {
       final days = await (_db.select(_db.workoutDays)
@@ -103,6 +125,20 @@ class WorkoutService {
           .go();
     });
   }
+
+    Future<bool> checkIfBackendIdIsAlreadyAdded(int backendId) async{
+      final userID = await _storage.read(key: "userid");
+      if (userID == null) {
+        throw Exception("User is not logged in");
+      }
+      final userIdToInt = int.parse(userID);
+      var workoutPlan = await (_db.select(_db.workoutPlans)..where((w) => w.backendId.equals(backendId) & w.userId.equals(userIdToInt))).getSingleOrNull();
+
+      if(workoutPlan != null){
+        return true;
+      }
+      return false;
+    }
 
     Future<WorkoutPlanFull?> getOneWorkoutPlan(int id) async {
     final plan = await (_db.select(_db.workoutPlans)

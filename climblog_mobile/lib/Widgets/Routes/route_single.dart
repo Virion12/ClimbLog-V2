@@ -5,6 +5,8 @@ import 'package:climblog_mobile/Riverpod/helpers_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/image_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/route_api_service.dart';
+import 'package:climblog_mobile/Utils.dart';
+import 'package:climblog_mobile/Widgets/Routes/RouteSingle/stats_box.dart';
 import 'package:climblog_mobile/Widgets/Routes/route_update_form.dart';
 import 'package:climblog_mobile/Widgets/Shared/action_button.dart';
 import 'package:flutter/material.dart';
@@ -44,8 +46,6 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
         }
         
         final appDir = snapshot.data!;
-        
-        
         final fullPath = "${appDir.path}/${selectedRoute.userId}/${selectedRoute.imagePathLocal}";
 
         return Dialog(
@@ -128,8 +128,11 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: _getColorFromString(selectedRoute.color),
+                              color: getColorFromString(selectedRoute.color),
                               borderRadius: BorderRadius.circular(8),
+                              border: getColorFromString(selectedRoute.color) == Colors.white
+                                  ? Border.all(color: Colors.black, width: 2)
+                                  : null,
                             ),
                           ),
                         ],
@@ -141,14 +144,14 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
                       Row(
                         children: [
                           Expanded(
-                            child: _StatBox(
+                            child: StatBox(
                               label: "Tries",
                               value: selectedRoute.numberOfTried.toString(),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _StatBox(
+                            child: StatBox(
                               label: "Height",
                               value: "${selectedRoute.height.toStringAsFixed(0)}m",
                             ),
@@ -263,66 +266,6 @@ class _RouteSingleState extends ConsumerState<RouteSingle> {
       },
     );
   }
-
-  Color _getColorFromString(String colorName) {
-    final colorMap = {
-      'red': Colors.red,
-      'blue': Colors.blue,
-      'green': Colors.green,
-      'yellow': Colors.yellow,
-      'orange': Colors.orange,
-      'purple': Colors.purple,
-      'pink': Colors.pink,
-      'black': Colors.black,
-      'white': Colors.white,
-      'grey': Colors.grey,
-      'brown': Colors.brown,
-      'turquoise': Colors.teal,
-    };
-    return colorMap[colorName.toLowerCase()] ?? Colors.grey;
-  }
 }
 
-class _StatBox extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _StatBox({
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF2C3E50),
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 

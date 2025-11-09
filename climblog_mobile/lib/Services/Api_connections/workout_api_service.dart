@@ -112,6 +112,128 @@ Future<String> _getUserId() async {
   await workoutLocalSerrvice.toogleIsAddedToBackend(workoutPlan.plan.id,planIdFromBackend);
 }
 
+Future<void> getMyAll() async {
+  final userAccessToken = await _validateToken();
+  final url = Uri.parse("$baseUrl/api/WorkoutPlan/my-all");
+  final ioClient = _createIoClient();
+  
+  try {
+    final response = await ioClient.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $userAccessToken"
+      },
+    );
+    
+    debugPrint("------------------------------Response from backend------------------------------");
+    debugPrint("Response status: ${response.statusCode}");
+    debugPrint("Response body: ${response.body}");
+    
+    if (response.statusCode != 200) {
+      debugPrint("Failed to fetch workout plans: ${response.statusCode}");
+      return;
+    }
+    
+    final List<dynamic> data = jsonDecode(response.body);
+    
+    int successCount = 0;
+    int failCount = 0;
+    
+    for (var workout in data) {
+      try {
+        // Parsowanie workout days
+        List<WorkoutDayInput> workoutDays = [];
+        
+        if (workout["workoutDays"] != null) {
+          for (var workoutDayJson in workout["workoutDays"]) {
+            try {
+              // Parsowanie sessions dla danego dnia
+              List<WorkoutSessionInput> sessions = [];
+              
+              if (workoutDayJson["sessions"] != null) {
+                for (var sessionJson in workoutDayJson["sessions"]) {
+                  try {
+                    // Parsowanie exercises dla danej sesji
+                    List<ExerciseInput> exercises = [];
+                    
+                    if (sessionJson["exercises"] != null) {
+                      for (var exerciseJson in sessionJson["exercises"]) {
+                        try {
+                          exercises.add(ExerciseInput(
+                            name: exerciseJson["name"] ?? "",
+                            time: exerciseJson["time"]?.toDouble(),
+                            breakTime: exerciseJson["breakTime"]?.toDouble(),
+                            setNumber: exerciseJson["setNumber"],
+                            repNumber: exerciseJson["repNumber"],
+                          ));
+                        } catch (e) {
+                          debugPrint("Failed to parse exercise: $e");
+                          continue; // Pomijamy to exercise i idziemy do następnego
+                        }
+                      }
+                    }
+                    
+                    // Parsowanie TimeSpan z backendu (format: "HH:MM:SS")
+                    String startTime = sessionJson["start"] ?? "00:00:00";
+                    
+                    sessions.add(WorkoutSessionInput(
+                      name: sessionJson["name"] ?? "",
+                      location: sessionJson["location"],
+                      start: startTime,
+                      exercises: exercises,
+                    ));
+                  } catch (e) {
+                    debugPrint("Failed to parse session: $e");
+                    continue; // Pomijamy tę sesję i idziemy do następnej
+                  }
+                }
+              }
+              
+              workoutDays.add(WorkoutDayInput(
+                dayOfWeek: workoutDayJson["workoutDayOfWeek"] ?? 0,
+                sessions: sessions,
+              ));
+            } catch (e) {
+              debugPrint("Failed to parse workout day: $e");
+              continue; // Pomijamy ten dzień i idziemy do następnego
+            }
+          }
+        }
+        
+        // Dodanie workout planu do lokalnej bazy
+        await workoutLocalSerrvice.addWorkoutPlan(
+          name: workout["name"] ?? "",
+          backendId: workout["id"],
+          isPublic: workout["isPublic"] ?? false,
+          imagePath: workout["imagePath"] ?? "",
+          days: workoutDays,
+        );
+        
+        successCount++;
+        debugPrint("✓ Successfully added workout plan: ${workout["name"]} (${workout["id"]})");
+        
+      } catch (e) {
+        failCount++;
+        debugPrint("✗ Failed to add workout plan: ${workout["name"] ?? 'Unknown'} (${workout["id"] ?? 'Unknown'})");
+        debugPrint("  Error: $e");
+        continue; //pomijamy ten workout i idziemy do następnego
+      }
+    }
+    
+    debugPrint("------------------------------Summary------------------------------");
+    debugPrint("Total workouts processed: ${data.length}");
+    debugPrint("Successfully added: $successCount");
+    debugPrint("Failed: $failCount");
+    
+  } catch (e) {
+    debugPrint("Critical error in getMyAll: $e");
+  } finally {
+    ioClient.close();
+  }
+}
+
 Future<void> RemoveWorkoutPlan(int id) async{
   final userAccessToken = await _validateToken();
     final plan = await workoutLocalSerrvice.getOneWorkoutPlan(id);

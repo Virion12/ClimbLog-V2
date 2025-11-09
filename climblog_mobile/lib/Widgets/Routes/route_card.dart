@@ -1,3 +1,4 @@
+import 'package:climblog_mobile/Utils.dart';
 import 'package:flutter/material.dart';
 
 class RouteCard extends StatelessWidget {
@@ -9,13 +10,6 @@ class RouteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-   
-
-
-    
-    Color bordercolor = Colors.black;
-
     return  Container(
           decoration: BoxDecoration(
             color: const Color.fromARGB(255, 241, 240, 240),
@@ -32,12 +26,7 @@ class RouteCard extends StatelessWidget {
               Text(grade,style: TextStyle(fontWeight: FontWeight.bold),),
               Container(
                 decoration: BoxDecoration(
-                  color: bordercolor,
-                  border: Border.all(
-                    color: bordercolor,
-                    width: 1.0,
-                    
-                  ),
+                  color: getColorFromString(color),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 

@@ -1,8 +1,8 @@
 import 'package:climblog_mobile/Riverpod/auth_riverpod.dart';
 import 'package:climblog_mobile/Riverpod/local_benchmark.dart';
 import 'package:climblog_mobile/Riverpod/local_routes_riverpod.dart';
+import 'package:climblog_mobile/Riverpod/local_trening_riverpod.dart';
 import 'package:climblog_mobile/Services/Api_connections/file_api.dart';
-import 'package:climblog_mobile/Services/Auth/auth_service.dart';
 import 'package:climblog_mobile/pages/home_page.dart';
 import 'package:climblog_mobile/pages/routes_page.dart';
 import 'package:climblog_mobile/pages/trening_page.dart';
@@ -23,14 +23,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _selectedIndex = index;
     });
   }
+
   static final List<Widget> _pages = <Widget>[
     HomePage(),
     RoutesPage(),
     TreningPage(),
 
   ];
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +54,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               final routeService = ref.read(routeServiceProvider);
               await routeService.purgeAllUserRoutes();
 
-              //To add: purge for all workouts
+              final workoutLocalSertvice = ref.read(workoutServiceProvider);
+              await workoutLocalSertvice.purge();
 
-              await AuthService().logout();
+              await auth.logout();
               if (context.mounted) {
                 Navigator.pushReplacementNamed(context, "/login");
               }
