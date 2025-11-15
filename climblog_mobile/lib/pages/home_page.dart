@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
             children: [
                 HomeDaysRow(),
                 HomeTreningCard(),
-                TestDataGenerator(routeService: route, benchmarkService: benchmark, workoutService: work,),
+                // TestDataGenerator(routeService: route, benchmarkService: benchmark, workoutService: work,),
             ],
           ))
           
